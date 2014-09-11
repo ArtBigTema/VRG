@@ -138,7 +138,7 @@ public class VRGframe extends JFrame {
 														.addComponent(
 																buttonDeleteVertex))));
 
-		jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		jLabel5.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
 		jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		jLabel5.setText("Игроки, автомобили");
 		jLabel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -251,7 +251,7 @@ public class VRGframe extends JFrame {
 														.addContainerGap(158,
 																Short.MAX_VALUE))));
 
-		jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14));
+		jLabel2.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14));
 		jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		jLabel2.setText("Координаты, спрос и цены клиентов");
 		jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -340,9 +340,9 @@ public class VRGframe extends JFrame {
 		jScrollPane1.setViewportView(tableTC);
 		tableTC.getColumnModel().getColumn(0).setResizable(false);
 
-		jLabel1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		jLabel1.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
 		jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		jLabel1.setText("Расстояния между вершинами (транспортные затраты)");
+		jLabel1.setText(StrUtils.TXT_DISTANCES);
 		jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		tablePath.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -370,9 +370,9 @@ public class VRGframe extends JFrame {
 		jScrollPane3.setViewportView(tablePath);
 		tablePath.getColumnModel().getColumn(0).setResizable(false);
 
-		jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		jLabel3.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
 		jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		jLabel3.setText("Можете выбрать путь согласованной игры или выбрать автоматическую");
+		jLabel3.setText(StrUtils.TXT_TYPE_OF_GAME);
 		jLabel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		buttonGenerPath.setText("Gener");
@@ -382,8 +382,8 @@ public class VRGframe extends JFrame {
 			}
 		});
 
-		jLabel4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-		jLabel4.setText(" Пример: 0, 3, 4, 7, 0.");
+		jLabel4.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 12)); // NOI18N
+		jLabel4.setText(StrUtils.TXT_EXAMPLE);
 		jLabel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(
@@ -465,7 +465,7 @@ public class VRGframe extends JFrame {
 												96,
 												javax.swing.GroupLayout.PREFERRED_SIZE)));
 
-		tabbedPane.addTab("ТС затраты/пути", jPanel3);
+		tabbedPane.addTab(StrUtils.TXT_TRANSPORTS_COSTS, jPanel3);
 
 		tableResult.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 		tableResult.setModel(new javax.swing.table.DefaultTableModel(
@@ -491,7 +491,7 @@ public class VRGframe extends JFrame {
 		});
 		jScrollPane5.setViewportView(tableResult);
 
-		jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+		jLabel6.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
 		jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		jLabel6.setText("Анализ на чувствительность");
 		jLabel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
