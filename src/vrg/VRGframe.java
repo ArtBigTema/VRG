@@ -2,23 +2,20 @@ package vrg;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.TableColumnModelListener;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class VRGframe extends JFrame {
+
+	public interface onInnerWindowClosed {
+
+	}
 
 	public VRGframe() {
 		initComponents();
@@ -70,21 +67,21 @@ public class VRGframe extends JFrame {
 
 		jPanel8.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-		buttonAddVertex.setText("Добавить вершины");
+		buttonAddVertex.setText(StrUtils.BTN_TXT_ADD_VERTEX);
 		buttonAddVertex.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				buttonAddVertexActionPerformed(evt);
 			}
 		});
 
-		buttonGenerGraph.setText("Генерировать данные");
+		buttonGenerGraph.setText(StrUtils.BTN_TXT_GENERATE_DATA);
 		buttonGenerGraph.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				buttonGenerGraphActionPerformed(evt);
 			}
 		});
 
-		buttonDeleteVertex.setText("Удалить вершины");
+		buttonDeleteVertex.setText(StrUtils.BTN_TXT_DELETE_VERTEX);
 		buttonDeleteVertex
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -135,7 +132,7 @@ public class VRGframe extends JFrame {
 
 		jLabel5.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
 		jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		jLabel5.setText("Игроки, автомобили");
+		jLabel5.setText(StrUtils.TXT_GAMERS_AUTO);
 		jLabel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		tableCoordsDP.setBorder(javax.swing.BorderFactory.createEtchedBorder(
@@ -144,7 +141,8 @@ public class VRGframe extends JFrame {
 				new Object[][] { { null, null, null, null },
 						{ null, null, null, null }, { null, null, null, null },
 						{ null, null, null, null } }, new String[] {
-						"Вершина, x[j]", "Координаты", "d(x[j])", "p(x[j])" }) {
+						StrUtils.TXT_VERTEX_LABEL, StrUtils.TXT_COORDS,
+						StrUtils.TXT_DEMAND, StrUtils.TXT_PRICE }) {
 			Class[] types = new Class[] { java.lang.String.class,
 					java.lang.String.class, java.lang.Integer.class,
 					java.lang.Integer.class };
@@ -161,7 +159,7 @@ public class VRGframe extends JFrame {
 		jScrollPane4.setViewportView(tableCoordsDP);
 		tableCoordsDP.getColumnModel().getColumn(0).setResizable(false);
 
-		textCountCars.setText("Введите количество игроков");
+		textCountCars.setText(StrUtils.FIELD_TXT_NUMBERS_OF_PLAYERS);
 		textCountCars.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 		textCountCars.addMouseListener(new java.awt.event.MouseAdapter() {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -173,7 +171,7 @@ public class VRGframe extends JFrame {
 				textCountCarsKeyReleased(evt);
 			}
 		});
-		buttonSaveCountCars.setText(StrUtils.TXT_SAVE_COUNT);
+		buttonSaveCountCars.setText(StrUtils.BTN_TXT_SAVE_COUNT);
 		buttonSaveCountCars
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -311,7 +309,7 @@ public class VRGframe extends JFrame {
 												javax.swing.GroupLayout.DEFAULT_SIZE,
 												Short.MAX_VALUE)));
 
-		tabbedPane.addTab("Ввод координат/авто", jPanel1);
+		tabbedPane.addTab(StrUtils.TAB_TXT_ENTER_COORDS, jPanel1);
 
 		frameCanvas.setVisible(true);
 
@@ -335,14 +333,14 @@ public class VRGframe extends JFrame {
 				javax.swing.GroupLayout.Alignment.LEADING).addComponent(
 				frameCanvas));
 
-		tabbedPane.addTab("Граф", jPanel2);
+		tabbedPane.addTab(StrUtils.TAB_TXT_GRAPH, jPanel2);
 		jPanel2.addFocusListener(graphFocusListener);
 
 		tableTC.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 		tableTC.setModel(new javax.swing.table.DefaultTableModel(
 				new Object[][] { { null, null, null, null },
 						{ null, null, null, null }, { null, null, null, null } },
-				new String[] { "x[j]/x[j]", "", "", "" }) {
+				new String[] { StrUtils.TXT_VERTEX, "", "", "" }) {
 			Class[] types = new Class[] { java.lang.String.class,
 					java.lang.String.class, java.lang.String.class,
 					java.lang.String.class };
@@ -369,8 +367,9 @@ public class VRGframe extends JFrame {
 				.setModel(new javax.swing.table.DefaultTableModel(
 						new Object[][] { { null, null, null, null },
 								{ null, null, null, null },
-								{ null, null, null, null } }, new String[] {
-								"r[i]", "", "", "k[i](r[i])" }) {
+								{ null, null, null, null } },
+						new String[] { StrUtils.TXT_ROUTE, "", "",
+								StrUtils.TXT_PROFIT }) {
 					Class[] types = new Class[] { java.lang.String.class,
 							java.lang.String.class, java.lang.String.class,
 							java.lang.String.class };
@@ -389,19 +388,19 @@ public class VRGframe extends JFrame {
 		jScrollPane3.setViewportView(tablePath);
 		tablePath.getColumnModel().getColumn(0).setResizable(false);
 
-		jLabel3.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
+		jLabel3.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14));
 		jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		jLabel3.setText(StrUtils.TXT_TYPE_OF_GAME);
 		jLabel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-		buttonGenerPath.setText("Gener");
+		buttonGenerPath.setText(StrUtils.BTN_TXT_GENERATE);
 		buttonGenerPath.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				buttonGenerPathActionPerformed(evt);
 			}
 		});
 
-		jLabel4.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 12)); // NOI18N
+		jLabel4.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 12));
 		jLabel4.setText(StrUtils.TXT_EXAMPLE);
 		jLabel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -487,27 +486,31 @@ public class VRGframe extends JFrame {
 		tabbedPane.addTab(StrUtils.TXT_TRANSPORTS_COSTS, jPanel3);
 
 		tableResult.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-		tableResult.setModel(new javax.swing.table.DefaultTableModel(
-				new Object[][] { { null, null, null, null, null },
-						{ null, null, null, null, null },
-						{ null, null, null, null, null },
-						{ null, null, null, null, null } }, new String[] {
-						"Игрок, i", "Маршрут, r[i]", "Длина маршрута r[i]",
-						"Загрузка ТС, Sum(d(x[j]))", "Прибыль, k[i](h[i])" }) {
-			Class[] types = new Class[] { java.lang.String.class,
-					java.lang.String.class, java.lang.Float.class,
-					java.lang.Integer.class, java.lang.Double.class };
-			boolean[] canEdit = new boolean[] { false, true, false, false,
-					false };
+		tableResult
+				.setModel(new javax.swing.table.DefaultTableModel(
+						new Object[][] { { null, null, null, null, null },
+								{ null, null, null, null, null },
+								{ null, null, null, null, null },
+								{ null, null, null, null, null } },
+						new String[] { StrUtils.TXT_PLAYER_NUMBER,
+								StrUtils.TXT_ROUTE_NUMBER,
+								StrUtils.TXT_LENGTH_OF_ROUTE,
+								StrUtils.TXT_LOAD_VEHICLE,
+								StrUtils.TXT_PROFIT_LABEL }) {
+					Class[] types = new Class[] { java.lang.String.class,
+							java.lang.String.class, java.lang.Float.class,
+							java.lang.Integer.class, java.lang.Double.class };
+					boolean[] canEdit = new boolean[] { false, true, false,
+							false, false };
 
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
-			}
+					public Class getColumnClass(int columnIndex) {
+						return types[columnIndex];
+					}
 
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
-			}
-		});
+					public boolean isCellEditable(int rowIndex, int columnIndex) {
+						return canEdit[columnIndex];
+					}
+				});
 		jScrollPane5.setViewportView(tableResult);
 
 		jLabel6.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
@@ -515,14 +518,14 @@ public class VRGframe extends JFrame {
 		jLabel6.setText("Анализ на чувствительность");
 		jLabel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-		buttonAnSolve.setText("Другое решение");
+		buttonAnSolve.setText(StrUtils.BTN_TXT_ANOTHER_SOLUTION);
 		buttonAnSolve.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				buttonAnSolveActionPerformed(evt);
 			}
 		});
 
-		buttonBestSolve.setText("Лучшее решение");
+		buttonBestSolve.setText(StrUtils.BTN_TXT_BEST_SOLUTION);
 		buttonBestSolve.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				buttonBestSolveActionPerformed(evt);
@@ -592,7 +595,7 @@ public class VRGframe extends JFrame {
 												302,
 												javax.swing.GroupLayout.PREFERRED_SIZE)));
 
-		tabbedPane.addTab("Результаты", jPanel9);
+		tabbedPane.addTab(StrUtils.TAB_TXT_RESULT, jPanel9);
 
 		jMenu1.setText("File");
 		menuBar.add(jMenu1);
@@ -623,22 +626,22 @@ public class VRGframe extends JFrame {
 			dtm.addRow(newRow);
 		}
 	}
-	
+
 	public void setColumnCount(int k, TableColumnModel dtm) {
 		for (int i = 0; i < k; i++) {
-			dtm.addColumn(new TableColumn(0));//FIXME
+			dtm.addColumn(new TableColumn(0));// FIXME
 		}
 	}
 
 	private void buttonAddVertexActionPerformed(java.awt.event.ActionEvent evt) {
-		int k = StrUtils.getIntFromDialog(StrUtils.TXT_ENTER_COUNT_ROWS);
+		int k = StrUtils.getIntFromDialog(StrUtils.FIELD_TXT_NUMBER_OF_ROWS);
 
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 
 		setRowCount(k, dtm);
 
 		for (int i = 0; i < dtm.getRowCount(); i++) {
-			dtm.setValueAt("x[" + (i + 1) + "]", i, 0);
+			dtm.setValueAt("x[" + i + "]", i, 0);
 		}
 	}
 
@@ -652,19 +655,20 @@ public class VRGframe extends JFrame {
 		setModel(tableCars);
 	}
 
-	private void textCountCarsKeyReleased(java.awt.event.KeyEvent evt) {
-		//tableCars.setModel(new javax.swing.JTable().getModel());
+	private void textCountCarsKeyReleased(java.awt.event.KeyEvent evt) {// FIXME
+		// tableCars.setModel(new javax.swing.JTable().getModel());
 		TableColumnModel dtm = tableCars.getColumnModel();
-		
-		VRG.countCars = StrUtils.getIntFromText(textCountCars.getText().trim()); 
-		setColumnCount(dtm.getColumnCount()-VRG.countCars, dtm);
-		//tableCars.setModel(new javax.swing.JTabl);
+
+		VRG.countCars = StrUtils.getIntFromText(textCountCars.getText().trim());
+		setColumnCount(dtm.getColumnCount() - VRG.countCars, dtm);
+		// tableCars.setModel(new javax.swing.JTabl);
+		fillCarsArray(dtm.getColumnCount());
 	}
 
 	private void setModel(JTable table) {
 		table.setModel(new javax.swing.table.DefaultTableModel(
 				new Object[][] { { null, null, null, null } }, new String[] {
-						"Игроки (Авто)", "", "", "" }) {
+						StrUtils.TXT_GAMERS_AUTO, "", "", "" }) {
 			Class[] types = new Class[] { java.lang.String.class,
 					java.lang.Integer.class, java.lang.Integer.class,
 					java.lang.Integer.class };
@@ -683,22 +687,42 @@ public class VRGframe extends JFrame {
 	private void buttonGenerGraphActionPerformed(java.awt.event.ActionEvent evt) {
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 
-		{
-			dtm.setValueAt("x[" + (0) + "]", 0, 0);
-			dtm.setValueAt(StrUtils.OPENEDBKT + VRG.CORDINATES[0][0]
-					+ StrUtils.SEMICOLON + VRG.CORDINATES[0][1]
-					+ StrUtils.CLOSEDBKT, 0, 1);
-			dtm.setValueAt("0", 0, 2);
-			dtm.setValueAt("0", 0, 3);
-		}
+		fillArrays(dtm.getRowCount());
+
+		fillCoordsTable(dtm);
+
+	}
+
+	private void fillArrays(int n) {
+		VRG.generateCoordinates(n);
+		VRG.generateCars(n);
+		VRG.generateDemand(n);
+		VRG.generatePrice(n);
+	}
+
+	private void fillCarsArray(int n) {
+		VRG.generateCars(n);
+	}
+
+	private void fillFirstStrokeCoordsTable(DefaultTableModel dtm) {
+		dtm.setValueAt("x[" + (0) + "]", 0, 0);
+		dtm.setValueAt(StrUtils.OPENEDBKT + VRG.coordinates.get(0).x
+				+ StrUtils.SEMICOLON + VRG.coordinates.get(0).y
+				+ StrUtils.CLOSEDBKT, 0, 1);
+		dtm.setValueAt("0", 0, 2);
+		dtm.setValueAt("0", 0, 3);
+	}
+
+	private void fillCoordsTable(DefaultTableModel dtm) {
+		fillFirstStrokeCoordsTable(dtm);
 
 		for (int i = 1; i < dtm.getRowCount(); i++) {
-			dtm.setValueAt("x[" + (i + 1) + "]", i, 0);
-			dtm.setValueAt(StrUtils.OPENEDBKT + VRG.CORDINATES[i][0]
-					+ StrUtils.SEMICOLON + VRG.CORDINATES[i][1]
+			dtm.setValueAt("x[" + i + "]", i, 0);
+			dtm.setValueAt(StrUtils.OPENEDBKT + VRG.coordinates.get(i).x
+					+ StrUtils.SEMICOLON + VRG.coordinates.get(i).y
 					+ StrUtils.CLOSEDBKT, i, 1);
-			dtm.setValueAt(VRG.DEMAND[i], i, 2);
-			dtm.setValueAt(VRG.PRICE[i], i, 3);
+			dtm.setValueAt(VRG.demand.get(i), i, 2);
+			dtm.setValueAt(VRG.price.get(i), i, 3);
 		}
 	}
 
@@ -712,11 +736,17 @@ public class VRGframe extends JFrame {
 	}
 
 	public void saveCars() {
-		DefaultTableModel dtm = (DefaultTableModel) tableCars.getModel();
-		VRG.cars.clear();
+		fillCarsTable();
+	}
 
-		for (int i = 0; i < dtm.getColumnCount(); i++) {
-			VRG.cars.add(StrUtils.getIntFromObject(dtm.getValueAt(0, i)));
+	private void fillCarsTable() {
+		DefaultTableModel dtm = (DefaultTableModel) tableCars.getModel();
+		fillCarsArray(dtm.getColumnCount());
+		dtm.setValueAt(StrUtils.TXT_PLAYER_LABEL + (dtm.getColumnCount() - 1),
+				0, 0);
+
+		for (int i = 1; i < dtm.getColumnCount(); i++) {
+			dtm.setValueAt(VRG.cars.get(i), 0, i);
 		}
 	}
 
@@ -758,7 +788,8 @@ public class VRGframe extends JFrame {
 
 		@Override
 		public void focusLost(FocusEvent paramFocusEvent) {
-
+			tabbedPane.setSelectedIndex(0);
+			isFirstOpened = true;
 		}
 
 		@Override
@@ -777,6 +808,7 @@ public class VRGframe extends JFrame {
 	private javax.swing.JButton buttonDeleteVertex;
 	private javax.swing.JButton buttonGenerGraph;
 	private javax.swing.JButton buttonGenerPath;
+	private javax.swing.JButton buttonSaveCountCars;
 	public javax.swing.JInternalFrame frameCanvas;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
@@ -805,6 +837,4 @@ public class VRGframe extends JFrame {
 	private javax.swing.JTable tableResult;
 	private javax.swing.JTable tableTC;
 	private javax.swing.JTextField textCountCars;
-	private javax.swing.JButton buttonSaveCountCars;
-	// End of variables declaration
 }
