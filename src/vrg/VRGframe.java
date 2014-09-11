@@ -2,11 +2,20 @@ package vrg;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.TableColumnModelListener;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class VRGframe extends JFrame {
@@ -30,6 +39,7 @@ public class VRGframe extends JFrame {
 		jScrollPane4 = new javax.swing.JScrollPane();
 		tableCoordsDP = new javax.swing.JTable();
 		textCountCars = new javax.swing.JTextField();
+		buttonSaveCountCars = new javax.swing.JButton();
 		jLabel2 = new javax.swing.JLabel();
 		jPanel2 = new javax.swing.JPanel();
 		frameCanvas = new javax.swing.JInternalFrame();
@@ -54,22 +64,7 @@ public class VRGframe extends JFrame {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-		tableCars.setModel(new javax.swing.table.DefaultTableModel(
-				new Object[][] { { null, null, null, null } }, new String[] {
-						"Игроки (Авто)", "", "", "" }) {
-			Class[] types = new Class[] { java.lang.String.class,
-					java.lang.Integer.class, java.lang.Integer.class,
-					java.lang.Integer.class };
-			boolean[] canEdit = new boolean[] { false, false, true, false };
-
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
-			}
-
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
-			}
-		});
+		setModel(tableCars);
 		jScrollPane2.setViewportView(tableCars);
 		tableCars.getColumnModel().getColumn(0).setResizable(false);
 
@@ -178,32 +173,55 @@ public class VRGframe extends JFrame {
 				textCountCarsKeyReleased(evt);
 			}
 		});
-
+		buttonSaveCountCars.setText(StrUtils.TXT_SAVE_COUNT);
+		buttonSaveCountCars
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						buttonSaveCountCarsActionPerformed(evt);
+					}
+				});
 		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(
 				jPanel4);
 		jPanel4.setLayout(jPanel4Layout);
-		jPanel4Layout.setHorizontalGroup(jPanel4Layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE,
-						javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				.addComponent(jScrollPane2,
-						javax.swing.GroupLayout.DEFAULT_SIZE, 506,
-						Short.MAX_VALUE)
-				.addGroup(
-						jPanel4Layout
-								.createSequentialGroup()
-								.addComponent(jLabel5,
-										javax.swing.GroupLayout.PREFERRED_SIZE,
-										212,
-										javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addGap(18, 18, 18).addComponent(textCountCars)
-								.addContainerGap())
-				.addGroup(
-						jPanel4Layout.createParallelGroup(
+		jPanel4Layout
+				.setHorizontalGroup(jPanel4Layout
+						.createParallelGroup(
 								javax.swing.GroupLayout.Alignment.LEADING)
-								.addComponent(jScrollPane4,
-										javax.swing.GroupLayout.DEFAULT_SIZE,
-										502, Short.MAX_VALUE)));
+						.addComponent(jPanel8,
+								javax.swing.GroupLayout.DEFAULT_SIZE,
+								javax.swing.GroupLayout.DEFAULT_SIZE,
+								Short.MAX_VALUE)
+						.addComponent(jScrollPane2,
+								javax.swing.GroupLayout.DEFAULT_SIZE, 506,
+								Short.MAX_VALUE)
+						.addGroup(
+								jPanel4Layout
+										.createSequentialGroup()
+										.addComponent(
+												jLabel5,
+												javax.swing.GroupLayout.PREFERRED_SIZE,
+												212,
+												javax.swing.GroupLayout.PREFERRED_SIZE)
+										.addGap(18, 18, 18)
+										.addComponent(
+												textCountCars,
+												javax.swing.GroupLayout.PREFERRED_SIZE,
+												javax.swing.GroupLayout.DEFAULT_SIZE,
+												javax.swing.GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+												javax.swing.GroupLayout.DEFAULT_SIZE,
+												Short.MAX_VALUE)
+										.addComponent(buttonSaveCountCars)
+										.addContainerGap())
+						.addGroup(
+								jPanel4Layout
+										.createParallelGroup(
+												javax.swing.GroupLayout.Alignment.LEADING)
+										.addComponent(
+												jScrollPane4,
+												javax.swing.GroupLayout.DEFAULT_SIZE,
+												502, Short.MAX_VALUE)));
 		jPanel4Layout
 				.setVerticalGroup(jPanel4Layout
 						.createParallelGroup(
@@ -211,7 +229,7 @@ public class VRGframe extends JFrame {
 						.addGroup(
 								jPanel4Layout
 										.createSequentialGroup()
-										.addContainerGap(192, Short.MAX_VALUE)
+										.addContainerGap(189, Short.MAX_VALUE)
 										.addComponent(
 												jPanel8,
 												javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -227,7 +245,9 @@ public class VRGframe extends JFrame {
 																textCountCars,
 																javax.swing.GroupLayout.PREFERRED_SIZE,
 																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
+																javax.swing.GroupLayout.PREFERRED_SIZE)
+														.addComponent(
+																buttonSaveCountCars))
 										.addGap(18, 18, 18)
 										.addComponent(
 												jScrollPane2,
@@ -250,10 +270,9 @@ public class VRGframe extends JFrame {
 																javax.swing.GroupLayout.PREFERRED_SIZE)
 														.addContainerGap(158,
 																Short.MAX_VALUE))));
-
 		jLabel2.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14));
 		jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		jLabel2.setText("Координаты, спрос и цены клиентов");
+		jLabel2.setText(StrUtils.TXT_COORDS_DEMAND_PRICE);
 		jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
@@ -595,7 +614,7 @@ public class VRGframe extends JFrame {
 				Short.MAX_VALUE));
 
 		pack();
-	}// </editor-fold>
+	}
 
 	public void setRowCount(int k, DefaultTableModel dtm) {
 		for (int i = 0; i < k; i++) {
@@ -604,15 +623,16 @@ public class VRGframe extends JFrame {
 			dtm.addRow(newRow);
 		}
 	}
+	
+	public void setColumnCount(int k, TableColumnModel dtm) {
+		for (int i = 0; i < k; i++) {
+			dtm.addColumn(new TableColumn(0));//FIXME
+		}
+	}
 
 	private void buttonAddVertexActionPerformed(java.awt.event.ActionEvent evt) {
-		int k = 0;
-		try {
-			k = Integer.parseInt(JOptionPane
-					.showInputDialog("Введите количество узлов"));
-		} catch (NumberFormatException e) {
-			k = VRG.count - 4;
-		}
+		int k = StrUtils.getIntFromDialog(StrUtils.TXT_ENTER_COUNT_ROWS);
+
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 
 		setRowCount(k, dtm);
@@ -629,10 +649,35 @@ public class VRGframe extends JFrame {
 
 	private void textCountCarsMouseClicked(java.awt.event.MouseEvent evt) {
 		textCountCars.setText("");
+		setModel(tableCars);
 	}
 
 	private void textCountCarsKeyReleased(java.awt.event.KeyEvent evt) {
+		//tableCars.setModel(new javax.swing.JTable().getModel());
+		TableColumnModel dtm = tableCars.getColumnModel();
+		
+		VRG.countCars = StrUtils.getIntFromText(textCountCars.getText().trim()); 
+		setColumnCount(dtm.getColumnCount()-VRG.countCars, dtm);
+		//tableCars.setModel(new javax.swing.JTabl);
+	}
 
+	private void setModel(JTable table) {
+		table.setModel(new javax.swing.table.DefaultTableModel(
+				new Object[][] { { null, null, null, null } }, new String[] {
+						"Игроки (Авто)", "", "", "" }) {
+			Class[] types = new Class[] { java.lang.String.class,
+					java.lang.Integer.class, java.lang.Integer.class,
+					java.lang.Integer.class };
+			boolean[] canEdit = new boolean[] { false, true, true, true };
+
+			public Class getColumnClass(int columnIndex) {
+				return types[columnIndex];
+			}
+
+			public boolean isCellEditable(int rowIndex, int columnIndex) {
+				return canEdit[columnIndex];
+			}
+		});
 	}
 
 	private void buttonGenerGraphActionPerformed(java.awt.event.ActionEvent evt) {
@@ -640,19 +685,38 @@ public class VRGframe extends JFrame {
 
 		{
 			dtm.setValueAt("x[" + (0) + "]", 0, 0);
-			dtm.setValueAt(StrUtils.OPENEDBKT + VRG.coordinates[0][0]
-					+ StrUtils.SEMICOLON + VRG.coordinates[0][1]
+			dtm.setValueAt(StrUtils.OPENEDBKT + VRG.CORDINATES[0][0]
+					+ StrUtils.SEMICOLON + VRG.CORDINATES[0][1]
 					+ StrUtils.CLOSEDBKT, 0, 1);
 			dtm.setValueAt("0", 0, 2);
 			dtm.setValueAt("0", 0, 3);
 		}
+
 		for (int i = 1; i < dtm.getRowCount(); i++) {
 			dtm.setValueAt("x[" + (i + 1) + "]", i, 0);
-			dtm.setValueAt(StrUtils.OPENEDBKT + VRG.coordinates[i][0]
-					+ StrUtils.SEMICOLON + VRG.coordinates[i][1]
+			dtm.setValueAt(StrUtils.OPENEDBKT + VRG.CORDINATES[i][0]
+					+ StrUtils.SEMICOLON + VRG.CORDINATES[i][1]
 					+ StrUtils.CLOSEDBKT, i, 1);
-			dtm.setValueAt("2", i, 2);
-			dtm.setValueAt("4", i, 3);
+			dtm.setValueAt(VRG.DEMAND[i], i, 2);
+			dtm.setValueAt(VRG.PRICE[i], i, 3);
+		}
+	}
+
+	private void buttonSaveCountCarsActionPerformed(
+			java.awt.event.ActionEvent evt) {
+		saveCars();
+	}
+
+	public void saveAllData() {
+
+	}
+
+	public void saveCars() {
+		DefaultTableModel dtm = (DefaultTableModel) tableCars.getModel();
+		VRG.cars.clear();
+
+		for (int i = 0; i < dtm.getColumnCount(); i++) {
+			VRG.cars.add(StrUtils.getIntFromObject(dtm.getValueAt(0, i)));
 		}
 	}
 
@@ -741,5 +805,6 @@ public class VRGframe extends JFrame {
 	private javax.swing.JTable tableResult;
 	private javax.swing.JTable tableTC;
 	private javax.swing.JTextField textCountCars;
+	private javax.swing.JButton buttonSaveCountCars;
 	// End of variables declaration
 }
