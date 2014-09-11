@@ -1,10 +1,11 @@
 package vrg;
 
+import java.util.ArrayList;
+
 import javax.swing.JFrame;
 
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxImageCanvas;
-import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
@@ -14,16 +15,19 @@ public class GraphFrame extends JFrame {
 	public mxGraph graph;
 	public static final int length = 20;
 	public static final int baseLength = 15;
-	public static final int distance = 30;
+	public static final int distance = 40;
 	public static int count = 8;
 	public static int[][] coordinates = { { 19, 45 }, { 18, 46 }, { 20, 47 },
 			{ 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 }, { 13, 45 } };
 	public int[] demand = { 0, 1, 1, 1, 2, 2, 2, 1 };
 	public int[] price = { 0, 4, 4, 4, 4, 4, 4, 4 };
 	public static int[][] cars = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
+	public ArrayList<VRGvertexes> vrgVertexes;
 
 	public GraphFrame() {
 		// GraphFrame frame = new GraphFrame();
+		vrgVertexes = new ArrayList<VRGvertexes>();
+
 		mxGraph graph = new mxGraph() {
 			public void drawState(mxICanvas canvas, mxCellState state,
 					boolean drawLabel) {
@@ -80,58 +84,86 @@ public class GraphFrame extends JFrame {
 
 		graph.getModel().beginUpdate();
 		try {
-			Object a = graph
-					.insertVertex(parent, null, StrUtils.LABEL_BASE,
-							VRG.coordinates.get(0).x * distance,
-							VRG.coordinates.get(0).y * distance, baseLength,
-							baseLength);// x,y,width,height
+			{
+				VRGvertexes a = new VRGvertexes();
 
-			for (int i = 0; i < VRG.carsCoordinates.size(); i++) {
-				graph.insertVertex(parent, null, "Cars, " + i,
-						VRG.carsCoordinates.get(i).x * distance,
-						VRG.carsCoordinates.get(i).y * distance, 3 * length,
-						length);// x,y,width,height
+				a.objectVertex = graph
+						.insertVertex(parent, null, StrUtils.LABEL_BASE,
+								VRG.coordinates.get(0).x * distance,
+								VRG.coordinates.get(0).y * distance,
+								baseLength, baseLength,
+								"shape=ellipse;perimeter=trianglePerimeter");// x,y,width,height
+				a.demand = 0;
+				a.price = 0;
+				a.vertexCoords = new VRGvertexes.VertexCoords(
+						VRG.coordinates.get(0));
+				vrgVertexes.add(a);
 			}
+
+			addCars(graph);
 
 			for (int i = 1; i < VRG.coordinates.size(); i++) {
-				graph.insertVertex(parent, null, StrUtils.LABEL_VERTEX + i,
-						VRG.coordinates.get(i).x * distance,
+				VRGvertexes vertex = new VRGvertexes();
+
+				vertex.objectVertex = graph.insertVertex(parent, null,
+						StrUtils.LABEL_VERTEX + i, VRG.coordinates.get(i).x
+								* distance,
 						VRG.coordinates.get(i).y * distance, length, length);// x,y,width,height
 
+				vertex.demand = VRG.demand.get(i);
+				vertex.price = VRG.price.get(i);
+				vertex.vertexCoords = new VRGvertexes.VertexCoords(
+						VRG.coordinates.get(i));
+
+				vrgVertexes.add(vertex);
 			}
-			/*
-			 * if (a instanceof mxCell) { // ((mxCell)a).getValue() }
-			 * 
-			 * Object v1 = graph.insertVertex(parent, null, "X1", 18 * distance,
-			 * 46 * distance, 1 * length, 1 * length); Object v2 =
-			 * graph.insertVertex(parent, null, "X2", 20 * distance, 47 *
-			 * distance, 1 * length, 1 * length); Object v3 =
-			 * graph.insertVertex(parent, null, "X3", 22 * distance, 42 *
-			 * distance, 1 * length, 1 * length); Object v4 =
-			 * graph.insertVertex(parent, null, "X4", 20 * distance, 41 *
-			 * distance, 2 * length, 2 * length); Object v5 =
-			 * graph.insertVertex(parent, null, "X5", 14 * distance, 40 *
-			 * distance, 2 * length, 2 * length); Object v6 =
-			 * graph.insertVertex(parent, null, "X6", 12 * distance, 44 *
-			 * distance, 2 * length, 2 * length); Object v7 =
-			 * graph.insertVertex(parent, null, "X7", 13 * distance, 45 *
-			 * distance, 1 * length, 1 * length); { graph.insertEdge(parent,
-			 * null, "", a, v1); graph.insertEdge(parent, null, "", v1, v2);
-			 * graph.insertEdge(parent, null, "", v2, a); } {
-			 * graph.insertEdge(parent, null, "", a, v3);
-			 * graph.insertEdge(parent, null, "", v3, v4);
-			 * graph.insertEdge(parent, null, "", v4, a); } {
-			 * graph.insertEdge(parent, null, "", a, v5);
-			 * graph.insertEdge(parent, null, "", v5, v6);
-			 * graph.insertEdge(parent, null, "", v6, v7);
-			 * graph.insertEdge(parent, null, "", v7, a); }
-			 */
-			// graph.insertVertex(parent, null, "", 50 * distance, 50 *
-			// distance,
-			// 0 * length, 0 * length);
+			Double distance;
+			{
+				distance = VRGvertexes.getDistance(
+						vrgVertexes.get(0).vertexCoords,
+						vrgVertexes.get(1).vertexCoords);
+
+				graph.insertEdge(parent, null,
+						distance.toString().substring(0, 3),
+						vrgVertexes.get(0).objectVertex,
+						vrgVertexes.get(1).objectVertex,StrUtils.GRAPH_PARAM_2);
+
+				distance = VRGvertexes.getDistance(
+						vrgVertexes.get(1).vertexCoords,
+						vrgVertexes.get(2).vertexCoords);
+				graph.insertEdge(parent, null,
+						distance.toString().substring(0, 3),
+						vrgVertexes.get(1).objectVertex,
+						vrgVertexes.get(2).objectVertex,StrUtils.GRAPH_PARAM_2);
+
+				distance = VRGvertexes.getDistance(
+						vrgVertexes.get(2).vertexCoords,
+						vrgVertexes.get(3).vertexCoords);
+				graph.insertEdge(parent, null,
+						distance.toString().substring(0, 3),
+						vrgVertexes.get(2).objectVertex,
+						vrgVertexes.get(3).objectVertex,StrUtils.GRAPH_PARAM_2);
+
+				distance = VRGvertexes.getDistance(
+						vrgVertexes.get(3).vertexCoords,
+						vrgVertexes.get(0).vertexCoords);
+				graph.insertEdge(parent, null,
+						distance.toString().substring(0, 3),
+						vrgVertexes.get(3).objectVertex,
+						vrgVertexes.get(0).objectVertex,StrUtils.GRAPH_PARAM_2);
+			}
 		} finally {
 			graph.getModel().endUpdate();
 
+		}
+	}
+
+	private void addCars(mxGraph graph) {
+		for (int i = 0; i < VRG.carsCoordinates.size(); i++) {
+			graph.insertVertex(graph.getDefaultParent(), null,
+					StrUtils.LABEL_CARS + i, VRG.carsCoordinates.get(i).x
+							* distance,
+					VRG.carsCoordinates.get(i).y * distance, 3 * length, length);// x,y,width,height
 		}
 	}
 

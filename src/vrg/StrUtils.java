@@ -42,6 +42,12 @@ public class StrUtils {
 	public static final String TXT_PLAYER_LABEL = "Всего игроков: ";// "Total players: ";
 	public static final String LABEL_BASE = "A ";// "Base";
 	public static final String LABEL_VERTEX = "X ";
+	public static final String LABEL_CARS = "Cars ";
+
+	public static final String GRAPH_PARAM_1 = "edgeStyle=elbowEdgeStyle;elbow=horizontal;"
+			+ "exitX=0.5;exitY=1;exitPerimeter=1;entryX=0;entryY=0;entryPerimeter=1;";
+	public static final String GRAPH_PARAM_2 = "edgeStyle=elbowEdgeStyle;elbow=horizontal;orthogonal=0;"
+			+ "entryX=0;entryY=0;entryPerimeter=1;";
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;
