@@ -25,6 +25,7 @@ public class VRG {
 	public static ArrayList<Integer> demand = new ArrayList<Integer>();
 	public static ArrayList<Point> coordinates = new ArrayList<Point>();
 	public static ArrayList<Point> carsCoordinates = new ArrayList<Point>();
+	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 
 	public static void generateCoordinates(int n) {
 		coordinates.clear();
@@ -46,22 +47,60 @@ public class VRG {
 		for (int i = 0; i < n; i++) {
 			cars.add(random(1, n));// 1..2
 		}
-		if (coordinates != null && coordinates.size() > 0)
+		if (coordinates != null && coordinates.size() > 0) {
 			fillCarsCoords();
+		}
+	}
+
+	public static ArrayList<Integer> getCoordsIndexes() {
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		for (int i = 0; i < coordinates.size() - 1; i++) {
+			indexes.add(i + 1);
+		}
+		Collections.shuffle(indexes);
+		return indexes;
+	}
+
+	public static void generateRoutes() {
+		routes.clear();
+
+		for (int i = 0; i < coordinates.size(); i++) {
+
+			ArrayList<Integer> tmp = new ArrayList<Integer>();
+			ArrayList<Integer> indexes = getCoordsIndexes();
+
+			tmp.add(0);
+			int m = random(Math.max(2, indexes.size() - 5), indexes.size());
+			for (int j = 0; j < m; j++) {
+				tmp.add(indexes.get(j));
+			}
+			tmp.add(0);
+
+			routes.add(tmp);
+		}
+	}
+
+	public static Integer[][] getRoutes() {
+		generateRoutes();
+		int n = routes.size();
+		Integer[][] paths = new Integer[n][n];
+		for (int i = 0; i < n; i++) {
+			paths[i] = routes.get(i).toArray(new Integer[n]);
+		}
+		return paths;
 	}
 
 	private static void fillCarsCoords() {
 		carsCoordinates.clear();
-		Point min = Collections.min(coordinates, new Comparator<Point>() {
+		Point max = Collections.max(coordinates, new Comparator<Point>() {
 			@Override
 			public int compare(Point paramInt1, Point paramInt2) {
-				return Integer.compare(paramInt1.y, paramInt2.y);
+				return Integer.compare(paramInt1.x, paramInt2.x);
 			}
 		});
 
 		for (int i = 0; i < cars.size(); i++) {
-			carsCoordinates.add(new Point(coordinates.get(0).x + 4, min.y
-					+ (i + 1)));
+			carsCoordinates.add(new Point(max.x + 4, (i + 1)));
 		}
 	}
 
@@ -73,7 +112,7 @@ public class VRG {
 	}
 
 	public static int random(int start, int end) {
-		return start + (int) (end * Math.random());
+		return start + (int) ((end - start) * Math.random());
 	}
 
 	public static void main(String[] args) {

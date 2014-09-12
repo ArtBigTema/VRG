@@ -2,12 +2,15 @@ package vrg;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxImageCanvas;
+import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.view.mxCellState;
@@ -15,7 +18,7 @@ import com.mxgraph.view.mxGraph;
 
 @SuppressWarnings("serial")
 public class GraphFrame extends JFrame {
-	public mxGraph graph;
+	public mxGraphComponent graphComponent;
 	public static final int length = 20;
 	public static final int baseLength = 15;
 	public static final int distance = 40;
@@ -50,7 +53,7 @@ public class GraphFrame extends JFrame {
 			}
 		};
 		this.constuctGraph(graph);
-		mxGraphComponent graphComponent = new mxGraphComponent(graph) {
+		graphComponent = new mxGraphComponent(graph) {
 
 			@Override
 			public void paint(Graphics paramGraphics) {
@@ -99,27 +102,8 @@ public class GraphFrame extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(600, 450);
 		this.setVisible(true);
-	}
 
-	public void createGraph() {
-		graph = new mxGraph() {
-			public void drawState(mxICanvas canvas, mxCellState state,
-					boolean drawLabel) {
-				String label = (drawLabel) ? state.getLabel() : "";
-
-				if (getModel().isVertex(state.getCell())
-						&& canvas instanceof mxImageCanvas
-						&& ((mxImageCanvas) canvas).getGraphicsCanvas() instanceof SwingCanvas) {
-					((SwingCanvas) ((mxImageCanvas) canvas).getGraphicsCanvas())
-							.drawVertex(state, label);
-				} else if (getModel().isVertex(state.getCell())
-						&& canvas instanceof SwingCanvas) {
-					((SwingCanvas) canvas).drawVertex(state, label);
-				} else {
-					super.drawState(canvas, state, drawLabel);
-				}
-			}
-		};
+		graphComponent.addKeyListener(keyListener);
 	}
 
 	public void constuctGraph(mxGraph graph) {
@@ -165,41 +149,7 @@ public class GraphFrame extends JFrame {
 
 				vrgVertexes.add(vertex);
 			}
-			Double distance;
-			{
-				distance = VRGvertexes.getDistance(
-						vrgVertexes.get(0).vertexCoords,
-						vrgVertexes.get(1).vertexCoords);
-
-				graph.insertEdge(parent, null,
-						distance.toString().substring(0, 3),
-						vrgVertexes.get(0).objectVertex,
-						vrgVertexes.get(1).objectVertex);// StrUtils.GRAPH_PARAM_2);
-
-				distance = VRGvertexes.getDistance(
-						vrgVertexes.get(1).vertexCoords,
-						vrgVertexes.get(2).vertexCoords);
-				graph.insertEdge(parent, null,
-						distance.toString().substring(0, 3),
-						vrgVertexes.get(1).objectVertex,
-						vrgVertexes.get(2).objectVertex);// StrUtils.GRAPH_PARAM_2);
-
-				distance = VRGvertexes.getDistance(
-						vrgVertexes.get(2).vertexCoords,
-						vrgVertexes.get(3).vertexCoords);
-				graph.insertEdge(parent, null,
-						distance.toString().substring(0, 3),
-						vrgVertexes.get(2).objectVertex,
-						vrgVertexes.get(3).objectVertex);// StrUtils.GRAPH_PARAM_2);
-
-				distance = VRGvertexes.getDistance(
-						vrgVertexes.get(3).vertexCoords,
-						vrgVertexes.get(0).vertexCoords);
-				graph.insertEdge(parent, null,
-						distance.toString().substring(0, 3),
-						vrgVertexes.get(3).objectVertex,
-						vrgVertexes.get(0).objectVertex); // StrUtils.GRAPH_PARAM_2);
-			}
+			updateEdges(graph);
 		} finally {
 			graph.getModel().endUpdate();
 		}
@@ -232,7 +182,71 @@ public class GraphFrame extends JFrame {
 		}
 	}
 
-	public static void main(String[] args) {
+	private void updateEdges(mxGraph graph) {
+		removeAllEdges(graph);
+		Double distance;
+		if (graph == null || VRG.routes == null || VRG.routes.size() == 0) {
+			return;
+		}
+		Object parent = graph.getDefaultParent();
 
+		int k = VRG.random(1, vrgVertexes.size());
+		ArrayList<Integer> tmp = VRG.routes.get(k - 1);
+		int in = 0;
+		tmp.remove(0);
+		for (int index : tmp) {
+			distance = VRGvertexes.getDistance(
+					vrgVertexes.get(in).vertexCoords,
+					vrgVertexes.get(index).vertexCoords);
+
+			graph.insertEdge(parent, null, distance.toString().substring(0, 3),
+					vrgVertexes.get(in).objectVertex,
+					vrgVertexes.get(index).objectVertex);// StrUtils.GRAPH_PARAM_2);
+			in = index;
+		}
+	}
+
+	private void removeAllEdges(mxGraph graph) {
+		graph.getModel().beginUpdate();
+		try {
+			for (VRGvertexes v : vrgVertexes) {
+				// Object[] edges = graph.getEdges(v.objectVertex);
+				Object[] edges = graph.getEdges((mxCell) v.objectVertex);
+				if (edges == null || edges.length == 0) {
+					continue;
+				}
+				for (Object edge : edges) {
+					graph.getModel().remove(edge);
+				}
+			}
+
+		} finally {
+			graph.getModel().endUpdate();
+		}
+	}
+
+	public KeyListener keyListener = new KeyListener() {
+		@Override
+		public void keyReleased(KeyEvent paramKeyEvent) {
+			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE)
+					&& VRG.routes != null && VRG.routes.size() > 0) {
+				updateEdges(graphComponent.getGraph());
+			}
+		}
+
+		@Override
+		public void keyTyped(KeyEvent paramKeyEvent) {
+
+		}
+
+		@Override
+		public void keyPressed(KeyEvent paramKeyEvent) {
+
+		}
+	};
+
+	@SuppressWarnings("static-access")
+	public static void main(String[] args) {
+		new VRG().main(new String[] { "" });
 	}
 }
