@@ -19,6 +19,14 @@ public class VRGvertexes {
 		public Point getPoint() {
 			return this.coords;
 		}
+
+		@Override
+		public String toString() {
+			return StrUtils.TXT_COORDS + StrUtils.SPACE + StrUtils.OPENEDBKT
+					+ coords.x + StrUtils.SEMICOLON + coords.y
+					+ StrUtils.CLOSEDBKT;
+		}
+
 	}
 
 	public int demand = 0;
@@ -38,8 +46,30 @@ public class VRGvertexes {
 				* (p2.y - p1.y));
 	}
 
-	public VRGvertexes(){
+	public static String getDistanceText(Object p1, Object p2) {
+		Double distanse = 0D;
+		if (p1 instanceof Point) {
+			distanse = getDistance(Point.class.cast(p1), Point.class.cast(p2));
+		}
+		if (p1 instanceof VertexCoords) {
+			distanse = getDistance(VertexCoords.class.cast(p1),
+					VertexCoords.class.cast(p2));
+		}
+		if (distanse.toString().length() < 4) {
+			return distanse.toString();
+		} else {
+			return distanse.toString().substring(0, 4);
+		}
+	}
+
+	public VRGvertexes() {
 		objectVertex = new Object();
 	}
 
+	@Override
+	public String toString() {
+		return vertexCoords.toString() + StrUtils.SPACE + StrUtils.TXT_DEMAND
+				+ StrUtils.EQ + demand + "," + StrUtils.SPACE
+				+ StrUtils.TXT_PRICE + StrUtils.EQ + price;
+	}
 }
