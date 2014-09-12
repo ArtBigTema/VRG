@@ -46,8 +46,9 @@ public class StrUtils {
 
 	public static final String GRAPH_PARAM_1 = "edgeStyle=elbowEdgeStyle;elbow=horizontal;"
 			+ "exitX=0.5;exitY=1;exitPerimeter=1;entryX=0;entryY=0;entryPerimeter=1;";
-	public static final String GRAPH_PARAM_2 = "edgeStyle=elbowEdgeStyle;elbow=horizontal;orthogonal=0;"
-			+ "entryX=0;entryY=0;entryPerimeter=1;";
+	public static final String GRAPH_PARAM_2 = "edgeStyle=elbowEdgeStyle;elbow=vertical;orthogonal=1;"
+			+ "entryX=0;entryY=1;entryPerimeter=0;";
+	public static final String GRAPH_PARAM_3 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;

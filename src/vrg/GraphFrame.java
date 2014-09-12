@@ -1,5 +1,7 @@
 package vrg;
 
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -7,6 +9,7 @@ import javax.swing.JFrame;
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxImageCanvas;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
@@ -47,7 +50,50 @@ public class GraphFrame extends JFrame {
 			}
 		};
 		this.constuctGraph(graph);
-		mxGraphComponent graphComponent = new mxGraphComponent(graph);
+		mxGraphComponent graphComponent = new mxGraphComponent(graph) {
+
+			@Override
+			public void paint(Graphics paramGraphics) {
+				super.paint(paramGraphics);//
+
+				paintCarcass(paramGraphics.create());
+
+			}
+
+			private void paintCarcass(Graphics paramGraphics) {
+				paramGraphics.setColor(Color.BLACK);
+
+				int numX = paramGraphics.getClipBounds().width / 10;
+				int numY = paramGraphics.getClipBounds().height / 10;
+
+				int offset = 5;
+				int dx = 0, dy = 0;
+				for (int i = 0; i < 10; i++) {
+					dx += numX;
+					dy += numY;
+					paramGraphics.drawLine(0, dy, offset, dy);
+					paramGraphics.drawString(String.valueOf(dy / distance),
+							offset + 1, dy);
+
+					paramGraphics.drawLine(dx, 0, dx, offset);
+					paramGraphics.drawString(String.valueOf(dx / distance), dx,
+							offset * 3);
+				}
+
+				paramGraphics.drawLine(0, 1,
+						paramGraphics.getClipBounds().width, 1);
+
+				paramGraphics.drawLine(1, 0, 1,
+						paramGraphics.getClipBounds().height);
+			}
+
+			// Sets global image base path
+			public mxInteractiveCanvas createCanvas() {
+				mxInteractiveCanvas canvas = super.createCanvas();
+				return canvas;
+			}
+		};
+
 		this.getContentPane().add(graphComponent);
 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -108,7 +154,7 @@ public class GraphFrame extends JFrame {
 				vertex.objectVertex = graph.insertVertex(parent, null,
 						StrUtils.LABEL_VERTEX + i, VRG.coordinates.get(i).x
 								* distance,
-						VRG.coordinates.get(i).y * distance, length, length);// x,y,width,height
+						VRG.coordinates.get(i).y * distance, length, length);// x,y,width,height//StrUtils.GRAPH_PARAM_3
 
 				vertex.demand = VRG.demand.get(i);
 				vertex.price = VRG.price.get(i);
@@ -126,7 +172,7 @@ public class GraphFrame extends JFrame {
 				graph.insertEdge(parent, null,
 						distance.toString().substring(0, 3),
 						vrgVertexes.get(0).objectVertex,
-						vrgVertexes.get(1).objectVertex,StrUtils.GRAPH_PARAM_2);
+						vrgVertexes.get(1).objectVertex, StrUtils.GRAPH_PARAM_2);
 
 				distance = VRGvertexes.getDistance(
 						vrgVertexes.get(1).vertexCoords,
@@ -134,7 +180,7 @@ public class GraphFrame extends JFrame {
 				graph.insertEdge(parent, null,
 						distance.toString().substring(0, 3),
 						vrgVertexes.get(1).objectVertex,
-						vrgVertexes.get(2).objectVertex,StrUtils.GRAPH_PARAM_2);
+						vrgVertexes.get(2).objectVertex, StrUtils.GRAPH_PARAM_2);
 
 				distance = VRGvertexes.getDistance(
 						vrgVertexes.get(2).vertexCoords,
@@ -142,7 +188,7 @@ public class GraphFrame extends JFrame {
 				graph.insertEdge(parent, null,
 						distance.toString().substring(0, 3),
 						vrgVertexes.get(2).objectVertex,
-						vrgVertexes.get(3).objectVertex,StrUtils.GRAPH_PARAM_2);
+						vrgVertexes.get(3).objectVertex, StrUtils.GRAPH_PARAM_2);
 
 				distance = VRGvertexes.getDistance(
 						vrgVertexes.get(3).vertexCoords,
@@ -150,13 +196,31 @@ public class GraphFrame extends JFrame {
 				graph.insertEdge(parent, null,
 						distance.toString().substring(0, 3),
 						vrgVertexes.get(3).objectVertex,
-						vrgVertexes.get(0).objectVertex,StrUtils.GRAPH_PARAM_2);
+						vrgVertexes.get(0).objectVertex, StrUtils.GRAPH_PARAM_2);
 			}
 		} finally {
 			graph.getModel().endUpdate();
 
 		}
 	}
+
+	/*
+	 * private void createCarcas(mxGraph graph) { mxRectangle rect =
+	 * graph.getGraphBounds();
+	 * 
+	 * double numX = rect.getWidth() / 10; double numY = rect.getHeight() / 10;
+	 * graph.insertVertex(graph.getDefaultParent(), null, ".", 1, 100, length,
+	 * length); graph.insertVertex(graph.getDefaultParent(), null, ".", 100, 1,
+	 * length, length); int offset = 5; int dx = 0, dy = 0; for (int i = 0; i <
+	 * 10; i++) { dx += numX; dy += numY;
+	 * graph.insertVertex(graph.getDefaultParent(), null, "-", 1, dy, length,
+	 * length); graph.insertVertex(graph.getDefaultParent(), null, "|", dx, 1,
+	 * length, length);
+	 * 
+	 * }
+	 * 
+	 * }
+	 */
 
 	private void addCars(mxGraph graph) {
 		for (int i = 0; i < VRG.carsCoordinates.size(); i++) {
