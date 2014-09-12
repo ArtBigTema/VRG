@@ -46,7 +46,8 @@ public class VRG {
 		for (int i = 0; i < n; i++) {
 			cars.add(random(1, n));// 1..2
 		}
-		fillCarsCoords();
+		if (coordinates != null && coordinates.size() > 0)
+			fillCarsCoords();
 	}
 
 	private static void fillCarsCoords() {

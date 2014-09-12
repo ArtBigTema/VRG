@@ -52,6 +52,7 @@ public class StrUtils {
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";//"Click graph tab"; 
 	public static final String EQ = "=";
+	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";//"Enter main values";
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;

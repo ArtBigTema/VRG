@@ -2,7 +2,6 @@ package vrg;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -64,7 +63,7 @@ public class VRGframe extends JFrame {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-		setModel(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
+		setModel(tableCars, StrUtils.TXT_GAMERS_AUTO, false, 4);
 		jScrollPane2.setViewportView(tableCars);
 		tableCars.getColumnModel().getColumn(0).setResizable(false);
 
@@ -203,16 +202,12 @@ public class VRGframe extends JFrame {
 												javax.swing.GroupLayout.PREFERRED_SIZE,
 												212,
 												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addGap(18, 18, 18)
-										.addComponent(
-												textCountCars,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												Short.MAX_VALUE)
+												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+										.addComponent(textCountCars)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+
 										.addComponent(buttonSaveCountCars)
 										.addContainerGap())
 						.addGroup(
@@ -469,9 +464,9 @@ public class VRGframe extends JFrame {
 										.addComponent(
 												jScrollPane1,
 												javax.swing.GroupLayout.PREFERRED_SIZE,
-												135,
+												172,
 												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addGap(55, 55, 55)
+										.addGap(18, 18, 18)
 										.addComponent(jLabel3)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -659,7 +654,7 @@ public class VRGframe extends JFrame {
 
 	private void textCountCarsMouseClicked(java.awt.event.MouseEvent evt) {
 		textCountCars.setText("");
-		setModel(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
+		setModel(tableCars, StrUtils.TXT_GAMERS_AUTO, false, 4);
 	}
 
 	private void textCountCarsKeyReleased(java.awt.event.KeyEvent evt) {// FIXME
@@ -672,23 +667,58 @@ public class VRGframe extends JFrame {
 		fillCarsArray(dtm.getColumnCount());
 	}
 
-	private void setModel(JTable table, String text, int n) {
-		table.setModel(new javax.swing.table.DefaultTableModel(
-				new Object[][] { { null, null, null, null } }, new String[] {
-						text, "", "", "" }) {
-			Class[] types = new Class[] { java.lang.String.class,
-					java.lang.Integer.class, java.lang.Integer.class,
-					java.lang.Integer.class };
-			boolean[] canEdit = new boolean[] { false, true, true, true };
+	private void setModel(JTable table, String textColumn, boolean b, int n) {
+		String[][] rowVertexLabels = new String[n][n];
+		String[] columnVertexLabels = new String[n + 1];
+		if (b) {
+			columnVertexLabels[0] = textColumn;
+			columnVertexLabels[n] = (StrUtils.X + "[" + (n - 1) + "]");
+			rowVertexLabels[0][0] = (StrUtils.X + "[" + 0 + "]");
 
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
+			for (int i = 1; i < n; i++) {
+				columnVertexLabels[i] = (StrUtils.X + "[" + (i - 1) + "]");
+				rowVertexLabels[i][0] = (StrUtils.X + "[" + i + "]");
 			}
 
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
+			Class[] stypes = new Class[n + 1];
+			for (int i = 0; i < n + 1; i++) {
+				stypes[i] = java.lang.String.class;
 			}
-		});
+
+			final Class[] type = Arrays.copyOf(stypes, stypes.length);
+			boolean[] canEdits = new boolean[n + 1];
+			Arrays.fill(canEdits, true);
+			final boolean[] canEdit = Arrays.copyOf(canEdits, canEdits.length);
+
+			table.setModel(new javax.swing.table.DefaultTableModel(
+					rowVertexLabels, columnVertexLabels) {
+
+				public Class getColumnClass(int columnIndex) {
+					return type[columnIndex];
+				}
+
+				public boolean isCellEditable(int rowIndex, int columnIndex) {
+					return canEdit[columnIndex];
+				}
+			});
+		} else {
+			table.setModel(new javax.swing.table.DefaultTableModel(
+					new Object[][] { { null, null, null, null } },
+					new String[] { textColumn, "", "", "" }) {
+				Class[] types = new Class[] { java.lang.String.class,
+						java.lang.Integer.class, java.lang.Integer.class,
+						java.lang.Integer.class };
+				boolean[] canEdit = new boolean[] { false, true, true, true };
+
+				public Class getColumnClass(int columnIndex) {
+					return types[columnIndex];
+				}
+
+				public boolean isCellEditable(int rowIndex, int columnIndex) {
+					return canEdit[columnIndex];
+				}
+			});
+		}
 	}
 
 	private void buttonGenerGraphActionPerformed(java.awt.event.ActionEvent evt) {
@@ -705,6 +735,7 @@ public class VRGframe extends JFrame {
 		VRG.generateCars(n);
 		VRG.generateDemand(n);
 		VRG.generatePrice(n);
+		GraphFrame.constructVertexes();
 	}
 
 	private void fillCarsArray(int n) {
@@ -809,44 +840,6 @@ public class VRGframe extends JFrame {
 		}
 	};
 
-	private void fillCarcassOfTransportTable() {// FIXME
-		int n = VRG.coordinates.size();
-
-		String[][] rowVertexLabels = new String[n][n];
-		String[] columnVertexLabels = new String[n + 1];
-
-		columnVertexLabels[0] = (StrUtils.TXT_VERTEX);
-		columnVertexLabels[n] = (StrUtils.X + "[" + (n - 1) + "]");
-		rowVertexLabels[0][0] = (StrUtils.X + "[" + 0 + "]");
-
-		for (int i = 1; i < n; i++) {
-			columnVertexLabels[i] = (StrUtils.X + "[" + (i - 1) + "]");
-			rowVertexLabels[i][0] = (StrUtils.X + "[" + i + "]");
-		}
-
-		Class[] stypes = new Class[n + 1];
-		for (int i = 0; i < n + 1; i++) {
-			stypes[i] = java.lang.String.class;
-		}
-
-		final Class[] type = Arrays.copyOf(stypes, stypes.length);
-		boolean[] canEdits = new boolean[n + 1];
-		Arrays.fill(canEdits, true);
-		final boolean[] canEdit = Arrays.copyOf(canEdits, canEdits.length);
-
-		tableTC.setModel(new javax.swing.table.DefaultTableModel(
-				rowVertexLabels, columnVertexLabels) {
-
-			public Class getColumnClass(int columnIndex) {
-				return type[columnIndex];
-			}
-
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
-			}
-		});
-	}
-
 	private void fillValueToTransportTable() {
 		if (GraphFrame.vrgVertexes == null
 				|| GraphFrame.vrgVertexes.size() == 0) {
@@ -858,17 +851,23 @@ public class VRGframe extends JFrame {
 		for (int i = 1; i < dtm.getColumnCount(); i++) {
 			for (int j = 0; j < dtm.getRowCount(); j++) {
 				String s = VRGvertexes.getDistanceText(
-						GraphFrame.vrgVertexes.get(i-1).vertexCoords,
+						GraphFrame.vrgVertexes.get(i - 1).vertexCoords,
 						GraphFrame.vrgVertexes.get(j).vertexCoords);
-				dtm.setValueAt(s, j,i);
+				dtm.setValueAt(s, j, i);
 			}
 		}
 	}
 
 	private void clickTab(java.awt.event.MouseEvent evt) {
+		if (VRG.coordinates == null || GraphFrame.vrgVertexes == null
+				|| GraphFrame.vrgVertexes.size() == 0) {
+			showErrorMess(StrUtils.MSG_ERR_TITLE, StrUtils.MSG_ERR_BODY_NULL);
+			tabbedPane.setSelectedIndex(0);
+			return;
+		}
 		switch (tabbedPane.getSelectedIndex()) {
 		case 2: {
-			fillCarcassOfTransportTable();
+			setModel(tableTC, StrUtils.TXT_VERTEX, true, VRG.coordinates.size());
 			fillValueToTransportTable();
 			break;
 		}
