@@ -2,9 +2,12 @@ package vrg;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
@@ -61,7 +64,7 @@ public class VRGframe extends JFrame {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-		setModel(tableCars);
+		setModel(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
 		jScrollPane2.setViewportView(tableCars);
 		tableCars.getColumnModel().getColumn(0).setResizable(false);
 
@@ -310,7 +313,11 @@ public class VRGframe extends JFrame {
 												Short.MAX_VALUE)));
 
 		tabbedPane.addTab(StrUtils.TAB_TXT_ENTER_COORDS, jPanel1);
-
+		tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
+			public void mouseClicked(java.awt.event.MouseEvent evt) {
+				clickTab(evt);
+			}
+		});
 		frameCanvas.setVisible(true);
 
 		javax.swing.GroupLayout frameCanvasLayout = new javax.swing.GroupLayout(
@@ -652,7 +659,7 @@ public class VRGframe extends JFrame {
 
 	private void textCountCarsMouseClicked(java.awt.event.MouseEvent evt) {
 		textCountCars.setText("");
-		setModel(tableCars);
+		setModel(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
 	}
 
 	private void textCountCarsKeyReleased(java.awt.event.KeyEvent evt) {// FIXME
@@ -665,10 +672,10 @@ public class VRGframe extends JFrame {
 		fillCarsArray(dtm.getColumnCount());
 	}
 
-	private void setModel(JTable table) {
+	private void setModel(JTable table, String text, int n) {
 		table.setModel(new javax.swing.table.DefaultTableModel(
 				new Object[][] { { null, null, null, null } }, new String[] {
-						StrUtils.TXT_GAMERS_AUTO, "", "", "" }) {
+						text, "", "", "" }) {
 			Class[] types = new Class[] { java.lang.String.class,
 					java.lang.Integer.class, java.lang.Integer.class,
 					java.lang.Integer.class };
@@ -783,24 +790,95 @@ public class VRGframe extends JFrame {
 		});
 	}
 
-	private boolean isFirstOpened = true;
+	private boolean graphIsFirstOpened = true;
 	private FocusListener graphFocusListener = new FocusListener() {
 
 		@Override
 		public void focusLost(FocusEvent paramFocusEvent) {
 			tabbedPane.setSelectedIndex(0);
-			isFirstOpened = true;
+			graphIsFirstOpened = true;
 		}
 
 		@Override
 		public void focusGained(FocusEvent paramFocusEvent) {
-			if (isFirstOpened) {
+			if (graphIsFirstOpened) {
 				GraphFrame frame = new GraphFrame();
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			}
-			isFirstOpened = false;
+			graphIsFirstOpened = false;
 		}
 	};
+
+	private void fillCarcassOfTransportTable() {// FIXME
+		int n = VRG.coordinates.size();
+
+		String[][] rowVertexLabels = new String[n][n];
+		String[] columnVertexLabels = new String[n + 1];
+
+		columnVertexLabels[0] = (StrUtils.TXT_VERTEX);
+		columnVertexLabels[n] = (StrUtils.X + "[" + (n - 1) + "]");
+		rowVertexLabels[0][0] = (StrUtils.X + "[" + 0 + "]");
+
+		for (int i = 1; i < n; i++) {
+			columnVertexLabels[i] = (StrUtils.X + "[" + (i - 1) + "]");
+			rowVertexLabels[i][0] = (StrUtils.X + "[" + i + "]");
+		}
+
+		Class[] stypes = new Class[n + 1];
+		for (int i = 0; i < n + 1; i++) {
+			stypes[i] = java.lang.String.class;
+		}
+
+		final Class[] type = Arrays.copyOf(stypes, stypes.length);
+		boolean[] canEdits = new boolean[n + 1];
+		Arrays.fill(canEdits, true);
+		final boolean[] canEdit = Arrays.copyOf(canEdits, canEdits.length);
+
+		tableTC.setModel(new javax.swing.table.DefaultTableModel(
+				rowVertexLabels, columnVertexLabels) {
+
+			public Class getColumnClass(int columnIndex) {
+				return type[columnIndex];
+			}
+
+			public boolean isCellEditable(int rowIndex, int columnIndex) {
+				return canEdit[columnIndex];
+			}
+		});
+	}
+
+	private void fillValueToTransportTable() {
+		if (GraphFrame.vrgVertexes == null
+				|| GraphFrame.vrgVertexes.size() == 0) {
+			showErrorMess(StrUtils.MSG_ERR_TITLE, StrUtils.MSG_ERR_BODY_TC);
+			return;
+		}
+
+		DefaultTableModel dtm = (DefaultTableModel) tableTC.getModel();
+		for (int i = 1; i < dtm.getColumnCount(); i++) {
+			for (int j = 0; j < dtm.getRowCount(); j++) {
+				String s = VRGvertexes.getDistanceText(
+						GraphFrame.vrgVertexes.get(i-1).vertexCoords,
+						GraphFrame.vrgVertexes.get(j).vertexCoords);
+				dtm.setValueAt(s, j,i);
+			}
+		}
+	}
+
+	private void clickTab(java.awt.event.MouseEvent evt) {
+		switch (tabbedPane.getSelectedIndex()) {
+		case 2: {
+			fillCarcassOfTransportTable();
+			fillValueToTransportTable();
+			break;
+		}
+		}
+	}
+
+	private void showErrorMess(String title, String body) {
+		JOptionPane.showMessageDialog(this, body, title,
+				JOptionPane.ERROR_MESSAGE);
+	}
 
 	private javax.swing.JButton buttonAddVertex;
 	private javax.swing.JButton buttonAnSolve;

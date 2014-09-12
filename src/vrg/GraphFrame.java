@@ -25,7 +25,7 @@ public class GraphFrame extends JFrame {
 	public int[] demand = { 0, 1, 1, 1, 2, 2, 2, 1 };
 	public int[] price = { 0, 4, 4, 4, 4, 4, 4, 4 };
 	public static int[][] cars = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
-	public ArrayList<VRGvertexes> vrgVertexes;
+	public static ArrayList<VRGvertexes> vrgVertexes;
 
 	public GraphFrame() {
 		// GraphFrame frame = new GraphFrame();
@@ -54,7 +54,7 @@ public class GraphFrame extends JFrame {
 
 			@Override
 			public void paint(Graphics paramGraphics) {
-				super.paint(paramGraphics);//
+				super.paint(paramGraphics);
 
 				paintCarcass(paramGraphics.create());
 
