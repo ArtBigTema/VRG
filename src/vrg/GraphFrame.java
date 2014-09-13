@@ -206,7 +206,7 @@ public class GraphFrame extends JFrame {
 		} while (tmp.size() < 2);
 
 		int in = 0;
-		tmp.remove(0);
+		//tmp.remove(0);
 		for (int index : tmp) {
 			distance = VRGvertexes.getDistance(
 					vrgVertexes.get(in).vertexCoords,
@@ -262,7 +262,9 @@ public class GraphFrame extends JFrame {
 
 		@Override
 		public void focusLost(FocusEvent arg0) {
-			GraphFrame.this.dispose();
+			if(VRGframe.isNeedToUpdate){
+				GraphFrame.this.dispose();
+			}
 		}
 
 		@Override

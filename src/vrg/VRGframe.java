@@ -176,7 +176,8 @@ public class VRGframe extends JFrame {
 			}
 
 		});
-		buttonSaveCountCars.setText(StrUtils.BTN_TXT_GENERATE);//old is save
+		buttonSaveCountCars.setText(StrUtils.BTN_TXT_GENERATE);// old is
+																// StrUtils.BTN_TXT_SAVE_COUNT
 		buttonSaveCountCars
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -495,7 +496,6 @@ public class VRGframe extends JFrame {
 				.setModel(new javax.swing.table.DefaultTableModel(
 						new Object[][] { { null, null, null, null, null },
 								{ null, null, null, null, null },
-								{ null, null, null, null, null },
 								{ null, null, null, null, null } },
 						new String[] { StrUtils.TXT_PLAYER_NUMBER,
 								StrUtils.TXT_ROUTE_NUMBER,
@@ -503,7 +503,7 @@ public class VRGframe extends JFrame {
 								StrUtils.TXT_LOAD_VEHICLE,
 								StrUtils.TXT_PROFIT_LABEL }) {
 					Class[] types = new Class[] { java.lang.String.class,
-							java.lang.String.class, java.lang.Float.class,
+							java.lang.String.class, java.lang.Double.class,
 							java.lang.Integer.class, java.lang.Double.class };
 					boolean[] canEdit = new boolean[] { false, true, false,
 							false, false };
@@ -624,7 +624,7 @@ public class VRGframe extends JFrame {
 		pack();
 	}
 
-	public void setRowCount(int k, DefaultTableModel dtm) {
+	public void addRowCount(int k, DefaultTableModel dtm) {
 		for (int i = 0; i < k; i++) {
 			Vector newRow = new Vector();
 			newRow.add("");
@@ -643,7 +643,7 @@ public class VRGframe extends JFrame {
 
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 
-		setRowCount(k, dtm);
+		addRowCount(k, dtm);
 
 		for (int i = 0; i < dtm.getRowCount(); i++) {
 			dtm.setValueAt("x[" + i + "]", i, 0);
@@ -660,27 +660,31 @@ public class VRGframe extends JFrame {
 		setModelForCoords(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
 	}
 
-	private void textCountCarsKey(java.awt.event.KeyEvent evt) {// FIXME
+	private void textCountCarsKey(java.awt.event.KeyEvent evt) {
 		int k = StrUtils.getIntFromText(textCountCars.getText().trim());
 
-		TableColumnModel dtm = tableCars.getColumnModel();
+		isNeedToUpdate = true;
 
 		VRG.countCars = k;
 
 		setModelForCars(tableCars, StrUtils.TXT_GAMERS_AUTO, k);
-		fillCarsArray(dtm.getColumnCount());
+		fillCarsArray(k);
 	}
 
 	private void buttonGenerGraphActionPerformed(java.awt.event.ActionEvent evt) {
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 
+		isNeedToUpdate = true;
+
 		fillArrays(dtm.getRowCount());
 
 		fillCoordsTable(dtm);
-
 	}
 
+	public static boolean isNeedToUpdate = false;
+
 	private void fillArrays(int n) {
+		isNeedToUpdate = true;
 		VRG.generateCoordinates(n);
 		VRG.generateCars(n);
 		VRG.generateDemand(n);
@@ -720,10 +724,6 @@ public class VRGframe extends JFrame {
 		saveCars();
 	}
 
-	public void saveAllData() {
-
-	}
-
 	public void saveCars() {
 		fillCarsTable();
 	}
@@ -741,10 +741,12 @@ public class VRGframe extends JFrame {
 
 	private void buttonGenerPathActionPerformed(java.awt.event.ActionEvent evt) {
 		setRoutesTable();
+		VRG.generateRoutes();
 	}
 
 	private void setRoutesTable() {
 		setModelForRoutes(tablePath, StrUtils.TXT_ROUTE, VRG.coordinates.size());
+		VRG.createTableOfRoutes();
 		fillTCcostsTable();
 	}
 
@@ -800,6 +802,7 @@ public class VRGframe extends JFrame {
 		}
 
 		DefaultTableModel dtm = (DefaultTableModel) tableTC.getModel();
+
 		for (int i = 1; i < dtm.getColumnCount(); i++) {
 			for (int j = 0; j < dtm.getRowCount(); j++) {
 				String s = VRGvertexes.getDistanceText(
@@ -812,9 +815,10 @@ public class VRGframe extends JFrame {
 
 	private void clickTab(java.awt.event.MouseEvent evt) {
 		if (VRG.coordinates == null || GraphFrame.vrgVertexes == null
-				|| GraphFrame.vrgVertexes.size() == 0) {
+				|| GraphFrame.vrgVertexes.size() == 0 || VRG.cars == null) {
 			showErrorMess(StrUtils.MSG_ERR_TITLE, StrUtils.MSG_ERR_BODY_NULL);
-			if (VRG.coordinates != null && VRG.routes == null) {
+			if (VRG.cars == null
+					|| (VRG.coordinates != null && VRG.routes == null)) {
 				tabbedPane.setSelectedIndex(2);
 			} else {
 				tabbedPane.setSelectedIndex(0);
@@ -822,7 +826,7 @@ public class VRGframe extends JFrame {
 			return;
 		}
 		switch (tabbedPane.getSelectedIndex()) {
-		case 1: {
+		case 1: {// Coordinates
 			tabbedPane.setSelectedIndex(2);
 			openGraphFrame();
 			break;
@@ -834,6 +838,42 @@ public class VRGframe extends JFrame {
 			graphIsFirstOpened = true;
 			break;
 		}
+		case 3: {// Result
+			fillColumnValueToResultTable();
+			if (isNeedToUpdate) {
+				isNeedToUpdate = false;
+				fillValueToResultTable();
+			}
+			break;
+		}
+		}
+	}
+
+	private void fillValueToResultTable() {
+		DefaultTableModel dtm = (DefaultTableModel) tableResult.getModel();
+		VRG.createTableOfRoutes();
+
+		for (int j = 0; j < dtm.getRowCount(); j++) {
+			// Second column is Routes
+			dtm.setValueAt(VRG.routes.get(j).toString(), j, 1);
+		}
+
+		for (int j = 0; j < dtm.getRowCount(); j++) {
+			// Third column is Length of routes
+			dtm.setValueAt(VRG.getLengthOfRoutes(j + 1), j, 2);// getTextLengthOfRoutes
+		}
+
+	}
+
+	private void fillColumnValueToResultTable() {
+		DefaultTableModel dtm = (DefaultTableModel) tableResult.getModel();
+
+		addRowCount(Math.max(VRG.countCars - dtm.getRowCount(), 0), dtm);
+
+		for (int j = 0; j < dtm.getRowCount(); j++) {
+			dtm.setValueAt(StrUtils.SPACE + (j + 1) + StrUtils.COMMA
+					+ StrUtils.SPACE + StrUtils.LABEL_WEIGHT + StrUtils.SPACE
+					+ VRG.cars.get(j + 1), j, 0);
 		}
 	}
 

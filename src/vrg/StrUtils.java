@@ -6,6 +6,7 @@ public class StrUtils {
 	public static final String OPENEDBKT = "(";
 	public static final String CLOSEDBKT = ")";
 	public static final String SEMICOLON = ";";
+	public static final String COMMA = ",";
 	public static final String X = "x";
 	public static final String SPACE = " ";
 	public static final String FONT_TAHOMA = "Tahoma";
@@ -53,6 +54,7 @@ public class StrUtils {
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
 	public static final String EQ = "=";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
+	public static final String LABEL_WEIGHT = "Масса: ";// "WEIGHT: ";
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;

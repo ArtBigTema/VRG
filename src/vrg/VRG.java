@@ -26,6 +26,7 @@ public class VRG {
 	public static ArrayList<Point> coordinates = new ArrayList<Point>();
 	public static ArrayList<Point> carsCoordinates = new ArrayList<Point>();
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
+	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 
 	public static void generateCoordinates(int n) {
 		coordinates.clear();
@@ -49,6 +50,21 @@ public class VRG {
 		}
 		if (coordinates != null && coordinates.size() > 0) {
 			fillCarsCoords();
+		}
+	}
+
+	public static void createTableOfRoutes() {
+		// FIXME vrgVertexes to coords
+
+		for (int i = 0; i < coordinates.size(); i++) {
+			ArrayList<Double> tmp = new ArrayList<Double>();
+			for (int j = 0; j < coordinates.size(); j++) {
+				String s = VRGvertexes.getDistanceText(
+						GraphFrame.vrgVertexes.get(i).vertexCoords,
+						GraphFrame.vrgVertexes.get(j).vertexCoords);
+				tmp.add(Double.valueOf(s));
+			}
+			lengthOfRoutes.add(tmp);
 		}
 	}
 
@@ -81,13 +97,35 @@ public class VRG {
 	}
 
 	public static Integer[][] getRoutes() {
-		generateRoutes();
 		int n = routes.size();
 		Integer[][] paths = new Integer[n][n];
 		for (int i = 0; i < n; i++) {
 			paths[i] = routes.get(i).toArray(new Integer[n]);
 		}
 		return paths;
+	}
+
+	public static Double getLengthOfRoutes(int k) {
+		int n = routes.size();
+		if (n < k) {
+			return 0D;
+		}
+
+		Double result = 0D;
+		ArrayList<Integer> tmp = routes.get(k - 1);
+
+		int index = 0;
+		
+		for (int i : tmp) {
+			result += lengthOfRoutes.get(index).get(i);
+			index = i;
+		}
+		
+		return result;
+	}
+
+	public static String getTextLengthOfRoutes(int k) {
+		return getLengthOfRoutes(k).toString();
 	}
 
 	private static void fillCarsCoords() {
@@ -100,7 +138,7 @@ public class VRG {
 		});
 
 		for (int i = 0; i < cars.size(); i++) {
-			carsCoordinates.add(new Point(max.x + 4, (i + 1)));
+			carsCoordinates.add(new Point(max.x + 4, i));
 		}
 	}
 
