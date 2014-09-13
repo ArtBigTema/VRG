@@ -37,7 +37,7 @@ public class StrUtils {
 	public static final String TXT_COORDS = "Координаты";// "Coordinates";
 	public static final String TXT_DEMAND = "d(x[j])";
 	public static final String TXT_PRICE = "p(x[j])";
-	public static final String BTN_TXT_DELETE_VERTEX = "Удалить вершины";// "Delete vertex";
+	public static final String BTN_TXT_DELETE_VERTEX = "Очистить всё";// "Clear ALL";"Delete vertex";
 	public static final String BTN_TXT_GENERATE_DATA = "Генерировать данные";// "Generate data";
 	public static final String BTN_TXT_ADD_VERTEX = "Добавить вершины";// "Add vertex";
 	public static final String TXT_PLAYER_LABEL = "Всего игроков: ";// "Total players: ";
@@ -55,7 +55,7 @@ public class StrUtils {
 	public static final String EQ = "=";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
 	public static final String LABEL_WEIGHT = "Масса: ";// "WEIGHT: ";
-	public static final String TXT_ANALYS = "Анализ на чувствительность";//"Analys";
+	public static final String TXT_ANALYS = "Анализ на чувствительность";// "Analys";
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;

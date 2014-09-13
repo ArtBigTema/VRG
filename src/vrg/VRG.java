@@ -151,7 +151,6 @@ public class VRG {
 	}
 
 	public static void generateRoutes() {
-		// int n = Math.max(k, coordinates.size());
 		routes.clear();
 
 		for (int i = 0; i < countCars; i++) {
@@ -174,10 +173,11 @@ public class VRG {
 		int n = routes.size();
 		int[][] paths = new int[n][n];
 		for (int i = 0; i < n; i++) {
-			paths[i] = new int[ routes.get(i).size()];
+			paths[i] = new int[routes.get(i).size()];
 			for (int j = 0; j < routes.get(i).size(); j++) {
-			paths[i][j] = routes.get(i).get(j);
-		}}
+				paths[i][j] = routes.get(i).get(j);
+			}
+		}
 		return paths;
 	}
 
@@ -198,10 +198,6 @@ public class VRG {
 		}
 
 		return result;
-	}
-
-	public static String getTextLengthOfRoutes(int k) {
-		return getLengthOfRoutes(k).toString();
 	}
 
 	private static void fillCarsCoords() {

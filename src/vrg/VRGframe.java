@@ -64,7 +64,7 @@ public class VRGframe extends JFrame {
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-		setModelForCoords(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
+		setModelForCar(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
 		jScrollPane2.setViewportView(tableCars);
 		tableCars.getColumnModel().getColumn(0).setResizable(false);
 
@@ -140,25 +140,8 @@ public class VRGframe extends JFrame {
 
 		tableCoordsDP.setBorder(javax.swing.BorderFactory.createEtchedBorder(
 				null, new java.awt.Color(0, 0, 0)));
-		tableCoordsDP.setModel(new javax.swing.table.DefaultTableModel(
-				new Object[][] { { null, null, null, null },
-						{ null, null, null, null }, { null, null, null, null },
-						{ null, null, null, null } }, new String[] {
-						StrUtils.TXT_VERTEX_LABEL, StrUtils.TXT_COORDS,
-						StrUtils.TXT_DEMAND, StrUtils.TXT_PRICE }) {
-			Class[] types = new Class[] { java.lang.String.class,
-					java.lang.String.class, java.lang.Integer.class,
-					java.lang.Integer.class };
-			boolean[] canEdit = new boolean[] { false, true, true, true };
-
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
-			}
-
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
-			}
-		});
+		setAllModel(tableCoordsDP, new String[] { StrUtils.TXT_VERTEX_LABEL,
+				StrUtils.TXT_COORDS, StrUtils.TXT_DEMAND, StrUtils.TXT_PRICE });
 		jScrollPane4.setViewportView(tableCoordsDP);
 		tableCoordsDP.getColumnModel().getColumn(0).setResizable(false);
 
@@ -343,23 +326,7 @@ public class VRGframe extends JFrame {
 		jPanel2.addFocusListener(graphFocusListener);
 
 		tableTC.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-		tableTC.setModel(new javax.swing.table.DefaultTableModel(
-				new Object[][] { { null, null, null, null },
-						{ null, null, null, null }, { null, null, null, null } },
-				new String[] { StrUtils.TXT_VERTEX, "", "", "" }) {
-			Class[] types = new Class[] { java.lang.String.class,
-					java.lang.String.class, java.lang.String.class,
-					java.lang.String.class };
-			boolean[] canEdit = new boolean[] { false, false, false, false };
-
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
-			}
-
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
-			}
-		});
+		setAllModel(tableTC, new String[] { StrUtils.TXT_VERTEX, "", "", "" });
 		jScrollPane1.setViewportView(tableTC);
 		tableTC.getColumnModel().getColumn(0).setResizable(false);
 
@@ -369,27 +336,8 @@ public class VRGframe extends JFrame {
 		jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		tablePath.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-		tablePath
-				.setModel(new javax.swing.table.DefaultTableModel(
-						new Object[][] { { null, null, null, null },
-								{ null, null, null, null },
-								{ null, null, null, null } },
-						new String[] { StrUtils.TXT_ROUTE, "", "",
-								StrUtils.TXT_PROFIT }) {
-					Class[] types = new Class[] { java.lang.String.class,
-							java.lang.String.class, java.lang.String.class,
-							java.lang.String.class };
-					boolean[] canEdit = new boolean[] { false, false, false,
-							false };
-
-					public Class getColumnClass(int columnIndex) {
-						return types[columnIndex];
-					}
-
-					public boolean isCellEditable(int rowIndex, int columnIndex) {
-						return canEdit[columnIndex];
-					}
-				});
+		setAllModel(tablePath, new String[] { StrUtils.TXT_ROUTE, "", "",
+				StrUtils.TXT_PROFIT });
 
 		jScrollPane3.setViewportView(tablePath);
 		tablePath.getColumnModel().getColumn(0).setResizable(false);
@@ -493,30 +441,9 @@ public class VRGframe extends JFrame {
 
 		tableResult.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 		tableResult.getTableHeader().setReorderingAllowed(false);
-		tableResult
-				.setModel(new javax.swing.table.DefaultTableModel(
-						new Object[][] { { null, null, null, null, null },
-								{ null, null, null, null, null },
-								{ null, null, null, null, null } },
-						new String[] { StrUtils.TXT_PLAYER_NUMBER,
-								StrUtils.TXT_ROUTE_NUMBER,
-								StrUtils.TXT_LENGTH_OF_ROUTE,
-								StrUtils.TXT_LOAD_VEHICLE,
-								StrUtils.TXT_PROFIT_LABEL }) {
-					Class[] types = new Class[] { java.lang.String.class,
-							java.lang.String.class, java.lang.Double.class,
-							java.lang.Integer.class, java.lang.Double.class };
-					boolean[] canEdit = new boolean[] { false, true, false,
-							false, false };
-
-					public Class getColumnClass(int columnIndex) {
-						return types[columnIndex];
-					}
-
-					public boolean isCellEditable(int rowIndex, int columnIndex) {
-						return canEdit[columnIndex];
-					}
-				});
+		setAllModel(tableResult, new String[] { StrUtils.TXT_PLAYER_NUMBER,
+				StrUtils.TXT_ROUTE_NUMBER, StrUtils.TXT_LENGTH_OF_ROUTE,
+				StrUtils.TXT_LOAD_VEHICLE, StrUtils.TXT_PROFIT_LABEL });
 		tableResult.getColumnModel().getColumn(1).setMinWidth(213);
 		jScrollPane5.setViewportView(tableResult);
 
@@ -654,12 +581,21 @@ public class VRGframe extends JFrame {
 
 	private void buttonDeleteVertexActionPerformed(
 			java.awt.event.ActionEvent evt) {
-		buttonDeleteVertex.setVisible(false);
+		VRG.clearAll();
+		setAllModel(tableCoordsDP, new String[] { StrUtils.TXT_VERTEX_LABEL,
+				StrUtils.TXT_COORDS, StrUtils.TXT_DEMAND, StrUtils.TXT_PRICE });
+		setAllModel(tableCars, new String[] { StrUtils.TXT_GAMERS_AUTO });
+		setAllModel(tablePath, new String[] { StrUtils.TXT_ROUTE });
+		setAllModel(tableTC, new String[] { StrUtils.TXT_VERTEX });
+		setAllModel(tableResult, new String[] { StrUtils.TXT_PLAYER_NUMBER,
+				StrUtils.TXT_ROUTE_NUMBER, StrUtils.TXT_LENGTH_OF_ROUTE,
+				StrUtils.TXT_LOAD_VEHICLE, StrUtils.TXT_PROFIT_LABEL });
+
 	}
 
 	private void textCountCarsMouseClicked(java.awt.event.MouseEvent evt) {
 		textCountCars.setText("");
-		setModelForCoords(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
+		setModelForCar(tableCars, StrUtils.TXT_GAMERS_AUTO, 4);
 	}
 
 	private void textCountCarsKey(java.awt.event.KeyEvent evt) {
@@ -670,7 +606,8 @@ public class VRGframe extends JFrame {
 		VRG.countCars = k;
 
 		setModelForCars(tableCars, StrUtils.TXT_GAMERS_AUTO, k);
-		fillCarsArray(k);
+		fillCarsTable();
+		VRG.generateRoutes();
 	}
 
 	private void buttonGenerGraphActionPerformed(java.awt.event.ActionEvent evt) {
@@ -719,8 +656,10 @@ public class VRGframe extends JFrame {
 
 	private void buttonSaveCountCarsActionPerformed(
 			java.awt.event.ActionEvent evt) {
-		VRG.countCars = tableCars.getColumnCount();
+		VRG.countCars = tableCars.getColumnCount() - 1;
 		fillCarsTable();
+		VRG.generateRoutes();
+		setRoutesTable();
 	}
 
 	private void fillCarsTable() {
@@ -750,7 +689,7 @@ public class VRGframe extends JFrame {
 
 	private void fillTCcostsTable() {
 		int[][] s = VRG.getRoutes();
-		for (int i = 0; i <s.length; i++) {
+		for (int i = 0; i < s.length; i++) {
 			for (int j = 0; j < s[i].length; j++) {
 				tablePath.setValueAt(s[i][j], i, j);
 			}
@@ -813,7 +752,8 @@ public class VRGframe extends JFrame {
 
 	private void clickTab(java.awt.event.MouseEvent evt) {
 		if (VRG.coordinates == null || GraphFrame.vrgVertexes == null
-				|| GraphFrame.vrgVertexes.size() == 0 || VRG.cars == null) {
+				|| GraphFrame.vrgVertexes.size() == 0 || VRG.cars == null
+				|| tableCoordsDP.getRowCount() < 3) {
 			showErrorMess(StrUtils.MSG_ERR_TITLE, StrUtils.MSG_ERR_BODY_NULL);
 			if (VRG.cars == null
 					|| (VRG.coordinates != null && VRG.routes == null)) {
@@ -889,6 +829,13 @@ public class VRGframe extends JFrame {
 				JOptionPane.ERROR_MESSAGE);
 	}
 
+	private void setAllModel(JTable table, String[] titles) {
+		table.setModel(new javax.swing.table.DefaultTableModel(
+				new Object[1][1], titles) {
+
+		});
+	}
+
 	private void setModelForRoutes(JTable table, String textColumn, int n, int m) {
 		String[][] rowVertexLabels = new String[m][n];
 		String[] columnVertexLabels = new String[n + 1];
@@ -896,12 +843,12 @@ public class VRGframe extends JFrame {
 
 		for (int i = 1; i < n + 1; i++) {
 			columnVertexLabels[i] = String.valueOf(i);
-			}
-		
-		for (int i = 0; i < m; i++) {
-		Arrays.fill(rowVertexLabels[i], "");
 		}
-			
+
+		for (int i = 0; i < m; i++) {
+			Arrays.fill(rowVertexLabels[i], "");
+		}
+
 		Class[] stypes = new Class[n + 1];
 		for (int i = 0; i < n + 1; i++) {
 			stypes[i] = java.lang.String.class;
@@ -925,7 +872,7 @@ public class VRGframe extends JFrame {
 		});
 	}
 
-	private void setModelForCoords(JTable table, String textColumn, int n) {
+	private void setModelForCar(JTable table, String textColumn, int n) {
 		table.setModel(new javax.swing.table.DefaultTableModel(
 				new Object[][] { { null, null, null, null } }, new String[] {
 						textColumn, "", "", "" }) {
