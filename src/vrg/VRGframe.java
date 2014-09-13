@@ -350,7 +350,7 @@ public class VRGframe extends JFrame {
 		buttonGenerPath.setText(StrUtils.BTN_TXT_GENERATE);
 		buttonGenerPath.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				buttonGenerPathActionPerformed(evt);
+				buttonGenerRoutesActionPerformed(evt);
 			}
 		});
 
@@ -554,9 +554,13 @@ public class VRGframe extends JFrame {
 	}
 
 	public void addRowCount(int k, DefaultTableModel dtm) {
+		addRow(k, dtm, "");
+	}
+
+	public void addRow(int k, DefaultTableModel dtm, String s) {
 		for (int i = 0; i < k; i++) {
 			Vector newRow = new Vector();
-			newRow.add("");
+			newRow.add(s);
 			dtm.addRow(newRow);
 		}
 	}
@@ -612,12 +616,17 @@ public class VRGframe extends JFrame {
 
 	private void buttonGenerGraphActionPerformed(java.awt.event.ActionEvent evt) {
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
-
+		if (dtm.getRowCount() < 3) {
+			buttonAddVertexActionPerformed(evt);
+			// showErrorMess(StrUtils.MSG_ERR_TITLE,
+			// StrUtils.MSG_ERR_ADD_VERTEX);
+		}
 		isNeedToUpdate = true;
 
 		fillArrays(dtm.getRowCount());
 
 		fillCoordsTable(dtm);
+		buttonSaveCountCarsActionPerformed(evt);
 	}
 
 	public static boolean isNeedToUpdate = false;
@@ -673,7 +682,7 @@ public class VRGframe extends JFrame {
 		}
 	}
 
-	private void buttonGenerPathActionPerformed(java.awt.event.ActionEvent evt) {
+	private void buttonGenerRoutesActionPerformed(java.awt.event.ActionEvent evt) {
 		isNeedToUpdate = true;
 		VRG.countCars = tableCars.getColumnCount() - 1;
 		setRoutesTable();
@@ -697,11 +706,12 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonAnSolveActionPerformed(java.awt.event.ActionEvent evt) {
-
+		VRG.generateRoutes();
+		fillValueToResultTable();
 	}
 
 	private void buttonBestSolveActionPerformed(java.awt.event.ActionEvent evt) {
-
+		fillValueToResultTable(StrUtils.TXT_IS_ALL);// FIXME
 	}
 
 	public static void main(String args[]) {
@@ -777,9 +787,9 @@ public class VRGframe extends JFrame {
 			break;
 		}
 		case 3: {// Result
-			fillColumnValueToResultTable();
 			if (isNeedToUpdate) {
 				isNeedToUpdate = false;
+				fillColumnValueToResultTable();
 				fillValueToResultTable();
 			}
 			break;
@@ -788,36 +798,80 @@ public class VRGframe extends JFrame {
 	}
 
 	private void fillValueToResultTable() {
-		DefaultTableModel dtm = (DefaultTableModel) tableResult.getModel();
-		VRG.createTableOfRoutes();
+		fillValueToResultTable("");
+	}
 
-		for (int j = 0; j < dtm.getRowCount(); j++) {
+	private void fillValueToResultTable(String s) {
+		DefaultTableModel dtm = (DefaultTableModel) tableResult.getModel();
+
+		int n = dtm.getRowCount();
+		if (!s.equals("")
+				|| dtm.getValueAt(n - 1, 0).equals(StrUtils.TXT_IS_ALL)) {
+			if (!dtm.getValueAt(n - 1, 0).equals(StrUtils.TXT_IS_ALL)) {
+				addRow(1, dtm, s);
+			} else {
+				n--;
+			}
+		}
+
+		VRG.createTableOfRoutes();
+		for (int j = 0; j < n; j++) {
 			// Second column is routes
 			dtm.setValueAt(VRG.routes.get(j).toString(), j, 1);
 		}
 
-		for (int j = 0; j < dtm.getRowCount(); j++) {
+		for (int j = 0; j < n; j++) {
 			// Third column is length of routes
 			dtm.setValueAt(VRG.getLengthOfRoutes(j + 1), j, 2);// getTextLengthOfRoutes
 		}
 
-		for (int j = 0; j < dtm.getRowCount(); j++) {
+		for (int j = 0; j < n; j++) {
 			// Fourth column is weight of routes
 			dtm.setValueAt(VRG.getRoutesWeight(j), j, 3);
 		}
 
-		for (int j = 0; j < dtm.getRowCount(); j++) {
+		for (int j = 0; j < n; j++) {
 			// Fiveth column is benefit of routes
 			dtm.setValueAt(VRG.getBenefit(j), j, 4);
 		}
+
+		setLastStroke(dtm);
+	}
+
+	private void setLastStroke(DefaultTableModel dtm) {
+		int n = dtm.getRowCount() - 1;
+		if (!dtm.getValueAt(n, 0).equals(StrUtils.TXT_IS_ALL)) {
+			return;
+		}
+		Double result = 0D;
+
+		for (int j = 0; j < n; j++) {
+			result += Double.class.cast(dtm.getValueAt(j, 2));
+		}
+		dtm.setValueAt(result, dtm.getRowCount() - 1, 2);
+
+		result = 0D;
+		for (int j = 0; j < n; j++) {
+			result += StrUtils.getIntFromObject(dtm.getValueAt(j, 3));
+		}
+		dtm.setValueAt(result.intValue(), dtm.getRowCount() - 1, 3);
+
+		result = 0D;
+		for (int j = 0; j < n; j++) {
+			result += Double.class.cast(dtm.getValueAt(j, 4));
+		}
+		dtm.setValueAt(result, dtm.getRowCount() - 1, 4);
 	}
 
 	private void fillColumnValueToResultTable() {
 		DefaultTableModel dtm = (DefaultTableModel) tableResult.getModel();
 
 		addRowCount(Math.max(VRG.countCars - dtm.getRowCount(), 0), dtm);
-
-		for (int j = 0; j < dtm.getRowCount(); j++) {
+		int n = dtm.getRowCount();
+		if (dtm.getValueAt(n - 1, 0).equals(StrUtils.TXT_IS_ALL)) {
+			n--;
+		}
+		for (int j = 0; j < n; j++) {
 			dtm.setValueAt(StrUtils.SPACE + (j + 1) + StrUtils.COMMA
 					+ StrUtils.SPACE + StrUtils.LABEL_WEIGHT + StrUtils.SPACE // NoWeight
 					+ VRG.cars.get(j), j, 0);

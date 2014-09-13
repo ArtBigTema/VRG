@@ -146,6 +146,7 @@ public class VRG {
 		for (int i = 0; i < coordinates.size() - 1; i++) {
 			indexes.add(i + 1);
 		}
+
 		Collections.shuffle(indexes);
 		return indexes;
 	}
@@ -158,6 +159,10 @@ public class VRG {
 			ArrayList<Integer> tmp = new ArrayList<Integer>();
 			ArrayList<Integer> indexes = getCoordsIndexes();
 
+			if (indexes == null || coordinates == null
+					|| coordinates.size() < 2) {
+				return;
+			}
 			tmp.add(0);
 			int m = random(Math.max(indexes.size() / 3, 1), indexes.size());
 			for (int j = 0; j <= m; j++) {
