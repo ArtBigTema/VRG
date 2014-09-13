@@ -2,6 +2,8 @@ package vrg;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -29,9 +31,9 @@ public class GraphFrame extends JFrame {
 	public int[] price = { 0, 4, 4, 4, 4, 4, 4, 4 };
 	public static int[][] cars = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
 	public static ArrayList<VRGvertexes> vrgVertexes;
+	public int nymberOfSpace = 0;
 
 	public GraphFrame() {
-		// GraphFrame frame = new GraphFrame();
 		vrgVertexes = new ArrayList<VRGvertexes>();
 
 		mxGraph graph = new mxGraph() {
@@ -52,6 +54,7 @@ public class GraphFrame extends JFrame {
 				}
 			}
 		};
+
 		this.constuctGraph(graph);
 		graphComponent = new mxGraphComponent(graph) {
 
@@ -60,34 +63,6 @@ public class GraphFrame extends JFrame {
 				super.paint(paramGraphics);
 
 				paintCarcass(paramGraphics.create());
-
-			}
-
-			private void paintCarcass(Graphics paramGraphics) {
-				paramGraphics.setColor(Color.BLACK);
-
-				int numX = paramGraphics.getClipBounds().width / 10;
-				int numY = paramGraphics.getClipBounds().height / 10;
-
-				int offset = 5;
-				int dx = 0, dy = 0;
-				for (int i = 0; i < 10; i++) {
-					dx += numX;
-					dy += numY;
-					paramGraphics.drawLine(0, dy, offset, dy);
-					paramGraphics.drawString(String.valueOf(dy / distance),
-							offset + 1, dy);
-
-					paramGraphics.drawLine(dx, 0, dx, offset);
-					paramGraphics.drawString(String.valueOf(dx / distance), dx,
-							offset * 3);
-				}
-
-				paramGraphics.drawLine(0, 1,
-						paramGraphics.getClipBounds().width, 1);
-
-				paramGraphics.drawLine(1, 0, 1,
-						paramGraphics.getClipBounds().height);
 			}
 
 			// Sets global image base path
@@ -104,6 +79,32 @@ public class GraphFrame extends JFrame {
 		this.setVisible(true);
 
 		graphComponent.addKeyListener(keyListener);
+		graphComponent.addFocusListener(focusListener);
+	}
+
+	private void paintCarcass(Graphics paramGraphics) {
+		paramGraphics.setColor(Color.BLACK);
+
+		int numX = paramGraphics.getClipBounds().width / 10;
+		int numY = paramGraphics.getClipBounds().height / 10;
+
+		int offset = 5;
+		int dx = 0, dy = 0;
+		for (int i = 0; i < 10; i++) {
+			dx += numX;
+			dy += numY;
+			paramGraphics.drawLine(0, dy, offset, dy);
+			paramGraphics.drawString(String.valueOf(dy / distance), offset + 1,
+					dy);
+
+			paramGraphics.drawLine(dx, 0, dx, offset);
+			paramGraphics.drawString(String.valueOf(dx / distance), dx,
+					offset * 3);
+		}
+
+		paramGraphics.drawLine(0, 1, paramGraphics.getClipBounds().width, 1);
+
+		paramGraphics.drawLine(1, 0, 1, paramGraphics.getClipBounds().height);
 	}
 
 	public void constuctGraph(mxGraph graph) {
@@ -118,10 +119,8 @@ public class GraphFrame extends JFrame {
 				VRGvertexes a = new VRGvertexes();
 
 				a.objectVertex = graph
-						.insertVertex(parent,
-								null,
-								StrUtils.LABEL_BASE,
-								(VRG.coordinates.get(0).x) * distance,// FIXME
+						.insertVertex(parent, null, StrUtils.LABEL_BASE,
+								(VRG.coordinates.get(0).x) * distance,
 								VRG.coordinates.get(0).y * distance,
 								baseLength, baseLength,
 								"shape=ellipse;perimeter=trianglePerimeter");// x,y,width,height
@@ -184,14 +183,28 @@ public class GraphFrame extends JFrame {
 
 	private void updateEdges(mxGraph graph) {
 		removeAllEdges(graph);
+
 		Double distance;
-		if (graph == null || VRG.routes == null || VRG.routes.size() == 0) {
+		if (graph == null) {
 			return;
 		}
+		if (VRG.routes == null || VRG.routes.size() == 0) {
+			VRG.generateRoutes();
+		}
+
 		Object parent = graph.getDefaultParent();
 
-		int k = VRG.random(1, vrgVertexes.size());
-		ArrayList<Integer> tmp = VRG.routes.get(k - 1);
+		int k;
+		ArrayList<Integer> tmp;
+
+		do {
+			if (nymberOfSpace > VRG.routes.size() / 3) {
+				VRG.generateRoutes();
+			}
+			k = VRG.random(1, vrgVertexes.size());
+			tmp = VRG.routes.get(k - 1);
+		} while (tmp.size() < 2);
+
 		int in = 0;
 		tmp.remove(0);
 		for (int index : tmp) {
@@ -230,6 +243,7 @@ public class GraphFrame extends JFrame {
 		public void keyReleased(KeyEvent paramKeyEvent) {
 			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE)
 					&& VRG.routes != null && VRG.routes.size() > 0) {
+				nymberOfSpace++;
 				updateEdges(graphComponent.getGraph());
 			}
 		}
@@ -244,9 +258,20 @@ public class GraphFrame extends JFrame {
 
 		}
 	};
+	FocusListener focusListener = new FocusListener() {
 
-	@SuppressWarnings("static-access")
+		@Override
+		public void focusLost(FocusEvent arg0) {
+			GraphFrame.this.dispose();
+		}
+
+		@Override
+		public void focusGained(FocusEvent arg0) {
+
+		}
+	};
+
 	public static void main(String[] args) {
-		new VRG().main(new String[] { "" });
+		VRG.main(new String[] { "" });
 	}
 }

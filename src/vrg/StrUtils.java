@@ -13,7 +13,7 @@ public class StrUtils {
 	public static final String TXT_TYPE_OF_GAME = "Можете выбрать путь согласованной игры или выбрать автоматическую";// "You can choose the way of a coherent game or choose to automatically";
 	public static final String TXT_EXAMPLE = " Пример: 0, 3, 4, 7, 0.";// "Example: 0, 3, 4, 7, 0";
 	public static final String TXT_TRANSPORTS_COSTS = "Транспортные затраты";// "Transport Costs";
-	public static final String BTN_TXT_SAVE_COUNT = "Сохранить";// "Save";
+	public static final String BTN_TXT_SAVE_COUNT = "Сохранить";// "Save";//Generate
 	public static final String FIELD_TXT_NUMBER_OF_ROWS = "Введите количество узлов";// "Enter count";
 	public static final String TXT_COORDS_DEMAND_PRICE = "Координаты, спрос и цены клиентов";//
 	public static final String TXT_GAMERS_AUTO = "Игроки (Авто)";// "Gamers";

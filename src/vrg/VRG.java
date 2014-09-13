@@ -71,7 +71,7 @@ public class VRG {
 
 			tmp.add(0);
 			int m = random(Math.max(2, indexes.size() - 5), indexes.size());
-			for (int j = 0; j < m; j++) {
+			for (int j = 0; j <= m; j++) {
 				tmp.add(indexes.get(j));
 			}
 			tmp.add(0);
