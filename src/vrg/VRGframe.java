@@ -492,6 +492,7 @@ public class VRGframe extends JFrame {
 		tabbedPane.addTab(StrUtils.TXT_TRANSPORTS_COSTS, jPanel3);
 
 		tableResult.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+		tableResult.getTableHeader().setReorderingAllowed(false);
 		tableResult
 				.setModel(new javax.swing.table.DefaultTableModel(
 						new Object[][] { { null, null, null, null, null },
@@ -516,11 +517,12 @@ public class VRGframe extends JFrame {
 						return canEdit[columnIndex];
 					}
 				});
+		tableResult.getColumnModel().getColumn(1).setMinWidth(213);
 		jScrollPane5.setViewportView(tableResult);
 
 		jLabel6.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
 		jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		jLabel6.setText("Анализ на чувствительность");
+		jLabel6.setText(StrUtils.TXT_ANALYS);
 		jLabel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		buttonAnSolve.setText(StrUtils.BTN_TXT_ANOTHER_SOLUTION);
@@ -652,7 +654,7 @@ public class VRGframe extends JFrame {
 
 	private void buttonDeleteVertexActionPerformed(
 			java.awt.event.ActionEvent evt) {
-
+		buttonDeleteVertex.setVisible(false);
 	}
 
 	private void textCountCarsMouseClicked(java.awt.event.MouseEvent evt) {
@@ -685,11 +687,7 @@ public class VRGframe extends JFrame {
 
 	private void fillArrays(int n) {
 		isNeedToUpdate = true;
-		VRG.generateCoordinates(n);
-		VRG.generateCars(n);
-		VRG.generateDemand(n);
-		VRG.generatePrice(n);
-		VRG.generateRoutes();
+		VRG.generateAll(n);
 		GraphFrame.constructVertexes();
 	}
 
@@ -721,10 +719,7 @@ public class VRGframe extends JFrame {
 
 	private void buttonSaveCountCarsActionPerformed(
 			java.awt.event.ActionEvent evt) {
-		saveCars();
-	}
-
-	public void saveCars() {
+		VRG.countCars = tableCars.getColumnCount();
 		fillCarsTable();
 	}
 
@@ -740,19 +735,22 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonGenerPathActionPerformed(java.awt.event.ActionEvent evt) {
+		isNeedToUpdate = true;
+		VRG.countCars = tableCars.getColumnCount() - 1;
 		setRoutesTable();
 		VRG.generateRoutes();
 	}
 
 	private void setRoutesTable() {
-		setModelForRoutes(tablePath, StrUtils.TXT_ROUTE, VRG.coordinates.size());
+		setModelForRoutes(tablePath, StrUtils.TXT_ROUTE,
+				VRG.coordinates.size(), VRG.countCars);
 		VRG.createTableOfRoutes();
 		fillTCcostsTable();
 	}
 
 	private void fillTCcostsTable() {
-		Integer[][] s = VRG.getRoutes();
-		for (int i = 0; i < s.length; i++) {
+		int[][] s = VRG.getRoutes();
+		for (int i = 0; i <s.length; i++) {
 			for (int j = 0; j < s[i].length; j++) {
 				tablePath.setValueAt(s[i][j], i, j);
 			}
@@ -826,8 +824,8 @@ public class VRGframe extends JFrame {
 			return;
 		}
 		switch (tabbedPane.getSelectedIndex()) {
-		case 1: {// Coordinates
-			tabbedPane.setSelectedIndex(2);
+		case 1: {// GraphFrame
+			tabbedPane.setSelectedIndex(3);
 			openGraphFrame();
 			break;
 		}
@@ -854,15 +852,24 @@ public class VRGframe extends JFrame {
 		VRG.createTableOfRoutes();
 
 		for (int j = 0; j < dtm.getRowCount(); j++) {
-			// Second column is Routes
+			// Second column is routes
 			dtm.setValueAt(VRG.routes.get(j).toString(), j, 1);
 		}
 
 		for (int j = 0; j < dtm.getRowCount(); j++) {
-			// Third column is Length of routes
+			// Third column is length of routes
 			dtm.setValueAt(VRG.getLengthOfRoutes(j + 1), j, 2);// getTextLengthOfRoutes
 		}
 
+		for (int j = 0; j < dtm.getRowCount(); j++) {
+			// Fourth column is weight of routes
+			dtm.setValueAt(VRG.getRoutesWeight(j), j, 3);
+		}
+
+		for (int j = 0; j < dtm.getRowCount(); j++) {
+			// Fiveth column is benefit of routes
+			dtm.setValueAt(VRG.getBenefit(j), j, 4);
+		}
 	}
 
 	private void fillColumnValueToResultTable() {
@@ -872,8 +879,8 @@ public class VRGframe extends JFrame {
 
 		for (int j = 0; j < dtm.getRowCount(); j++) {
 			dtm.setValueAt(StrUtils.SPACE + (j + 1) + StrUtils.COMMA
-					+ StrUtils.SPACE + StrUtils.LABEL_WEIGHT + StrUtils.SPACE
-					+ VRG.cars.get(j + 1), j, 0);
+					+ StrUtils.SPACE + StrUtils.LABEL_WEIGHT + StrUtils.SPACE // NoWeight
+					+ VRG.cars.get(j), j, 0);
 		}
 	}
 
@@ -882,16 +889,19 @@ public class VRGframe extends JFrame {
 				JOptionPane.ERROR_MESSAGE);
 	}
 
-	private void setModelForRoutes(JTable table, String textColumn, int n) {
-		String[][] rowVertexLabels = new String[n][n];
+	private void setModelForRoutes(JTable table, String textColumn, int n, int m) {
+		String[][] rowVertexLabels = new String[m][n];
 		String[] columnVertexLabels = new String[n + 1];
 		columnVertexLabels[0] = textColumn;
 
 		for (int i = 1; i < n + 1; i++) {
 			columnVertexLabels[i] = String.valueOf(i);
-			Arrays.fill(rowVertexLabels[i - 1], "");
+			}
+		
+		for (int i = 0; i < m; i++) {
+		Arrays.fill(rowVertexLabels[i], "");
 		}
-
+			
 		Class[] stypes = new Class[n + 1];
 		for (int i = 0; i < n + 1; i++) {
 			stypes[i] = java.lang.String.class;

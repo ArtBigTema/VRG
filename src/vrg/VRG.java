@@ -11,14 +11,16 @@ public class VRG {
 	public static final int LENGTH = 20;
 	public static final int DISTANCE = 30;
 	public static final int COUNT = 8;
-	public static final int[][] CORDINATES = { { 19, 45 }, { 18, 46 },
+	public static final Integer[][] CORDINATES = { { 19, 45 }, { 18, 46 },
 			{ 20, 47 }, { 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 },
 			{ 13, 45 } };
-	public static final int[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
-	public static final int[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
-	public static final int[][] CARS = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
+	public static final Integer[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
+	public static final Integer[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
+	public static final Integer[] CARS_WEIGHT = { 2, 2, 3 };
+	public static final Integer[][] CARS = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
 
-	public static int countCars = 0;
+	public static int countCars = 3;
+	public static final int ZOOM = 5;
 
 	public static ArrayList<Integer> cars = new ArrayList<Integer>();
 	public static ArrayList<Integer> price = new ArrayList<Integer>();
@@ -28,10 +30,46 @@ public class VRG {
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 
+	public static void generateAllStandart() {
+		clearAll();
+
+		Collections.addAll(price, PRICE);
+		Collections.addAll(demand, DEMAND);
+		Collections.addAll(cars, CARS_WEIGHT);
+
+		for (int i = 0; i < COUNT; i++) {
+			coordinates.add(new Point(CORDINATES[i][0], CORDINATES[i][1]));
+			price.add(PRICE[i]);
+			demand.add(DEMAND[i]);
+		}
+
+		fillCarsCoords();
+		createTableOfRoutes();
+		generateRoutes();
+	}
+
+	public static void generateAll(int n) {
+		generateCoordinates(n);
+		generateCars(n);
+		generateDemand(n);
+		generatePrice(n);
+		generateRoutes();
+	}
+
+	public static void clearAll() {
+		coordinates.clear();
+		price.clear();
+		demand.clear();
+		cars.clear();
+		lengthOfRoutes.clear();
+		routes.clear();
+		carsCoordinates.clear();
+	}
+
 	public static void generateCoordinates(int n) {
 		coordinates.clear();
 		coordinates.add(new Point(random(n / 2, n), random(n / 2, n)));
-		for (int i = 1; i < n; i++) {// First is base == a
+		for (int i = 1; i < n; i++) {
 			coordinates.add(new Point(random(1, n), random(1, n)));
 		}
 	}
@@ -39,14 +77,23 @@ public class VRG {
 	public static void generatePrice(int n) {
 		price.clear();
 		for (int i = 0; i < n; i++) {
-			price.add(random(1, n));// ==4
+			price.add(random(1, n));
+		}
+	}
+
+	public static void generateDemand(int n) {
+		demand.clear();
+		demand.add(0);
+		for (int i = 1; i < n; i++) {
+			demand.add(random(1, n));
 		}
 	}
 
 	public static void generateCars(int n) {
 		cars.clear();
+
 		for (int i = 0; i < n; i++) {
-			cars.add(random(1, n));// 1..2
+			cars.add(random(1, n));
 		}
 		if (coordinates != null && coordinates.size() > 0) {
 			fillCarsCoords();
@@ -54,18 +101,44 @@ public class VRG {
 	}
 
 	public static void createTableOfRoutes() {
-		// FIXME vrgVertexes to coords
+		lengthOfRoutes.clear();
 
 		for (int i = 0; i < coordinates.size(); i++) {
 			ArrayList<Double> tmp = new ArrayList<Double>();
+
 			for (int j = 0; j < coordinates.size(); j++) {
-				String s = VRGvertexes.getDistanceText(
-						GraphFrame.vrgVertexes.get(i).vertexCoords,
-						GraphFrame.vrgVertexes.get(j).vertexCoords);
+				String s = VRGvertexes.getDistanceText(coordinates.get(i),
+						coordinates.get(j));
 				tmp.add(Double.valueOf(s));
 			}
+
 			lengthOfRoutes.add(tmp);
 		}
+	}
+
+	public static int getRoutesWeight(int k) {
+		ArrayList<Integer> indexes = routes.get(k);
+		int result = 0;
+
+		for (int i : indexes) {
+			result += demand.get(i);
+		}
+
+		return result;
+	}
+
+	public static Double getBenefit(int k) {
+		Double result = 0D;
+		ArrayList<Integer> tmp = routes.get(k);
+
+		int lastVertex = tmp.get(tmp.size() - 2);
+		result = -lengthOfRoutes.get(lastVertex).get(0);
+
+		for (int i = 1; i < tmp.size() - 1; i++) {
+			result += price.get(tmp.get(i)) * demand.get(tmp.get(i));
+			result -= lengthOfRoutes.get(tmp.get(i - 1)).get(tmp.get(i));
+		}
+		return result;
 	}
 
 	public static ArrayList<Integer> getCoordsIndexes() {
@@ -78,15 +151,16 @@ public class VRG {
 	}
 
 	public static void generateRoutes() {
+		// int n = Math.max(k, coordinates.size());
 		routes.clear();
 
-		for (int i = 0; i < coordinates.size(); i++) {
+		for (int i = 0; i < countCars; i++) {
 
 			ArrayList<Integer> tmp = new ArrayList<Integer>();
 			ArrayList<Integer> indexes = getCoordsIndexes();
 
 			tmp.add(0);
-			int m = random(Math.max(2, indexes.size() - 5), indexes.size());
+			int m = random(Math.max(indexes.size() / 3, 1), indexes.size());
 			for (int j = 0; j <= m; j++) {
 				tmp.add(indexes.get(j));
 			}
@@ -96,31 +170,33 @@ public class VRG {
 		}
 	}
 
-	public static Integer[][] getRoutes() {
+	public static int[][] getRoutes() {
 		int n = routes.size();
-		Integer[][] paths = new Integer[n][n];
+		int[][] paths = new int[n][n];
 		for (int i = 0; i < n; i++) {
-			paths[i] = routes.get(i).toArray(new Integer[n]);
-		}
+			paths[i] = new int[ routes.get(i).size()];
+			for (int j = 0; j < routes.get(i).size(); j++) {
+			paths[i][j] = routes.get(i).get(j);
+		}}
 		return paths;
 	}
 
 	public static Double getLengthOfRoutes(int k) {
 		int n = routes.size();
+		Double result = 0D;
+
 		if (n < k) {
-			return 0D;
+			return result;
 		}
 
-		Double result = 0D;
 		ArrayList<Integer> tmp = routes.get(k - 1);
-
 		int index = 0;
-		
+
 		for (int i : tmp) {
 			result += lengthOfRoutes.get(index).get(i);
 			index = i;
 		}
-		
+
 		return result;
 	}
 
@@ -139,13 +215,6 @@ public class VRG {
 
 		for (int i = 0; i < cars.size(); i++) {
 			carsCoordinates.add(new Point(max.x + 4, i));
-		}
-	}
-
-	public static void generateDemand(int n) {
-		demand.clear();
-		for (int i = 0; i < n; i++) {
-			demand.add(random(1, n));
 		}
 	}
 

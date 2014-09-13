@@ -55,10 +55,10 @@ public class VRGvertexes {
 			distanse = getDistance(VertexCoords.class.cast(p1),
 					VertexCoords.class.cast(p2));
 		}
-		if (distanse.toString().length() < 4) {
+		if (distanse.toString().length() < 5) {
 			return distanse.toString();
 		} else {
-			return distanse.toString().substring(0, 4);
+			return distanse.toString().substring(0, 5);
 		}
 	}
 

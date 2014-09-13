@@ -176,8 +176,8 @@ public class GraphFrame extends JFrame {
 		for (int i = 0; i < VRG.carsCoordinates.size(); i++) {
 			graph.insertVertex(graph.getDefaultParent(), null,
 					StrUtils.LABEL_CARS + i, VRG.carsCoordinates.get(i).x
-							* distance,
-					VRG.carsCoordinates.get(i).y * distance, 3 * length, length);// x,y,width,height
+							* distance, distance + VRG.carsCoordinates.get(i).y
+							* distance, 3 * length, length);// x,y,width,height
 		}
 	}
 
@@ -206,7 +206,7 @@ public class GraphFrame extends JFrame {
 		} while (tmp.size() < 2);
 
 		int in = 0;
-		//tmp.remove(0);
+		// tmp.remove(0);
 		for (int index : tmp) {
 			distance = VRGvertexes.getDistance(
 					vrgVertexes.get(in).vertexCoords,
@@ -262,7 +262,7 @@ public class GraphFrame extends JFrame {
 
 		@Override
 		public void focusLost(FocusEvent arg0) {
-			if(VRGframe.isNeedToUpdate){
+			if (VRGframe.isNeedToUpdate) {
 				GraphFrame.this.dispose();
 			}
 		}

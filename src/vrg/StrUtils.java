@@ -55,6 +55,7 @@ public class StrUtils {
 	public static final String EQ = "=";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
 	public static final String LABEL_WEIGHT = "Масса: ";// "WEIGHT: ";
+	public static final String TXT_ANALYS = "Анализ на чувствительность";//"Analys";
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;
