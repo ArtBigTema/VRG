@@ -184,21 +184,19 @@ public class GraphFrame extends JFrame {
 			return;
 		}
 		if (VRG.routes == null || VRG.routes.size() == 0) {
-			VRG.generateRoutes();
+			VRG.generateGraphRoutes();
 		}
 
 		Object parent = graph.getDefaultParent();
 
-		int k;
-		ArrayList<Integer> tmp;
+		if ((nymberOfSpace + 1) > VRG.routes.size()) {
+			nymberOfSpace = 0;
+			VRG.generateGraphRoutes();
+		}
 
-		do {
-			k = VRG.random(0, VRG.routes.size());
-			tmp = VRG.routes.get(k);
-		} while (tmp.size() < 2);
+		ArrayList<Integer> tmp = VRG.routes.get(nymberOfSpace);
 
 		int in = 0;
-		// tmp.remove(0);
 		for (int index : tmp) {
 			distance = VRGvertexes.getDistance(
 					vrgVertexes.get(in).vertexCoords,
@@ -206,7 +204,7 @@ public class GraphFrame extends JFrame {
 
 			graph.insertEdge(parent, null, distance.toString().substring(0, 3),
 					vrgVertexes.get(in).objectVertex,
-					vrgVertexes.get(index).objectVertex);// StrUtils.GRAPH_PARAM_2);
+					vrgVertexes.get(index).objectVertex, StrUtils.GRAPH_PARAM_2);
 			in = index;
 		}
 	}

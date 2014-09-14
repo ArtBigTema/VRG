@@ -4,10 +4,10 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.swing.JFrame;
-
-import vrg.VRGvertexes.VertexCoords;
 
 public class VRG {
 	public static final int[][] COORDINATES = { { 19, 45 }, { 18, 46 },
@@ -57,11 +57,12 @@ public class VRG {
 	}
 
 	public static void generateAll(int n) {
+		clearAll();
 		generateCoordinates(n);
 		generateCars(n);
 		generateDemand(n);
 		generatePrice(n);
-		generateRoutes();
+		generateGraphRoutes();// FIXME
 	}
 
 	public static void clearAll() {
@@ -159,7 +160,7 @@ public class VRG {
 		return indexes;
 	}
 
-	public static void generateRoutes() {
+	public static void generateRoutes() {//FIXME 
 		routes.clear();
 
 		for (int i = 0; i < countCars; i++) {
@@ -175,6 +176,31 @@ public class VRG {
 			int m = random(Math.max(indexes.size() / 3, 1), indexes.size());
 			for (int j = 0; j <= m; j++) {
 				tmp.add(indexes.get(j));
+			}
+			tmp.add(0);
+
+			routes.add(tmp);
+		}
+	}
+
+	public static void generateGraphRoutes() {
+		routes.clear();
+
+		ArrayList<Integer> tmp = new ArrayList<Integer>();
+
+		Queue<Integer> indexQ = new LinkedList<Integer>();
+		indexQ.addAll(getCoordsIndexes());
+
+		if (indexQ == null || coordinates == null || coordinates.size() < 2
+				|| indexQ.size() < 2) {
+			return;
+		}
+		for (int i = 0; i < countCars; i++) {
+			tmp = new ArrayList<Integer>();
+			tmp.add(0);
+			int m = random(1, Math.max(indexQ.size() / 2, 0));
+			for (int j = 0; j < Math.min(indexQ.size(), m); j++) {
+				tmp.add(indexQ.poll());
 			}
 			tmp.add(0);
 
@@ -246,7 +272,7 @@ public class VRG {
 	}
 
 	public static int random(int start, int end) {
-		return start + (int) ((end - start) * Math.random());
+		return (int) (start + Math.round((end - start) * Math.random()));
 	}
 
 	public static void main(String[] args) {

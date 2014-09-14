@@ -135,7 +135,7 @@ public class VRGframe extends JFrame {
 														.addComponent(
 																buttonDeleteVertex))));
 
-		jLabel5.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14)); // NOI18N
+		jLabel5.setFont(new java.awt.Font(StrUtils.FONT_TAHOMA, 0, 14));
 		jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		jLabel5.setText(StrUtils.TXT_GAMERS_AUTO);
 		jLabel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -162,8 +162,7 @@ public class VRGframe extends JFrame {
 			}
 
 		});
-		buttonSaveCountCars.setText(StrUtils.BTN_TXT_GENERATE);// old is
-																// StrUtils.BTN_TXT_SAVE_COUNT
+		buttonSaveCountCars.setText(StrUtils.BTN_TXT_GENERATE);
 		buttonSaveCountCars
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -662,7 +661,7 @@ public class VRGframe extends JFrame {
 		setModelForCars(tableCars, StrUtils.TXT_GAMERS_AUTO, k);
 		fillCarsArray(k + 1);
 		fillCarsTable();
-		VRG.generateRoutes();
+		VRG.generateGraphRoutes();
 	}
 
 	private void buttonGenerGraphActionPerformed(java.awt.event.ActionEvent evt) {
@@ -714,7 +713,7 @@ public class VRGframe extends JFrame {
 		VRG.countCars = tableCars.getColumnCount() - 1;
 		fillCarsArray(VRG.countCars + 1);
 		fillCarsTable();
-		VRG.generateRoutes();
+		VRG.generateGraphRoutes();
 		setRoutesTable();
 	}
 
@@ -732,7 +731,7 @@ public class VRGframe extends JFrame {
 		isNeedToUpdate = true;
 		VRG.countCars = tableCars.getColumnCount() - 1;
 		setRoutesTable();
-		VRG.generateRoutes();
+		VRG.generateGraphRoutes();
 	}
 
 	private void setRoutesTable() {
@@ -752,7 +751,7 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonAnSolveActionPerformed(java.awt.event.ActionEvent evt) {
-		VRG.generateRoutes();
+		VRG.generateGraphRoutes();
 		fillValueToResultTable();
 	}
 
@@ -839,7 +838,6 @@ public class VRGframe extends JFrame {
 				return;
 			}
 			isNeedToUpdate = false;
-			
 
 			break;
 		}
@@ -929,8 +927,8 @@ public class VRGframe extends JFrame {
 		}
 		for (int j = 0; j < n; j++) {
 			dtm.setValueAt(StrUtils.SPACE + (j + 1) + StrUtils.COMMA
-					+ StrUtils.SPACE + StrUtils.LABEL_WEIGHT + StrUtils.SPACE // NoWeight
-					+ VRG.cars.get(j), j, 0);
+					+ StrUtils.SPACE + StrUtils.LABEL_WEIGHT + StrUtils.SPACE
+					+ VRG.cars.get(j + 1), j, 0);
 		}
 	}
 

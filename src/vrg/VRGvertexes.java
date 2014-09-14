@@ -48,7 +48,7 @@ public class VRGvertexes {
 	@Override
 	public String toString() {
 		return vertexCoords.toString() + StrUtils.SPACE + StrUtils.TXT_DEMAND
-				+ StrUtils.EQ + demand + "," + StrUtils.SPACE
+				+ StrUtils.EQ + demand + StrUtils.COMMA + StrUtils.SPACE
 				+ StrUtils.TXT_PRICE + StrUtils.EQ + price;
 	}
 }

@@ -50,6 +50,7 @@ public class StrUtils {
 	public static final String GRAPH_PARAM_2 = "edgeStyle=elbowEdgeStyle;elbow=vertical;orthogonal=1;"
 			+ "entryX=0;entryY=1;entryPerimeter=0;";
 	public static final String GRAPH_PARAM_3 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
+
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
 	public static final String MSG_ERR_ATTENTION = "Attention";
@@ -66,7 +67,7 @@ public class StrUtils {
 		try {
 			k = Integer.parseInt(JOptionPane.showInputDialog(text));
 		} catch (NumberFormatException e) {
-			k = 0;
+			return 0;
 		}
 		return k;
 	}
@@ -76,7 +77,7 @@ public class StrUtils {
 		try {
 			k = Integer.parseInt(text);
 		} catch (NumberFormatException e) {
-			k = 0;
+			return 0;
 		}
 		return k;
 	}
@@ -86,7 +87,7 @@ public class StrUtils {
 		try {
 			k = Integer.parseInt(String.valueOf(object));
 		} catch (Exception e) {
-			k = 0;
+			return 0;
 		}
 		return k;
 	}
