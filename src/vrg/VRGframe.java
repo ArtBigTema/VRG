@@ -933,6 +933,7 @@ public class VRGframe extends JFrame {
 			return;
 		}
 		Double result = 0D;
+		dtm.setValueAt(VRGUtils.TXT_GRAPH+VRG.getStringDifferenceBetweenSets(), dtm.getRowCount() - 1, 1);//FIXME
 
 		for (int j = 0; j < n; j++) {
 			result += Double.class.cast(dtm.getValueAt(j, 2));

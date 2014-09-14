@@ -8,7 +8,9 @@ public class VRGUtils {
 	public static final String SEMICOLON = ";";
 	public static final String COMMA = ",";
 	public static final String X = "x";
+	public static final String EQ = "=";
 	public static final String SPACE = " ";
+	public static final String SLASH = "/";
 	public static final String FONT_TAHOMA = "Tahoma";
 	public static final String TXT_DISTANCES = "Расстояния между вершинами (транспортные затраты)";// "Distances between vertices";
 	public static final String TXT_TYPE_OF_GAME = "Можете выбрать путь согласованной игры или выбрать автоматическую";// "You can choose the way of a coherent game or choose to automatically";
@@ -41,8 +43,6 @@ public class VRGUtils {
 	public static final String BTN_TXT_GENERATE_DATA = "Генерировать данные";// "Generate data";
 	public static final String BTN_TXT_ADD_VERTEX = "Добавить вершины";// "Add vertex";
 	public static final String TXT_PLAYER_LABEL = "Всего игроков: ";// "Total players: ";
-	public static final String LABEL_BASE = "A ";// "Base";
-	public static final String LABEL_VERTEX = "X ";
 	public static final String LABEL_CARS = "Cars ";
 
 	public static final String GRAPH_PARAM_1 = "edgeStyle=elbowEdgeStyle;elbow=horizontal;"
@@ -56,7 +56,6 @@ public class VRGUtils {
 	public static final String MSG_ERR_ATTENTION = "Attention";
 	public static final String MSG_ERR_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n "
 			+ "чтобы посмотреть визуализацию";// "Click graph tab";
-	public static final String EQ = "=";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
 	public static final String LABEL_WEIGHT = "Масса: ";// "WEIGHT: ";
 	public static final String TXT_ANALYS = "Анализ на чувствительность";// "Analys";
@@ -67,7 +66,10 @@ public class VRGUtils {
 
 	public static final String SYBOLS_ON = "☑";
 	public static final String SYBOLS_OFF = "☐";
-
+	public static final String TXT_GRAPH = "V";
+	public static final String LABEL_BASE = "A ";// "Base";
+	public static final String LABEL_VERTEX = "X ";
+	
 	public static int getIntFromDialog(String text) {
 		int k = 0;
 		try {

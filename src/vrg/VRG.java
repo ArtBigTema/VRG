@@ -66,6 +66,8 @@ public class VRG {
 	}
 
 	public static void clearAll() {
+		countCars = CARS.length;
+		countCoords = COORDINATES.length;
 		coordinates.clear();
 		price.clear();
 		demand.clear();
@@ -273,6 +275,34 @@ public class VRG {
 
 	public static int random(int start, int end) {
 		return (int) (start + Math.round((end - start) * Math.random()));
+	}
+
+	public static String getDifferenceBetweenSets() {
+		ArrayList<Integer> allIndexes = new ArrayList<Integer>();
+
+		for (ArrayList<Integer> tmp : routes) {
+			allIndexes.addAll(new ArrayList<Integer>(tmp));
+		}
+
+		ArrayList<Integer> indexes = getCoordsIndexes();
+		indexes.add(0);
+
+		ArrayList<Integer> diff = new ArrayList<Integer>(indexes);
+
+		diff.removeAll(allIndexes);
+		Collections.sort(diff);
+
+		return diff.toString();
+	}
+
+	public static String getStringDifferenceBetweenSets() {
+		String result = getDifferenceBetweenSets();
+		if (result.length() < 3) {
+			result = "";
+		} else {
+			result = VRGUtils.SPACE + VRGUtils.SLASH + VRGUtils.SPACE + result;
+		}
+		return result;
 	}
 
 	public static void main(String[] args) {
