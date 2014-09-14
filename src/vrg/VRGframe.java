@@ -1,12 +1,16 @@
 package vrg;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
 
+import javax.swing.GroupLayout;
 import javax.swing.JFrame;
 import javax.swing.JTable;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -27,6 +31,11 @@ public class VRGframe extends JFrame {
 	}
 
 	private void initComponents() {
+		final int P_SIZE = GroupLayout.PREFERRED_SIZE;
+		final int D_SIZE = GroupLayout.DEFAULT_SIZE;
+		final short S_MAX = Short.MAX_VALUE;
+		final java.awt.Font font = new java.awt.Font(VRGUtils.FONT_TAHOMA, 0,
+				14);
 
 		tabbedPane = new javax.swing.JTabbedPane();
 		jPanel1 = new javax.swing.JPanel();
@@ -50,7 +59,7 @@ public class VRGframe extends JFrame {
 		tableTC = new javax.swing.JTable();
 		jLabel1 = new javax.swing.JLabel();
 		jScrollPane3 = new javax.swing.JScrollPane();
-		tablePath = new javax.swing.JTable();
+		tableRoutes = new javax.swing.JTable();
 		jLabel3 = new javax.swing.JLabel();
 		buttonGenerPath = new javax.swing.JButton();
 		jLabel4 = new javax.swing.JLabel();
@@ -74,81 +83,58 @@ public class VRGframe extends JFrame {
 		jPanel8.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		buttonAddVertex.setText(VRGUtils.BTN_TXT_ADD_VERTEX);
-		buttonAddVertex.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+		buttonAddVertex.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
 				buttonAddVertexActionPerformed(evt);
 			}
 		});
 
 		buttonGenerGraph.setText(VRGUtils.BTN_TXT_GENERATE_DATA);
-		buttonGenerGraph.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+		buttonGenerGraph.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
 				buttonGenerGraphActionPerformed(evt);
 			}
 		});
 
 		buttonDeleteVertex.setText(VRGUtils.BTN_TXT_DELETE_VERTEX);
-		buttonDeleteVertex
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						buttonDeleteVertexActionPerformed(evt);
-					}
-				});
+		buttonDeleteVertex.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				buttonDeleteVertexActionPerformed(evt);
+			}
+		});
 
-		javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(
-				jPanel8);
+		GroupLayout jPanel8Layout = new GroupLayout(jPanel8);
 		jPanel8.setLayout(jPanel8Layout);
-		jPanel8Layout
-				.setHorizontalGroup(jPanel8Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
+		jPanel8Layout.setHorizontalGroup(jPanel8Layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addGroup(
+				jPanel8Layout.createSequentialGroup()
+						.addComponent(buttonAddVertex).addGap(18, 18, 18)
+						.addComponent(buttonGenerGraph, D_SIZE, D_SIZE, S_MAX)
+						.addPreferredGap(ComponentPlacement.UNRELATED)
+						.addComponent(buttonDeleteVertex)));
+		jPanel8Layout.setVerticalGroup(jPanel8Layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addGroup(
+				jPanel8Layout
+						.createSequentialGroup()
+						.addContainerGap(D_SIZE, S_MAX)
 						.addGroup(
 								jPanel8Layout
-										.createSequentialGroup()
+										.createParallelGroup(
+												GroupLayout.Alignment.BASELINE)
 										.addComponent(buttonAddVertex)
-										.addGap(18, 18, 18)
-										.addComponent(
-												buttonGenerGraph,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												Short.MAX_VALUE)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-										.addComponent(buttonDeleteVertex)));
-		jPanel8Layout
-				.setVerticalGroup(jPanel8Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanel8Layout
-										.createSequentialGroup()
-										.addContainerGap(
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												Short.MAX_VALUE)
-										.addGroup(
-												jPanel8Layout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																buttonAddVertex)
-														.addComponent(
-																buttonGenerGraph)
-														.addComponent(
-																buttonDeleteVertex))));
+										.addComponent(buttonGenerGraph)
+										.addComponent(buttonDeleteVertex))));
 
-		buttonStandartData.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0,
-				14));
-		buttonStandartData
-				.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		buttonStandartData.setFont(font);
+		buttonStandartData.setHorizontalAlignment(0);
 		buttonStandartData.setText(VRGUtils.TXT_GENERATE_STANDARD_DATA);
 		buttonStandartData.setBorder(javax.swing.BorderFactory
 				.createEtchedBorder());
-		buttonStandartData
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						buttonStandartDataActionPerformed(evt);
-					}
-				});
+		buttonStandartData.addActionListener(new ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				buttonStandartDataActionPerformed(evt);
+			}
+		});
 
 		tableCoordsDP.setBorder(javax.swing.BorderFactory.createEtchedBorder(
 				null, new java.awt.Color(0, 0, 0)));
@@ -173,139 +159,93 @@ public class VRGframe extends JFrame {
 
 		});
 		buttonSaveCountCars.setText(VRGUtils.BTN_TXT_GENERATE);
-		buttonSaveCountCars
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						buttonSaveCountCarsActionPerformed(evt);
-					}
-				});
-		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(
-				jPanel4);
+		buttonSaveCountCars.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				buttonSaveCountCarsActionPerformed(evt);
+			}
+		});
+		GroupLayout jPanel4Layout = new GroupLayout(jPanel4);
 		jPanel4.setLayout(jPanel4Layout);
-		jPanel4Layout
-				.setHorizontalGroup(jPanel4Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addComponent(jPanel8,
-								javax.swing.GroupLayout.DEFAULT_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE,
-								Short.MAX_VALUE)
-						.addComponent(jScrollPane2,
-								javax.swing.GroupLayout.DEFAULT_SIZE, 506,
-								Short.MAX_VALUE)
-						.addGroup(
-								jPanel4Layout
-										.createSequentialGroup()
-										.addComponent(
-												buttonStandartData,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												212,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-										.addComponent(textCountCars)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+		jPanel4Layout.setHorizontalGroup(jPanel4Layout
+				.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addComponent(jPanel8, D_SIZE, D_SIZE, S_MAX)
+				.addComponent(jScrollPane2, D_SIZE, 506, S_MAX)
+				.addGroup(
+						jPanel4Layout
+								.createSequentialGroup()
+								.addComponent(buttonStandartData, P_SIZE, 212,
+										P_SIZE)
+								.addPreferredGap(ComponentPlacement.UNRELATED)
+								.addComponent(textCountCars)
+								.addPreferredGap(ComponentPlacement.UNRELATED)
 
-										.addComponent(buttonSaveCountCars)
-										.addContainerGap())
-						.addGroup(
-								jPanel4Layout
-										.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.LEADING)
-										.addComponent(
-												jScrollPane4,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												502, Short.MAX_VALUE)));
+								.addComponent(buttonSaveCountCars)
+								.addContainerGap())
+				.addGroup(
+						jPanel4Layout.createParallelGroup(
+								GroupLayout.Alignment.LEADING).addComponent(
+								jScrollPane4, D_SIZE, 502, S_MAX)));
 		jPanel4Layout
 				.setVerticalGroup(jPanel4Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addGroup(
 								jPanel4Layout
 										.createSequentialGroup()
-										.addContainerGap(189, Short.MAX_VALUE)
-										.addComponent(
-												jPanel8,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
+										.addContainerGap(189, S_MAX)
+										.addComponent(jPanel8, P_SIZE, D_SIZE,
+												P_SIZE)
 										.addGap(18, 18, 18)
 										.addGroup(
 												jPanel4Layout
 														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
+																GroupLayout.Alignment.BASELINE)
 														.addComponent(
 																buttonStandartData)
 														.addComponent(
 																textCountCars,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
+																P_SIZE, D_SIZE,
+																P_SIZE)
 														.addComponent(
 																buttonSaveCountCars))
 										.addGap(18, 18, 18)
-										.addComponent(
-												jScrollPane2,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												50,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addContainerGap())
+										.addComponent(jScrollPane2, P_SIZE, 50,
+												P_SIZE).addContainerGap())
 						.addGroup(
 								jPanel4Layout
 										.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.LEADING)
+												GroupLayout.Alignment.LEADING)
 										.addGroup(
 												jPanel4Layout
 														.createSequentialGroup()
 														.addContainerGap()
 														.addComponent(
 																jScrollPane4,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																179,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
+																P_SIZE, 179,
+																P_SIZE)
 														.addContainerGap(158,
-																Short.MAX_VALUE))));
-		jLabel2.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 14));
-		jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+																S_MAX))));
+		jLabel2.setFont(font);
+		jLabel2.setHorizontalAlignment(0);
 		jLabel2.setText(VRGUtils.TXT_COORDS_DEMAND_PRICE);
 		jLabel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
-				jPanel1);
+		GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
 		jPanel1Layout.setHorizontalGroup(jPanel1Layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE,
-						javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addComponent(jPanel4, D_SIZE, D_SIZE, S_MAX)
 				.addGroup(
-						jPanel1Layout
-								.createSequentialGroup()
-								.addContainerGap()
-								.addComponent(jLabel2,
-										javax.swing.GroupLayout.DEFAULT_SIZE,
-										javax.swing.GroupLayout.DEFAULT_SIZE,
-										Short.MAX_VALUE).addContainerGap()));
-		jPanel1Layout
-				.setVerticalGroup(jPanel1Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								javax.swing.GroupLayout.Alignment.TRAILING,
-								jPanel1Layout
-										.createSequentialGroup()
-										.addGap(5, 5, 5)
-										.addComponent(jLabel2)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(
-												jPanel4,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addContainerGap(
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												Short.MAX_VALUE)));
+						jPanel1Layout.createSequentialGroup().addContainerGap()
+								.addComponent(jLabel2, D_SIZE, D_SIZE, S_MAX)
+								.addContainerGap()));
+		jPanel1Layout.setVerticalGroup(jPanel1Layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addGroup(
+				GroupLayout.Alignment.TRAILING,
+				jPanel1Layout.createSequentialGroup().addGap(5, 5, 5)
+						.addComponent(jLabel2)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(jPanel4, P_SIZE, D_SIZE, P_SIZE)
+						.addContainerGap(D_SIZE, S_MAX)));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_ENTER_COORDS, jPanel1);
 		tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -315,25 +255,22 @@ public class VRGframe extends JFrame {
 		});
 		frameCanvas.setVisible(true);
 
-		javax.swing.GroupLayout frameCanvasLayout = new javax.swing.GroupLayout(
+		GroupLayout frameCanvasLayout = new GroupLayout(
 				frameCanvas.getContentPane());
 		frameCanvas.getContentPane().setLayout(frameCanvasLayout);
 		frameCanvasLayout.setHorizontalGroup(frameCanvasLayout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGap(0, 490, Short.MAX_VALUE));
+				.createParallelGroup(GroupLayout.Alignment.LEADING).addGap(0,
+						490, S_MAX));
 		frameCanvasLayout.setVerticalGroup(frameCanvasLayout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGap(0, 355, Short.MAX_VALUE));
+				.createParallelGroup(GroupLayout.Alignment.LEADING).addGap(0,
+						355, S_MAX));
 
-		javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(
-				jPanel2);
+		GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
 		jPanel2.setLayout(jPanel2Layout);
 		jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(
-				javax.swing.GroupLayout.Alignment.LEADING).addComponent(
-				frameCanvas));
+				GroupLayout.Alignment.LEADING).addComponent(frameCanvas));
 		jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(
-				javax.swing.GroupLayout.Alignment.LEADING).addComponent(
-				frameCanvas));
+				GroupLayout.Alignment.LEADING).addComponent(frameCanvas));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_GRAPH, jPanel2);
 
@@ -342,41 +279,39 @@ public class VRGframe extends JFrame {
 		jScrollPane1.setViewportView(tableTC);
 		tableTC.getColumnModel().getColumn(0).setResizable(false);
 
-		jLabel1.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 14)); // NOI18N
-		jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		jLabel1.setFont(font);
+		jLabel1.setHorizontalAlignment(0);
 		jLabel1.setText(VRGUtils.TXT_DISTANCES);
 		jLabel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-		tablePath.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-		setAllModel(tablePath, new String[] { VRGUtils.TXT_ROUTE, "", "",
+		tableRoutes.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+		setAllModel(tableRoutes, new String[] { VRGUtils.TXT_ROUTE, "", "",
 				VRGUtils.TXT_PROFIT });
 
-		jScrollPane3.setViewportView(tablePath);
-		tablePath.getColumnModel().getColumn(0).setResizable(false);
+		jScrollPane3.setViewportView(tableRoutes);
+		tableRoutes.getColumnModel().getColumn(0).setResizable(false);
 
-		jLabel3.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 14));
-		jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		jLabel3.setFont(font);
+		jLabel3.setHorizontalAlignment(0);
 		jLabel3.setText(VRGUtils.TXT_TYPE_OF_GAME);
 		jLabel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		buttonGenerPath.setText(VRGUtils.BTN_TXT_GENERATE);
-		buttonGenerPath.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+		buttonGenerPath.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
 				buttonGenerRoutesActionPerformed(evt);
 			}
 		});
 
-		jLabel4.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 12));
+		jLabel4.setFont(font);
 		jLabel4.setText(VRGUtils.TXT_EXAMPLE);
 		jLabel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-		javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(
-				jPanel3);
+		GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
 		jPanel3.setLayout(jPanel3Layout);
 		jPanel3Layout
 				.setHorizontalGroup(jPanel3Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addComponent(jScrollPane1)
 						.addComponent(jScrollPane3)
 						.addGroup(
@@ -386,17 +321,13 @@ public class VRGframe extends JFrame {
 										.addGroup(
 												jPanel3Layout
 														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.LEADING)
-														.addComponent(
-																jLabel1,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																Short.MAX_VALUE)
-														.addComponent(
-																jLabel3,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																Short.MAX_VALUE)
+																GroupLayout.Alignment.LEADING)
+														.addComponent(jLabel1,
+																D_SIZE, D_SIZE,
+																S_MAX)
+														.addComponent(jLabel3,
+																D_SIZE, D_SIZE,
+																S_MAX)
 														.addGroup(
 																jPanel3Layout
 																		.createSequentialGroup()
@@ -407,48 +338,30 @@ public class VRGframe extends JFrame {
 																				18)
 																		.addComponent(
 																				jLabel4,
-																				javax.swing.GroupLayout.DEFAULT_SIZE,
-																				javax.swing.GroupLayout.DEFAULT_SIZE,
-																				Short.MAX_VALUE)))
+																				D_SIZE,
+																				D_SIZE,
+																				S_MAX)))
 										.addContainerGap()));
-		jPanel3Layout
-				.setVerticalGroup(jPanel3Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
+		jPanel3Layout.setVerticalGroup(jPanel3Layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addGroup(
+				GroupLayout.Alignment.TRAILING,
+				jPanel3Layout
+						.createSequentialGroup()
+						.addComponent(jLabel1, P_SIZE, 25, P_SIZE)
+						.addGap(18, 18, 18)
+						.addComponent(jScrollPane1, P_SIZE, 172, P_SIZE)
+						.addGap(18, 18, 18)
+						.addComponent(jLabel3)
+						.addPreferredGap(ComponentPlacement.RELATED)
 						.addGroup(
-								javax.swing.GroupLayout.Alignment.TRAILING,
 								jPanel3Layout
-										.createSequentialGroup()
-										.addComponent(
-												jLabel1,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												25,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addGap(18, 18, 18)
-										.addComponent(
-												jScrollPane1,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												172,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addGap(18, 18, 18)
-										.addComponent(jLabel3)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanel3Layout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																buttonGenerPath)
-														.addComponent(jLabel4))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(
-												jScrollPane3,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												85,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addContainerGap()));
+										.createParallelGroup(
+												GroupLayout.Alignment.BASELINE)
+										.addComponent(buttonGenerPath)
+										.addComponent(jLabel4))
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(jScrollPane3, P_SIZE, 85, P_SIZE)
+						.addContainerGap()));
 		tabbedPane.addTab(VRGUtils.TXT_TRANSPORTS_COSTS, jPanel3);
 
 		tableResult.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -459,35 +372,31 @@ public class VRGframe extends JFrame {
 		tableResult.getColumnModel().getColumn(1).setMinWidth(213);
 		jScrollPane5.setViewportView(tableResult);
 
-		jLabel6.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 14));
-		jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		jLabel6.setFont(font);
+		jLabel6.setHorizontalAlignment(0);
 		jLabel6.setText(VRGUtils.TXT_ANALYS);
 		jLabel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
 		buttonAnSolve.setText(VRGUtils.BTN_TXT_ANOTHER_SOLUTION);
-		buttonAnSolve.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+		buttonAnSolve.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
 				buttonAnSolveActionPerformed(evt);
 			}
 		});
 
 		buttonBestSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION);
-		buttonBestSolve.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
+		buttonBestSolve.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
 				buttonBestSolveActionPerformed(evt);
 			}
 		});
 
-		javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(
-				jPanel9);
+		GroupLayout jPanel9Layout = new GroupLayout(jPanel9);
 		jPanel9.setLayout(jPanel9Layout);
 		jPanel9Layout
 				.setHorizontalGroup(jPanel9Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addComponent(jScrollPane5,
-								javax.swing.GroupLayout.DEFAULT_SIZE, 506,
-								Short.MAX_VALUE)
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
+						.addComponent(jScrollPane5, D_SIZE, 506, S_MAX)
 						.addGroup(
 								jPanel9Layout
 										.createSequentialGroup()
@@ -495,51 +404,38 @@ public class VRGframe extends JFrame {
 										.addGroup(
 												jPanel9Layout
 														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.LEADING)
-														.addComponent(
-																jLabel6,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																Short.MAX_VALUE)
+																GroupLayout.Alignment.LEADING)
+														.addComponent(jLabel6,
+																D_SIZE, D_SIZE,
+																S_MAX)
 														.addGroup(
 																jPanel9Layout
 																		.createSequentialGroup()
 																		.addComponent(
 																				buttonAnSolve)
 																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-																				javax.swing.GroupLayout.DEFAULT_SIZE,
-																				Short.MAX_VALUE)
+																				ComponentPlacement.RELATED,
+																				D_SIZE,
+																				S_MAX)
 																		.addComponent(
 																				buttonBestSolve)))
 										.addContainerGap()));
-		jPanel9Layout
-				.setVerticalGroup(jPanel9Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
+		jPanel9Layout.setVerticalGroup(jPanel9Layout.createParallelGroup(
+				GroupLayout.Alignment.LEADING).addGroup(
+				GroupLayout.Alignment.TRAILING,
+				jPanel9Layout
+						.createSequentialGroup()
+						.addGap(4, 4, 4)
+						.addComponent(jLabel6)
+						.addGap(18, 18, 18)
 						.addGroup(
-								javax.swing.GroupLayout.Alignment.TRAILING,
 								jPanel9Layout
-										.createSequentialGroup()
-										.addGap(4, 4, 4)
-										.addComponent(jLabel6)
-										.addGap(18, 18, 18)
-										.addGroup(
-												jPanel9Layout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																buttonAnSolve)
-														.addComponent(
-																buttonBestSolve))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-												13, Short.MAX_VALUE)
-										.addComponent(
-												jScrollPane5,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												302,
-												javax.swing.GroupLayout.PREFERRED_SIZE)));
+										.createParallelGroup(
+												GroupLayout.Alignment.BASELINE)
+										.addComponent(buttonAnSolve)
+										.addComponent(buttonBestSolve))
+						.addPreferredGap(ComponentPlacement.RELATED, 13, S_MAX)
+						.addComponent(jScrollPane5, P_SIZE, 302, P_SIZE)));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_RESULT, jPanel9);
 
@@ -551,16 +447,13 @@ public class VRGframe extends JFrame {
 
 		setJMenuBar(menuBar);
 
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(
-				getContentPane());
+		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup(
-				javax.swing.GroupLayout.Alignment.LEADING).addComponent(
-				tabbedPane));
+				GroupLayout.Alignment.LEADING).addComponent(tabbedPane));
 		layout.setVerticalGroup(layout.createParallelGroup(
-				javax.swing.GroupLayout.Alignment.LEADING).addComponent(
-				tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 409,
-				Short.MAX_VALUE));
+				GroupLayout.Alignment.LEADING).addComponent(tabbedPane, P_SIZE,
+				409, S_MAX));
 
 		pack();
 	}
@@ -599,7 +492,7 @@ public class VRGframe extends JFrame {
 		}
 	}
 
-	private void buttonAddVertexActionPerformed(java.awt.event.ActionEvent evt) {
+	private void buttonAddVertexActionPerformed(ActionEvent evt) {
 		int k = VRGUtils.getIntFromDialog(this,
 				VRGUtils.FIELD_TXT_NUMBER_OF_ROWS, VRG.countCoords);
 
@@ -618,8 +511,7 @@ public class VRGframe extends JFrame {
 		}
 	}
 
-	private void buttonDeleteVertexActionPerformed(
-			java.awt.event.ActionEvent evt) {
+	private void buttonDeleteVertexActionPerformed(ActionEvent evt) {
 		clearAll();
 	}
 
@@ -629,7 +521,7 @@ public class VRGframe extends JFrame {
 				VRGUtils.TXT_COORDS, VRGUtils.TXT_DEMAND, VRGUtils.TXT_PRICE });
 		setAllModel(tableCars, new String[] { VRGUtils.TXT_GAMERS_AUTO, "1",
 				"2", "3" });
-		setAllModel(tablePath, new String[] { VRGUtils.TXT_ROUTE });
+		setAllModel(tableRoutes, new String[] { VRGUtils.TXT_ROUTE });
 		setAllModel(tableTC, new String[] { VRGUtils.TXT_VERTEX });
 		setAllModel(tableResult, new String[] { VRGUtils.TXT_PLAYER_NUMBER,
 				VRGUtils.TXT_ROUTE_NUMBER, VRGUtils.TXT_LENGTH_OF_ROUTE,
@@ -653,7 +545,7 @@ public class VRGframe extends JFrame {
 		VRG.generateGraphRoutes();
 	}
 
-	private void buttonGenerGraphActionPerformed(java.awt.event.ActionEvent evt) {
+	private void buttonGenerGraphActionPerformed(ActionEvent evt) {
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 		if (dtm.getRowCount() < 3) {
 			buttonAddVertexActionPerformed(evt);
@@ -664,8 +556,7 @@ public class VRGframe extends JFrame {
 		buttonSaveCountCarsActionPerformed(evt);
 	}
 
-	private void buttonStandartDataActionPerformed(
-			java.awt.event.ActionEvent evt) {
+	private void buttonStandartDataActionPerformed(ActionEvent evt) {
 		generateAllStandart();
 	}
 
@@ -701,8 +592,7 @@ public class VRGframe extends JFrame {
 		}
 	}
 
-	private void buttonSaveCountCarsActionPerformed(
-			java.awt.event.ActionEvent evt) {
+	private void buttonSaveCountCarsActionPerformed(ActionEvent evt) {
 		VRG.countCars = tableCars.getColumnCount() - 1;
 		fillCarsArray(VRG.countCars + 1);
 		fillCarsTable();
@@ -720,7 +610,7 @@ public class VRGframe extends JFrame {
 		}
 	}
 
-	private void buttonGenerRoutesActionPerformed(java.awt.event.ActionEvent evt) {
+	private void buttonGenerRoutesActionPerformed(ActionEvent evt) {
 		isNeedToUpdate = true;
 		VRG.countCars = tableCars.getColumnCount() - 1;
 		setRoutesTable();
@@ -728,38 +618,38 @@ public class VRGframe extends JFrame {
 	}
 
 	private void setRoutesTable() {
-		setModelForRoutes(tablePath, VRGUtils.TXT_ROUTE,
+		setModelForRoutes(tableRoutes, VRGUtils.TXT_ROUTE,
 				VRG.coordinates.size(), VRG.countCars);
 		VRG.createTableOfRoutes();
-		fillTCcostsTable();
+		fillRoutesTable();
 	}
 
-	private void fillTCcostsTable() {
+	private void fillRoutesTable() {
 		int[][] s = VRG.getRoutes();
 		for (int i = 0; i < s.length; i++) {
 			for (int j = 0; j < s[i].length; j++) {
-				tablePath.setValueAt(s[i][j], i, j);
+				tableRoutes.setValueAt(s[i][j], i, j);
 			}
 		}
 	}
 
-	private void buttonAnSolveActionPerformed(java.awt.event.ActionEvent evt) {
+	private void buttonAnSolveActionPerformed(ActionEvent evt) {
 		if (VRG.isValid()) {
 			VRG.generateGraphRoutes();
 			fillValueToResultTable();
 		}
 	}
 
-	private void buttonBestSolveActionPerformed(java.awt.event.ActionEvent evt) {// FIXME
+	private void buttonBestSolveActionPerformed(ActionEvent evt) {// FIXME
 		turnOnTimer(evt);
 	}
 
-	private void turnOnTimer(final java.awt.event.ActionEvent evt) {
+	private void turnOnTimer(final ActionEvent evt) {
 		if (turnOffTimer()) {
 			return;
 		} else {
 			buttonBestSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION
-					+ VRGUtils.SPACE + VRGUtils.SYBOLS_ON);
+					+ VRGUtils.SPACE + VRGUtils.SYMBOLS_ON);
 		}
 
 		timer = new java.util.Timer();
@@ -776,7 +666,7 @@ public class VRGframe extends JFrame {
 		// if ((isEnabled || isNeedToUpdate) && (timer != null)) {
 		if ((isEnabled) && (timer != null)) {
 			buttonBestSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION
-					+ VRGUtils.SPACE + VRGUtils.SYBOLS_OFF);
+					+ VRGUtils.SPACE + VRGUtils.SYMBOLS_OFF);
 			timer.cancel();
 			isEnabled = false;
 			return true;
@@ -1147,7 +1037,7 @@ public class VRGframe extends JFrame {
 	private javax.swing.JTabbedPane tabbedPane;
 	private javax.swing.JTable tableCars;
 	private javax.swing.JTable tableCoordsDP;
-	private javax.swing.JTable tablePath;
+	private javax.swing.JTable tableRoutes;
 	private javax.swing.JTable tableResult;
 	private javax.swing.JTable tableTC;
 	private javax.swing.JTextField textCountCars;

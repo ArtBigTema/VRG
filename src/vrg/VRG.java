@@ -2,10 +2,10 @@ package vrg;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.swing.JFrame;
 
