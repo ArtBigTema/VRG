@@ -2,12 +2,16 @@ package vrg;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.mxgraph.canvas.mxICanvas;
@@ -241,7 +245,38 @@ public class GraphFrame extends JFrame {
 				nymberOfSpace++;
 				updateEdges(graphComponent.getGraph());
 			}
-		}
+
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ALT
+					|| paramKeyEvent.getKeyCode() == KeyEvent.VK_CONTROL) {
+				try {
+
+					BufferedImage image = new BufferedImage(getWidth(),
+							getHeight(), BufferedImage.TYPE_INT_RGB);
+					Graphics2D graphics2D = image.createGraphics();
+					GraphFrame.this.paint(graphics2D);
+
+					File directory = new File(VRGUtils.LABEL_VRG);
+					File filename = null;
+
+					if (directory.exists() && directory.isDirectory()) {
+						filename = new File(directory.getName()
+								+ "/ScreenShots"
+								+ (directory.list().length + 1) + ".jpeg");
+					} else {
+						directory.mkdir();
+						filename = new File(directory.getName()
+								+ "/ScreenShots"
+								+ (directory.list().length + 1) + ".jpeg");
+					}
+
+					ImageIO.write(image, "jpeg", filename);
+				} catch (Exception e) {
+					VRGUtils.showErrorMess(GraphFrame.this,
+							VRGUtils.MSG_ERR_TITLE,
+							VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
+				}
+			}
+		};
 
 		@Override
 		public void keyTyped(KeyEvent paramKeyEvent) {
