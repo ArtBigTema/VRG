@@ -160,7 +160,7 @@ public class VRG {
 		return indexes;
 	}
 
-	public static void generateRoutes() {//FIXME 
+	public static void generateRoutes() {// FIXME
 		routes.clear();
 
 		for (int i = 0; i < countCars; i++) {
