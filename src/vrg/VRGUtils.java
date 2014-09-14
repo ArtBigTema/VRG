@@ -2,7 +2,7 @@ package vrg;
 
 import javax.swing.JOptionPane;
 
-public class StrUtils {
+public class VRGUtils {
 	public static final String OPENEDBKT = "(";
 	public static final String CLOSEDBKT = ")";
 	public static final String SEMICOLON = ";";
@@ -54,13 +54,16 @@ public class StrUtils {
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
 	public static final String MSG_ERR_ATTENTION = "Attention";
-	public static final String MSG_ERR_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n чтобы посмотреть визуализацию";// "Click graph tab";
+	public static final String MSG_ERR_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n "
+			+ "чтобы посмотреть визуализацию";// "Click graph tab";
 	public static final String EQ = "=";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
 	public static final String LABEL_WEIGHT = "Масса: ";// "WEIGHT: ";
 	public static final String TXT_ANALYS = "Анализ на чувствительность";// "Analys";
 	public static final String MSG_ERR_ADD_VERTEX = "Добавьте несколько вершин";// "Add more vertexes";
 	public static final String TXT_IS_ALL = "Всего";// "All: ";
+	public static final String MSG_ERR_ROUTES = "Возможные пути исчерпаны \n "
+			+ "Сгенерировать другие?";// "Generate routes?";
 
 	public static final String SYBOLS_ON = "☑";
 	public static final String SYBOLS_OFF = "☐";
@@ -69,6 +72,19 @@ public class StrUtils {
 		int k = 0;
 		try {
 			k = Integer.parseInt(JOptionPane.showInputDialog(text));
+		} catch (NumberFormatException e) {
+			return 0;
+		}
+		return k;
+	}
+
+	public static int getIntFromDialog(javax.swing.JFrame frame, String title,
+			int text) {
+		int k = 0;
+		try {
+			k = Integer.parseInt(String.valueOf(JOptionPane.showInputDialog(
+					frame, title, null, JOptionPane.QUESTION_MESSAGE, null,
+					null, text)));
 		} catch (NumberFormatException e) {
 			return 0;
 		}
@@ -93,5 +109,17 @@ public class StrUtils {
 			return 0;
 		}
 		return k;
+	}
+
+	public static void showErrorMess(javax.swing.JFrame frame, String title,
+			String body) {
+		JOptionPane.showMessageDialog(frame, body, title,
+				JOptionPane.ERROR_MESSAGE);
+	}
+
+	public static boolean showInputDialog(javax.swing.JFrame frame,
+			String title, String body) {
+		return (JOptionPane.showConfirmDialog(frame, body, title,
+				JOptionPane.YES_OPTION) == JOptionPane.YES_OPTION);
 	}
 }

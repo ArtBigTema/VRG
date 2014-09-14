@@ -62,7 +62,7 @@ public class VRG {
 		generateCars(n);
 		generateDemand(n);
 		generatePrice(n);
-		generateGraphRoutes();// FIXME
+		generateGraphRoutes();
 	}
 
 	public static void clearAll() {
@@ -198,7 +198,7 @@ public class VRG {
 		for (int i = 0; i < countCars; i++) {
 			tmp = new ArrayList<Integer>();
 			tmp.add(0);
-			int m = random(1, Math.max(indexQ.size() / 2, 0));
+			int m = random(1, Math.max(indexQ.size() / 2, 0));// FIXME
 			for (int j = 0; j < Math.min(indexQ.size(), m); j++) {
 				tmp.add(indexQ.poll());
 			}

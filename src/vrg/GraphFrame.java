@@ -114,7 +114,7 @@ public class GraphFrame extends JFrame {
 				VRGvertexes a = new VRGvertexes();
 
 				a.objectVertex = graph
-						.insertVertex(parent, null, StrUtils.LABEL_BASE,
+						.insertVertex(parent, null, VRGUtils.LABEL_BASE,
 								(VRG.coordinates.get(0).x) * distance,
 								VRG.coordinates.get(0).y * distance,
 								baseLength, baseLength,
@@ -132,7 +132,7 @@ public class GraphFrame extends JFrame {
 				VRGvertexes vertex = new VRGvertexes();
 
 				vertex.objectVertex = graph.insertVertex(parent, null,
-						StrUtils.LABEL_VERTEX + i, VRG.coordinates.get(i).x
+						VRGUtils.LABEL_VERTEX + i, VRG.coordinates.get(i).x
 								* distance,
 						VRG.coordinates.get(i).y * distance, length, length);// x,y,width,height//StrUtils.GRAPH_PARAM_3
 
@@ -168,9 +168,9 @@ public class GraphFrame extends JFrame {
 	}
 
 	private void addCars(mxGraph graph) {
-		for (int i = 0; i < VRG.carsCoordinates.size(); i++) {
+		for (int i = 1; i < VRG.carsCoordinates.size(); i++) {
 			graph.insertVertex(graph.getDefaultParent(), null,
-					StrUtils.LABEL_CARS + i, VRG.carsCoordinates.get(i).x
+					VRGUtils.LABEL_CARS + i, VRG.carsCoordinates.get(i).x
 							* distance, distance + VRG.carsCoordinates.get(i).y
 							* distance, 3 * length, length);// x,y,width,height
 		}
@@ -190,8 +190,13 @@ public class GraphFrame extends JFrame {
 		Object parent = graph.getDefaultParent();
 
 		if ((nymberOfSpace + 1) > VRG.routes.size()) {
+			VRGframe.isNeedToUpdate = false;
+			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ERR_ATTENTION,
+					VRGUtils.MSG_ERR_ROUTES)) {
+				VRG.generateGraphRoutes();
+			}
+			VRGframe.isNeedToUpdate = true;
 			nymberOfSpace = 0;
-			VRG.generateGraphRoutes();
 		}
 
 		ArrayList<Integer> tmp = VRG.routes.get(nymberOfSpace);
@@ -204,7 +209,7 @@ public class GraphFrame extends JFrame {
 
 			graph.insertEdge(parent, null, distance.toString().substring(0, 3),
 					vrgVertexes.get(in).objectVertex,
-					vrgVertexes.get(index).objectVertex, StrUtils.GRAPH_PARAM_2);
+					vrgVertexes.get(index).objectVertex, VRGUtils.GRAPH_PARAM_2);
 			in = index;
 		}
 	}

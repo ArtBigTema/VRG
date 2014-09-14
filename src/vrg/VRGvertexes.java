@@ -22,9 +22,9 @@ public class VRGvertexes {
 
 		@Override
 		public String toString() {
-			return StrUtils.TXT_COORDS + StrUtils.SPACE + StrUtils.OPENEDBKT
-					+ coords.x + StrUtils.SEMICOLON + coords.y
-					+ StrUtils.CLOSEDBKT;
+			return VRGUtils.TXT_COORDS + VRGUtils.SPACE + VRGUtils.OPENEDBKT
+					+ coords.x + VRGUtils.SEMICOLON + coords.y
+					+ VRGUtils.CLOSEDBKT;
 		}
 
 	}
@@ -47,8 +47,8 @@ public class VRGvertexes {
 
 	@Override
 	public String toString() {
-		return vertexCoords.toString() + StrUtils.SPACE + StrUtils.TXT_DEMAND
-				+ StrUtils.EQ + demand + StrUtils.COMMA + StrUtils.SPACE
-				+ StrUtils.TXT_PRICE + StrUtils.EQ + price;
+		return vertexCoords.toString() + VRGUtils.SPACE + VRGUtils.TXT_DEMAND
+				+ VRGUtils.EQ + demand + VRGUtils.COMMA + VRGUtils.SPACE
+				+ VRGUtils.TXT_PRICE + VRGUtils.EQ + price;
 	}
 }
