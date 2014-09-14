@@ -82,6 +82,9 @@ public class VRGUtils {
 	public static final int DELAY = 400;
 	public static final int START = 10;
 
+	public static final String TXT_FILES = "Файлы текста";// "Text files";
+	public static final String ENCODING = "cp1251";
+
 	public static int getIntFromDialog(String text) {
 		int k = 0;
 		try {

@@ -24,7 +24,7 @@ public class VRGTableExporter {
 
 			filename = createFile(name);
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(filename), "cp1251"));
+					new FileOutputStream(filename), VRGUtils.ENCODING));
 
 			for (JTable table : tables) {
 				writeFile(out, table);

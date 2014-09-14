@@ -492,6 +492,7 @@ public class VRGframe extends JFrame {
 			menuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
 					buttonDeleteVertexActionPerformed(evt);
+					buttonGenerGraphActionPerformed(evt);
 				}
 			});
 
@@ -547,6 +548,15 @@ public class VRGframe extends JFrame {
 			JMenuItem menuItem = new JMenuItem();
 			menuItem.setText("Файл с координатами");
 			menu.add(menuItem);
+
+			menuItem.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent evt) {
+					VRG.readTableFromFile(VRGframe.this);
+					fillAllStandart();
+				}
+			});
 		}
 		jMenu1.addSeparator();
 		{
@@ -567,8 +577,12 @@ public class VRGframe extends JFrame {
 	protected void generateAllStandart() {
 		clearAll();
 		isNeedToUpdate = true;
-		VRG.generateAllStandart();
 
+		VRG.generateAllStandart();
+		fillAllStandart();
+	}
+
+	protected void fillAllStandart() {
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 
 		addRowCount(VRG.countCoords - 1, dtm);

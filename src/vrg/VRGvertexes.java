@@ -12,8 +12,7 @@ public class VRGvertexes {
 		}
 
 		public VertexCoords(int x, int y) {
-			this.coords.x = x;
-			this.coords.y = y;
+			this.coords = new Point(x, y);
 		}
 
 		public Point getPoint() {
@@ -43,6 +42,19 @@ public class VRGvertexes {
 
 	public VRGvertexes() {
 		objectVertex = new Object();
+	}
+
+	public VRGvertexes(int x, int y, int d, int p) {
+		objectVertex = new Object();
+		vertexCoords = new VertexCoords(x, y);
+		price = p;
+		demand = d;
+	}
+
+	public VRGvertexes(String[] array) {
+		this(VRGUtils.getIntFromText(array[0]), VRGUtils
+				.getIntFromText(array[1]), VRGUtils.getIntFromText(array[2]),
+				VRGUtils.getIntFromText(array[3]));
 	}
 
 	@Override

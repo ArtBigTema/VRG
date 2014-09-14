@@ -1,5 +1,6 @@
 package vrg;
 
+import java.awt.Component;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -330,6 +331,32 @@ public class VRG {
 			result = VRGUtils.SPACE + VRGUtils.SLASH + VRGUtils.SPACE + result;
 		}
 		return result;
+	}
+
+	public static void readTableFromFile(Component parent) {
+		ArrayList<VRGvertexes> vertexes = VRGfile.readFromFile(parent);
+		clearAll();
+		countCoords = vertexes.size();
+
+		for (int i = 0; i < countCoords; i++) {
+			coordinates.add(vertexes.get(i).vertexCoords.getPoint());
+			price.add(vertexes.get(i).price);
+			demand.add(vertexes.get(i).demand);
+		}
+
+		for (int i = 0; i < countCars; i++) {
+			cars.add(CARS_WEIGHT[i]);
+
+			ArrayList<Integer> tmp = new ArrayList<Integer>();
+			for (int j = 0; j < ROUTES[i].length; j++) {
+				tmp.add(ROUTES[i][j]);
+			}
+			routes.add(tmp);
+		}
+		cars.add(CARS_WEIGHT[countCars - 1]);
+
+		fillCarsCoords();
+		createTableOfRoutes();
 	}
 
 	public static void main(String[] args) {
