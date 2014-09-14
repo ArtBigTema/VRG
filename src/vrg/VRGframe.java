@@ -676,7 +676,7 @@ public class VRGframe extends JFrame {
 	}
 
 	private void fillFirstStrokeCoordsTable(DefaultTableModel dtm) {
-		dtm.setValueAt("x[" + (0) + "]", 0, 0);
+		dtm.setValueAt(VRGUtils.X + "[" + (0) + "]", 0, 0);
 		dtm.setValueAt(VRGUtils.OPENEDBKT + VRG.coordinates.get(0).x
 				+ VRGUtils.SEMICOLON + VRG.coordinates.get(0).y
 				+ VRGUtils.CLOSEDBKT, 0, 1);
@@ -765,7 +765,7 @@ public class VRGframe extends JFrame {
 			public void run() {
 				buttonAnSolveActionPerformed(evt);
 			}
-		}, 10, 300);
+		}, VRGUtils.START, VRGUtils.DELAY);
 	}
 
 	private boolean turnOffTimer() {

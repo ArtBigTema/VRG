@@ -3,6 +3,9 @@ package vrg;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -10,6 +13,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -31,6 +35,10 @@ public class GraphFrame extends JFrame {
 
 	public static ArrayList<VRGvertexes> vrgVertexes;
 	public int nymberOfSpace = 0;
+
+	private void showInitMessage() {
+		VRGUtils.showInitMessage(this, VRGUtils.MSG_INIT);
+	}
 
 	public GraphFrame() {
 		vrgVertexes = new ArrayList<VRGvertexes>();
@@ -76,6 +84,8 @@ public class GraphFrame extends JFrame {
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(600, 450);
 		this.setVisible(true);
+
+		showInitMessage();
 
 		graphComponent.addKeyListener(keyListener);
 		graphComponent.addFocusListener(focusListener);
@@ -222,7 +232,6 @@ public class GraphFrame extends JFrame {
 		graph.getModel().beginUpdate();
 		try {
 			for (VRGvertexes v : vrgVertexes) {
-				// Object[] edges = graph.getEdges(v.objectVertex);
 				Object[] edges = graph.getEdges((mxCell) v.objectVertex);
 				if (edges == null || edges.length == 0) {
 					continue;
@@ -246,37 +255,67 @@ public class GraphFrame extends JFrame {
 				updateEdges(graphComponent.getGraph());
 			}
 
-			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ALT
-					|| paramKeyEvent.getKeyCode() == KeyEvent.VK_CONTROL) {
-				try {
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ALT) {
+				takeScreenShotOfWindow();
+			}
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_CONTROL) {
+				setExtendedState(MAXIMIZED_BOTH);
 
-					BufferedImage image = new BufferedImage(getWidth(),
-							getHeight(), BufferedImage.TYPE_INT_RGB);
-					Graphics2D graphics2D = image.createGraphics();
-					GraphFrame.this.paint(graphics2D);
+				java.util.Timer timer = new java.util.Timer();
+				timer.scheduleAtFixedRate(new TimerTask() {
 
-					File directory = new File(VRGUtils.LABEL_VRG);
-					File filename = null;
-
-					if (directory.exists() && directory.isDirectory()) {
-						filename = new File(directory.getName()
-								+ "/ScreenShots"
-								+ (directory.list().length + 1) + ".jpeg");
-					} else {
-						directory.mkdir();
-						filename = new File(directory.getName()
-								+ "/ScreenShots"
-								+ (directory.list().length + 1) + ".jpeg");
+					public void run() {
+						takeScreenCapture();
+						this.cancel();
 					}
-
-					ImageIO.write(image, "jpeg", filename);
-				} catch (Exception e) {
-					VRGUtils.showErrorMess(GraphFrame.this,
-							VRGUtils.MSG_ERR_TITLE,
-							VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
-				}
+				}, VRGUtils.DELAY, VRGUtils.START);
 			}
 		};
+
+		private void takeScreenCapture() {
+			BufferedImage image;
+			try {
+				image = new Robot().createScreenCapture(new Rectangle(Toolkit
+						.getDefaultToolkit().getScreenSize()));
+
+				ImageIO.write(image, "png",
+						getFile(new File(VRGUtils.LABEL_VRG)));
+
+			} catch (Exception e) {
+				VRGUtils.showErrorMess(GraphFrame.this, VRGUtils.MSG_ERR_TITLE,
+						VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
+			}
+		}
+
+		private void takeScreenShotOfWindow() {
+			try {
+				BufferedImage image = new BufferedImage(getWidth(),
+						getHeight(), BufferedImage.TYPE_INT_RGB);
+				Graphics2D graphics2D = image.createGraphics();
+				GraphFrame.this.paint(graphics2D);
+
+				File directory = new File(VRGUtils.LABEL_VRG);
+
+				ImageIO.write(image, "jpeg", getFile(directory));
+			} catch (Exception e) {
+				VRGUtils.showErrorMess(GraphFrame.this, VRGUtils.MSG_ERR_TITLE,
+						VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
+			}
+		}
+
+		private File getFile(File directory) {
+			File filename = null;
+
+			if (directory.exists() && directory.isDirectory()) {
+				filename = new File(directory.getName() + "/ScreenShots"
+						+ (directory.list().length + 1) + ".jpeg");
+			} else {
+				directory.mkdir();
+				filename = new File(directory.getName() + "/ScreenShots"
+						+ (directory.list().length + 1) + ".jpeg");
+			}
+			return filename;
+		}
 
 		@Override
 		public void keyTyped(KeyEvent paramKeyEvent) {

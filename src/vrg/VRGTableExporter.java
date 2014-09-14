@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
 public class VRGTableExporter {
@@ -34,8 +33,7 @@ public class VRGTableExporter {
 			flushAndOpenFile(out, filename);
 
 		} catch (IOException ex) {
-			JOptionPane.showMessageDialog(null, ex.toString(), "Ошибка",
-					JOptionPane.ERROR_MESSAGE);
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, ex.toString());
 		}
 	}
 
@@ -108,14 +106,15 @@ public class VRGTableExporter {
 					+ "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">"
 					+ "<tr>");
 			out.write("</table></body></html>");
+
 		} catch (IOException ex) {
 			try {
 				out.flush();
 				out.close();
 			} catch (IOException e) {
+				ex = e;
 			}
-			JOptionPane.showMessageDialog(null, ex.toString(), "Ошибка",
-					JOptionPane.ERROR_MESSAGE);
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, ex.toString());
 		}
 	}
 }

@@ -52,6 +52,11 @@ public class VRGUtils {
 			+ "entryX=0;entryY=1;entryPerimeter=0;";
 	public static final String GRAPH_PARAM_3 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
 
+	public static final String MSG_INIT = "Здесь будет отображаться Ваш граф"
+			+ "\n"
+			+ "Чтобы сгенерировать другой маршрут нажмите пробел (spase)"
+			+ "\n" + "Чтобы сохранить текущее окно как картинку, нажмите CTRL"
+			+ "\n" + "Чтобы сохранить весь экран как картинку, нажмите ALT";
 	public static final String MSG_ERR_FILE_ISNT_CREATED = "Не возможно создать файл!";// "File is not created!";
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
@@ -74,6 +79,8 @@ public class VRGUtils {
 	public static final String LABEL_VERTEX = "X ";
 
 	public static final String LABEL_VRG = "VRG";
+	public static final int DELAY = 400;
+	public static final int START = 10;
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;
@@ -141,5 +148,9 @@ public class VRGUtils {
 			String title, String body) {
 		return (JOptionPane.showConfirmDialog(frame, body, title,
 				JOptionPane.YES_OPTION) == JOptionPane.YES_OPTION);
+	}
+
+	public static void showInitMessage(javax.swing.JFrame frame, String text) {
+		JOptionPane.showMessageDialog(frame, text);
 	}
 }
