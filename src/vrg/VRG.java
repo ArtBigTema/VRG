@@ -7,18 +7,20 @@ import java.util.Comparator;
 
 import javax.swing.JFrame;
 
+import vrg.VRGvertexes.VertexCoords;
+
 public class VRG {
-	public static final int LENGTH = 20;
-	public static final int DISTANCE = 30;
-	public static final int COUNT = 8;
-	public static final Integer[][] CORDINATES = { { 19, 45 }, { 18, 46 },
+	public static final int[][] COORDINATES = { { 19, 45 }, { 18, 46 },
 			{ 20, 47 }, { 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 },
 			{ 13, 45 } };
-	public static final Integer[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
-	public static final Integer[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
-	public static final Integer[] CARS_WEIGHT = { 2, 2, 3 };
-	public static final Integer[][] CARS = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
+	public static final int[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
+	public static final int[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
+	public static final int[] CARS_WEIGHT = { 2, 2, 3 };
+	public static final int[][] CARS = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
+	public static final int[][] ROUTES = { { 0, 1, 2, 0 }, { 0, 3, 4, 0 },
+			{ 0, 5, 6, 7, 0 } };
 
+	public static int countCoords = 8;
 	public static int countCars = 3;
 	public static final int ZOOM = 5;
 
@@ -33,19 +35,25 @@ public class VRG {
 	public static void generateAllStandart() {
 		clearAll();
 
-		Collections.addAll(price, PRICE);
-		Collections.addAll(demand, DEMAND);
-		Collections.addAll(cars, CARS_WEIGHT);
-
-		for (int i = 0; i < COUNT; i++) {
-			coordinates.add(new Point(CORDINATES[i][0], CORDINATES[i][1]));
+		for (int i = 0; i < countCoords; i++) {
+			coordinates.add(new Point(COORDINATES[i][0], COORDINATES[i][1]));
 			price.add(PRICE[i]);
 			demand.add(DEMAND[i]);
 		}
 
+		for (int i = 0; i < countCars; i++) {
+			cars.add(CARS_WEIGHT[i]);
+
+			ArrayList<Integer> tmp = new ArrayList<Integer>();
+			for (int j = 0; j < ROUTES[i].length; j++) {
+				tmp.add(ROUTES[i][j]);
+			}
+			routes.add(tmp);
+		}
+		cars.add(CARS_WEIGHT[countCars - 1]);
+
 		fillCarsCoords();
 		createTableOfRoutes();
-		generateRoutes();
 	}
 
 	public static void generateAll(int n) {
@@ -107,7 +115,7 @@ public class VRG {
 			ArrayList<Double> tmp = new ArrayList<Double>();
 
 			for (int j = 0; j < coordinates.size(); j++) {
-				String s = VRGvertexes.getDistanceText(coordinates.get(i),
+				String s = getDistanceText(coordinates.get(i),
 						coordinates.get(j));
 				tmp.add(Double.valueOf(s));
 			}
@@ -217,6 +225,24 @@ public class VRG {
 		for (int i = 0; i < cars.size(); i++) {
 			carsCoordinates.add(new Point(max.x + 4, i));
 		}
+	}
+
+	public static String getDistanceText(Object p1, Object p2) {
+		Double distanse = 0D;
+		if (p1 instanceof Point) {
+			distanse = getDistance(Point.class.cast(p1), Point.class.cast(p2));
+		}
+
+		if (distanse.toString().length() < 5) {
+			return distanse.toString();
+		} else {
+			return distanse.toString().substring(0, 5);
+		}
+	}
+
+	public static double getDistance(Point p1, Point p2) {
+		return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y)
+				* (p2.y - p1.y));
 	}
 
 	public static int random(int start, int end) {

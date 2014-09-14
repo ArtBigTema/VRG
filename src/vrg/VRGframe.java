@@ -3,6 +3,8 @@ package vrg;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.Vector;
 
@@ -137,6 +139,7 @@ public class VRGframe extends JFrame {
 		jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		jLabel5.setText(StrUtils.TXT_GAMERS_AUTO);
 		jLabel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+		jLabel5.addMouseListener(mouseListener);
 
 		tableCoordsDP.setBorder(javax.swing.BorderFactory.createEtchedBorder(
 				null, new java.awt.Color(0, 0, 0)));
@@ -553,8 +556,52 @@ public class VRGframe extends JFrame {
 		pack();
 	}
 
+	MouseListener mouseListener = new MouseListener() {
+		@Override
+		public void mousePressed(MouseEvent paramMouseEvent) {
+		}
+
+		@Override
+		public void mouseExited(MouseEvent paramMouseEvent) {
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent paramMouseEvent) {
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent paramMouseEvent) {
+			generateAllStandart();
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent paramMouseEvent) {
+		}
+	};
+
 	public void addRowCount(int k, DefaultTableModel dtm) {
 		addRow(k, dtm, "");
+	}
+
+	protected void generateAllStandart() {
+		clearAll();
+		VRG.generateAllStandart();
+
+		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
+
+		addRowCount(VRG.countCoords - 1, dtm);
+
+		for (int i = 0; i < dtm.getRowCount(); i++) {
+			dtm.setValueAt("x[" + i + "]", i, 0);
+		}
+
+		isNeedToUpdate = true;
+
+		fillCoordsTable(dtm);
+
+		setModelForCars(tableCars, StrUtils.TXT_GAMERS_AUTO, VRG.countCars);
+		fillCarsTable();
+		setRoutesTable();
 	}
 
 	public void addRow(int k, DefaultTableModel dtm, String s) {
@@ -585,6 +632,10 @@ public class VRGframe extends JFrame {
 
 	private void buttonDeleteVertexActionPerformed(
 			java.awt.event.ActionEvent evt) {
+		clearAll();
+	}
+
+	private void clearAll() {
 		VRG.clearAll();
 		setAllModel(tableCoordsDP, new String[] { StrUtils.TXT_VERTEX_LABEL,
 				StrUtils.TXT_COORDS, StrUtils.TXT_DEMAND, StrUtils.TXT_PRICE });
@@ -594,7 +645,6 @@ public class VRGframe extends JFrame {
 		setAllModel(tableResult, new String[] { StrUtils.TXT_PLAYER_NUMBER,
 				StrUtils.TXT_ROUTE_NUMBER, StrUtils.TXT_LENGTH_OF_ROUTE,
 				StrUtils.TXT_LOAD_VEHICLE, StrUtils.TXT_PROFIT_LABEL });
-
 	}
 
 	private void textCountCarsMouseClicked(java.awt.event.MouseEvent evt) {
@@ -610,6 +660,7 @@ public class VRGframe extends JFrame {
 		VRG.countCars = k;
 
 		setModelForCars(tableCars, StrUtils.TXT_GAMERS_AUTO, k);
+		fillCarsArray(k + 1);
 		fillCarsTable();
 		VRG.generateRoutes();
 	}
@@ -618,11 +669,7 @@ public class VRGframe extends JFrame {
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 		if (dtm.getRowCount() < 3) {
 			buttonAddVertexActionPerformed(evt);
-			// showErrorMess(StrUtils.MSG_ERR_TITLE,
-			// StrUtils.MSG_ERR_ADD_VERTEX);
 		}
-		isNeedToUpdate = true;
-
 		fillArrays(dtm.getRowCount());
 
 		fillCoordsTable(dtm);
@@ -634,7 +681,6 @@ public class VRGframe extends JFrame {
 	private void fillArrays(int n) {
 		isNeedToUpdate = true;
 		VRG.generateAll(n);
-		GraphFrame.constructVertexes();
 	}
 
 	private void fillCarsArray(int n) {
@@ -666,6 +712,7 @@ public class VRGframe extends JFrame {
 	private void buttonSaveCountCarsActionPerformed(
 			java.awt.event.ActionEvent evt) {
 		VRG.countCars = tableCars.getColumnCount() - 1;
+		fillCarsArray(VRG.countCars + 1);
 		fillCarsTable();
 		VRG.generateRoutes();
 		setRoutesTable();
@@ -673,7 +720,6 @@ public class VRGframe extends JFrame {
 
 	private void fillCarsTable() {
 		DefaultTableModel dtm = (DefaultTableModel) tableCars.getModel();
-		fillCarsArray(dtm.getColumnCount());
 		dtm.setValueAt(StrUtils.TXT_PLAYER_LABEL + (dtm.getColumnCount() - 1),
 				0, 0);
 
@@ -711,7 +757,7 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonBestSolveActionPerformed(java.awt.event.ActionEvent evt) {
-		fillValueToResultTable(StrUtils.TXT_IS_ALL);// FIXME
+		// fillValueToResultTable(StrUtils.TXT_IS_ALL);// FIXME
 	}
 
 	public static void main(String args[]) {
@@ -742,27 +788,19 @@ public class VRGframe extends JFrame {
 	}
 
 	private void fillValueToTransportTable() {
-		if (GraphFrame.vrgVertexes == null
-				|| GraphFrame.vrgVertexes.size() == 0) {
-			showErrorMess(StrUtils.MSG_ERR_TITLE, StrUtils.MSG_ERR_BODY_TC);
-			return;
-		}
-
 		DefaultTableModel dtm = (DefaultTableModel) tableTC.getModel();
 
 		for (int i = 1; i < dtm.getColumnCount(); i++) {
 			for (int j = 0; j < dtm.getRowCount(); j++) {
-				String s = VRGvertexes.getDistanceText(
-						GraphFrame.vrgVertexes.get(i - 1).vertexCoords,
-						GraphFrame.vrgVertexes.get(j).vertexCoords);
+				String s = VRG.getDistanceText(VRG.coordinates.get(i - 1),
+						VRG.coordinates.get(j));
 				dtm.setValueAt(s, j, i);
 			}
 		}
 	}
 
 	private void clickTab(java.awt.event.MouseEvent evt) {
-		if (VRG.coordinates == null || GraphFrame.vrgVertexes == null
-				|| GraphFrame.vrgVertexes.size() == 0 || VRG.cars == null
+		if (VRG.coordinates == null || VRG.cars == null
 				|| tableCoordsDP.getRowCount() < 3) {
 			showErrorMess(StrUtils.MSG_ERR_TITLE, StrUtils.MSG_ERR_BODY_NULL);
 			if (VRG.cars == null
@@ -773,9 +811,15 @@ public class VRGframe extends JFrame {
 			}
 			return;
 		}
+
 		switch (tabbedPane.getSelectedIndex()) {
+		case 0: {// Coords
+			isNeedToUpdate = true;
+			break;
+		}
 		case 1: {// GraphFrame
 			tabbedPane.setSelectedIndex(3);
+			fillTabResult();
 			openGraphFrame();
 			break;
 		}
@@ -787,13 +831,25 @@ public class VRGframe extends JFrame {
 			break;
 		}
 		case 3: {// Result
-			if (isNeedToUpdate) {
-				isNeedToUpdate = false;
-				fillColumnValueToResultTable();
-				fillValueToResultTable();
+			fillTabResult();
+			if (graphIsFirstOpened && isNeedToUpdate) {
+				graphIsFirstOpened = false;
+				showErrorMess(StrUtils.MSG_ERR_ATTENTION,
+						StrUtils.MSG_ERR_BODY_ATTENTION);
+				return;
 			}
+			isNeedToUpdate = false;
+			
+
 			break;
 		}
+		}
+	}
+
+	private void fillTabResult() {
+		if (isNeedToUpdate) {
+			fillColumnValueToResultTable();
+			fillValueToResultTable(StrUtils.TXT_IS_ALL);
 		}
 	}
 

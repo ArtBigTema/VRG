@@ -52,12 +52,14 @@ public class StrUtils {
 	public static final String GRAPH_PARAM_3 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
+	public static final String MSG_ERR_ATTENTION = "Attention";
+	public static final String MSG_ERR_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n чтобы посмотреть визуализацию";// "Click graph tab";
 	public static final String EQ = "=";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
 	public static final String LABEL_WEIGHT = "Масса: ";// "WEIGHT: ";
 	public static final String TXT_ANALYS = "Анализ на чувствительность";// "Analys";
 	public static final String MSG_ERR_ADD_VERTEX = "Добавьте несколько вершин";// "Add more vertexes";
-	public static final String TXT_IS_ALL = "Всего";//"All: ";
+	public static final String TXT_IS_ALL = "Всего";// "All: ";
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;

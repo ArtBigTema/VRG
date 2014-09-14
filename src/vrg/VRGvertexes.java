@@ -41,27 +41,6 @@ public class VRGvertexes {
 				* (p2.getPoint().y - p1.getPoint().y));
 	}
 
-	public static double getDistance(Point p1, Point p2) {
-		return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y)
-				* (p2.y - p1.y));
-	}
-
-	public static String getDistanceText(Object p1, Object p2) {
-		Double distanse = 0D;
-		if (p1 instanceof Point) {
-			distanse = getDistance(Point.class.cast(p1), Point.class.cast(p2));
-		}
-		if (p1 instanceof VertexCoords) {
-			distanse = getDistance(VertexCoords.class.cast(p1),
-					VertexCoords.class.cast(p2));
-		}
-		if (distanse.toString().length() < 5) {
-			return distanse.toString();
-		} else {
-			return distanse.toString().substring(0, 5);
-		}
-	}
-
 	public VRGvertexes() {
 		objectVertex = new Object();
 	}

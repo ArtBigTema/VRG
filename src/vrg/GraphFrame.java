@@ -24,12 +24,7 @@ public class GraphFrame extends JFrame {
 	public static final int length = 20;
 	public static final int baseLength = 15;
 	public static final int distance = 40;
-	public static int count = 8;
-	public static int[][] coordinates = { { 19, 45 }, { 18, 46 }, { 20, 47 },
-			{ 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 }, { 13, 45 } };
-	public int[] demand = { 0, 1, 1, 1, 2, 2, 2, 1 };
-	public int[] price = { 0, 4, 4, 4, 4, 4, 4, 4 };
-	public static int[][] cars = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
+
 	public static ArrayList<VRGvertexes> vrgVertexes;
 	public int nymberOfSpace = 0;
 
@@ -198,11 +193,8 @@ public class GraphFrame extends JFrame {
 		ArrayList<Integer> tmp;
 
 		do {
-			if (nymberOfSpace > VRG.routes.size() / 3) {
-				VRG.generateRoutes();
-			}
-			k = VRG.random(1, vrgVertexes.size());
-			tmp = VRG.routes.get(k - 1);
+			k = VRG.random(0, VRG.routes.size());
+			tmp = VRG.routes.get(k);
 		} while (tmp.size() < 2);
 
 		int in = 0;
