@@ -295,6 +295,28 @@ public class VRG {
 		return diff.toString();
 	}
 
+	public static void generateCoordTableAtIndex(int row, int column) {
+		switch (column) {
+		case 1: {
+			coordinates.set(row,
+					new Point(random(1, countCoords), random(1, countCoords)));
+			break;
+		}
+		case 2: {
+			demand.set(row, random(1, countCoords));
+			break;
+		}
+		case 3: {
+			price.set(row, random(1, countCoords));
+			break;
+		}
+		}
+	}
+
+	public static void generateCarsTableAtIndex(int row, int column) {
+		cars.set(column, random(1, countCars));
+	}
+
 	public static String getStringDifferenceBetweenSets() {
 		String result = getDifferenceBetweenSets();
 		if (result.length() < 3) {

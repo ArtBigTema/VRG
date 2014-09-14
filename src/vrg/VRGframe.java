@@ -73,6 +73,7 @@ public class VRGframe extends JFrame {
 		setModelForCar(tableCars, VRGUtils.TXT_GAMERS_AUTO, 4);
 		jScrollPane2.setViewportView(tableCars);
 		tableCars.getColumnModel().getColumn(0).setResizable(false);
+		tableCars.addMouseListener(carsSelectionListener);
 
 		jPanel8.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -151,6 +152,7 @@ public class VRGframe extends JFrame {
 				VRGUtils.TXT_COORDS, VRGUtils.TXT_DEMAND, VRGUtils.TXT_PRICE });
 		jScrollPane4.setViewportView(tableCoordsDP);
 		tableCoordsDP.getColumnModel().getColumn(0).setResizable(false);
+		tableCoordsDP.addMouseListener(coordsSelectionListener);
 
 		textCountCars.setText(VRGUtils.FIELD_TXT_NUMBERS_OF_PLAYERS);
 		textCountCars.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -452,6 +454,7 @@ public class VRGframe extends JFrame {
 				VRGUtils.TXT_LOAD_VEHICLE, VRGUtils.TXT_PROFIT_LABEL });
 		tableResult.getColumnModel().getColumn(1).setMinWidth(213);
 		jScrollPane5.setViewportView(tableResult);
+		// FIXME
 
 		jLabel6.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 14)); // NOI18N
 		jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -559,7 +562,7 @@ public class VRGframe extends JFrame {
 		pack();
 	}
 
-	MouseListener mouseListener = new MouseListener() {
+	MouseListener mouseListener = new MouseListener() {// FIXME
 		@Override
 		public void mousePressed(MouseEvent paramMouseEvent) {
 		}
@@ -582,29 +585,24 @@ public class VRGframe extends JFrame {
 		}
 	};
 
-	public void addRowCount(int k, DefaultTableModel dtm) {
-		addRow(k, dtm, "");
-	}
-
 	protected void generateAllStandart() {
 		clearAll();
+		isNeedToUpdate = true;
 		VRG.generateAllStandart();
 
 		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
 
 		addRowCount(VRG.countCoords - 1, dtm);
-
-		for (int i = 0; i < dtm.getRowCount(); i++) {
-			dtm.setValueAt("x[" + i + "]", i, 0);
-		}
-
-		isNeedToUpdate = true;
-
+		setValueInFirstColumn(dtm);
 		fillCoordsTable(dtm);
 
 		setModelForCars(tableCars, VRGUtils.TXT_GAMERS_AUTO, VRG.countCars);
 		fillCarsTable();
 		setRoutesTable();
+	}
+
+	public void addRowCount(int k, DefaultTableModel dtm) {
+		addRow(k, dtm, "");
 	}
 
 	public void addRow(int k, DefaultTableModel dtm, String s) {
@@ -622,7 +620,6 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonAddVertexActionPerformed(java.awt.event.ActionEvent evt) {
-		// int k = VRGUtils.getIntFromDialog(VRGUtils.FIELD_TXT_NUMBER_OF_ROWS);
 		int k = VRGUtils.getIntFromDialog(this,
 				VRGUtils.FIELD_TXT_NUMBER_OF_ROWS, VRG.countCoords);
 
@@ -630,6 +627,12 @@ public class VRGframe extends JFrame {
 
 		addRowCount(k, dtm);
 
+		fillArrays(dtm.getRowCount());
+		fillCoordsTable(dtm);
+		buttonSaveCountCarsActionPerformed(evt);
+	}
+
+	private void setValueInFirstColumn(DefaultTableModel dtm) {
 		for (int i = 0; i < dtm.getRowCount(); i++) {
 			dtm.setValueAt("x[" + i + "]", i, 0);
 		}
@@ -644,7 +647,8 @@ public class VRGframe extends JFrame {
 		VRG.clearAll();
 		setAllModel(tableCoordsDP, new String[] { VRGUtils.TXT_VERTEX_LABEL,
 				VRGUtils.TXT_COORDS, VRGUtils.TXT_DEMAND, VRGUtils.TXT_PRICE });
-		setAllModel(tableCars, new String[] { VRGUtils.TXT_GAMERS_AUTO });
+		setAllModel(tableCars, new String[] { VRGUtils.TXT_GAMERS_AUTO, "1",
+				"2", "3" });
 		setAllModel(tablePath, new String[] { VRGUtils.TXT_ROUTE });
 		setAllModel(tableTC, new String[] { VRGUtils.TXT_VERTEX });
 		setAllModel(tableResult, new String[] { VRGUtils.TXT_PLAYER_NUMBER,
@@ -661,7 +665,6 @@ public class VRGframe extends JFrame {
 		int k = VRGUtils.getIntFromText(textCountCars.getText().trim());
 
 		isNeedToUpdate = true;
-
 		VRG.countCars = k;
 
 		setModelForCars(tableCars, VRGUtils.TXT_GAMERS_AUTO, k);
@@ -702,8 +705,9 @@ public class VRGframe extends JFrame {
 	private void fillCoordsTable(DefaultTableModel dtm) {
 		fillFirstStrokeCoordsTable(dtm);
 
+		setValueInFirstColumn(dtm);
+
 		for (int i = 1; i < dtm.getRowCount(); i++) {
-			dtm.setValueAt("x[" + i + "]", i, 0);
 			dtm.setValueAt(VRGUtils.OPENEDBKT + VRG.coordinates.get(i).x
 					+ VRGUtils.SEMICOLON + VRG.coordinates.get(i).y
 					+ VRGUtils.CLOSEDBKT, i, 1);
@@ -933,7 +937,9 @@ public class VRGframe extends JFrame {
 			return;
 		}
 		Double result = 0D;
-		dtm.setValueAt(VRGUtils.TXT_GRAPH+VRG.getStringDifferenceBetweenSets(), dtm.getRowCount() - 1, 1);//FIXME
+		dtm.setValueAt(
+				VRGUtils.TXT_GRAPH + VRG.getStringDifferenceBetweenSets(),
+				dtm.getRowCount() - 1, 1);
 
 		for (int j = 0; j < n; j++) {
 			result += Double.class.cast(dtm.getValueAt(j, 2));
@@ -969,9 +975,12 @@ public class VRGframe extends JFrame {
 	}
 
 	private void setAllModel(JTable table, String[] titles) {
+		final boolean[] canEdit = new boolean[titles.length];
 		table.setModel(new javax.swing.table.DefaultTableModel(
 				new Object[1][1], titles) {
-
+			public boolean isCellEditable(int rowIndex, int columnIndex) {
+				return canEdit[columnIndex];
+			}
 		});
 	}
 
@@ -995,7 +1004,7 @@ public class VRGframe extends JFrame {
 
 		final Class[] type = Arrays.copyOf(stypes, stypes.length);
 		boolean[] canEdits = new boolean[n + 1];
-		Arrays.fill(canEdits, true);
+		Arrays.fill(canEdits, false);
 		final boolean[] canEdit = Arrays.copyOf(canEdits, canEdits.length);
 
 		table.setModel(new javax.swing.table.DefaultTableModel(rowVertexLabels,
@@ -1018,7 +1027,7 @@ public class VRGframe extends JFrame {
 			Class[] types = new Class[] { java.lang.String.class,
 					java.lang.Integer.class, java.lang.Integer.class,
 					java.lang.Integer.class };
-			boolean[] canEdit = new boolean[] { false, true, true, true };
+			boolean[] canEdit = new boolean[] { false, false, false, false };
 
 			public Class getColumnClass(int columnIndex) {
 				return types[columnIndex];
@@ -1047,7 +1056,7 @@ public class VRGframe extends JFrame {
 
 		final Class[] type = Arrays.copyOf(stypes, stypes.length);
 		boolean[] canEdits = new boolean[n + 1];
-		Arrays.fill(canEdits, true);
+		Arrays.fill(canEdits, false);
 		final boolean[] canEdit = Arrays.copyOf(canEdits, canEdits.length);
 
 		table.setModel(new javax.swing.table.DefaultTableModel(rowVertexLabels,
@@ -1082,7 +1091,7 @@ public class VRGframe extends JFrame {
 
 		final Class[] type = Arrays.copyOf(stypes, stypes.length);
 		boolean[] canEdits = new boolean[n + 1];
-		Arrays.fill(canEdits, true);
+		Arrays.fill(canEdits, false);
 		final boolean[] canEdit = Arrays.copyOf(canEdits, canEdits.length);
 
 		table.setModel(new javax.swing.table.DefaultTableModel(rowVertexLabels,
@@ -1097,6 +1106,43 @@ public class VRGframe extends JFrame {
 			}
 		});
 	}
+
+	public void generateCoordsValue(int row, int column) {
+		VRG.generateCoordTableAtIndex(row, column);
+		fillCoordsTable((DefaultTableModel) tableCoordsDP.getModel());
+	}
+
+	java.awt.event.MouseAdapter coordsSelectionListener = new java.awt.event.MouseAdapter() {
+		@Override
+		public void mouseClicked(java.awt.event.MouseEvent evt) {
+			int row = tableCoordsDP.rowAtPoint(evt.getPoint());
+			int col = tableCoordsDP.columnAtPoint(evt.getPoint());
+			if (row >= 1 && col >= 1) {
+				generateCoordsValue(row, col);
+			}
+			if (row > 0 && col == 0) {
+				generateCoordsValue(row, 1);
+				generateCoordsValue(row, 2);
+				generateCoordsValue(row, 3);
+			}
+		}
+	};
+
+	public void generateCarsValue(int row, int column) {
+		VRG.generateCarsTableAtIndex(row, column);
+		fillCarsTable();
+	}
+
+	java.awt.event.MouseAdapter carsSelectionListener = new java.awt.event.MouseAdapter() {
+		@Override
+		public void mouseClicked(java.awt.event.MouseEvent evt) {
+			int row = tableCars.rowAtPoint(evt.getPoint());
+			int col = tableCars.columnAtPoint(evt.getPoint());
+			if (row >= 0 && col >= 1 && tableCars.getValueAt(row, col) != null) {
+				generateCarsValue(row, col);
+			}
+		}
+	};
 
 	private javax.swing.JButton buttonAddVertex;
 	private javax.swing.JButton buttonAnSolve;

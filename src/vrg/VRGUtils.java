@@ -69,7 +69,7 @@ public class VRGUtils {
 	public static final String TXT_GRAPH = "V";
 	public static final String LABEL_BASE = "A ";// "Base";
 	public static final String LABEL_VERTEX = "X ";
-	
+
 	public static int getIntFromDialog(String text) {
 		int k = 0;
 		try {
