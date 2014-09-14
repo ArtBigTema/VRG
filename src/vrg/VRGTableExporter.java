@@ -11,41 +11,58 @@ import javax.swing.JTable;
 
 public class VRGTableExporter {
 
-	public static void exportTableToXLS(JTable table) {
-		File directory = new File(VRGUtils.LABEL_VRG);
-		File filename = null;
+	public static void exportTableToXLS(JTable[] tables) {
 		try {
-			if (directory.exists() && directory.isDirectory()) {
-				filename = new File(directory.getName() + "/" + table.getName()
-						+ +(directory.list().length + 1) + ".xls");
+			File filename = null;
+			String name = "";
+
+			if (tables.length == 1) {
+				name = tables[0].getName();
 			} else {
-				directory.mkdir();
-				filename = new File(directory.getName() + "/" + table.getName()
-						+ +(directory.list().length + 1) + ".xls");
+				name = VRGUtils.TAB_TXT_RESULT;
+				tables[0].setName("");
 			}
 
+			filename = createFile(name);
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(filename), "cp1251"));
 
-			writeFile(out, table);
+			for (JTable table : tables) {
+				writeFile(out, table);
+			}
 
-			out.flush();
-			out.close();
-			Desktop desk = Desktop.getDesktop();
-			desk.open(filename);
-			// filename.deleteOnExit();
+			flushAndOpenFile(out, filename);
 
 		} catch (IOException ex) {
-			filename.deleteOnExit();
 			JOptionPane.showMessageDialog(null, ex.toString(), "Ошибка",
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
-	private static void writeFile(BufferedWriter out, JTable table)
+	private static File createFile(String name) {
+		File directory = new File(VRGUtils.LABEL_VRG);
+		if (directory.exists() && directory.isDirectory()) {
+			return new File(directory.getName() + "/" + name
+					+ +(directory.list().length + 1) + ".xls");
+		} else {
+			directory.mkdir();
+			return new File(directory.getName() + "/" + name
+					+ +(directory.list().length + 1) + ".xls");
+		}
+	}
+
+	private static void flushAndOpenFile(BufferedWriter out, File filename)
 			throws IOException {
+		out.flush();
+		out.close();
+		Desktop desk = Desktop.getDesktop();
+		desk.open(filename);
+		// filename.deleteOnExit();
+	}
+
+	private static void writeFile(BufferedWriter out, JTable table) {
 		try {
-			out.write("<html xmlns=\"http://www.w3.org/1999/xhtml\">"
+			out.write("<html>"
 					+ "<head>"
 					+ "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />"
 					+ "<title>"
@@ -79,9 +96,24 @@ public class VRGTableExporter {
 			}
 
 			out.write("</table></body></html>");
+
+			out.write("<html>"
+					+ "<head>"
+					+ "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />"
+					+ "<title>"
+					+ "\t"
+					+ "</title>"
+					+ "</head>"
+					+ "<body>"
+					+ "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">"
+					+ "<tr>");
+			out.write("</table></body></html>");
 		} catch (IOException ex) {
-			out.flush();
-			out.close();
+			try {
+				out.flush();
+				out.close();
+			} catch (IOException e) {
+			}
 			JOptionPane.showMessageDialog(null, ex.toString(), "Ошибка",
 					JOptionPane.ERROR_MESSAGE);
 		}

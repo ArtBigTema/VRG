@@ -1119,17 +1119,15 @@ public class VRGframe extends JFrame {
 			int index = VRGUtils.getIntFromText(((JMenuItem) actionEvent
 					.getSource()).getToolTipText());
 			if (index < 5) {
-				exportTable(tables[index]);
+				exportTable(new JTable[] { tables[index] });
 			} else {
-				for (int i = 0; i < 5; i++) {
-					exportTable(tables[i]);
-				}
+				exportTable(tables);
 			}
 		}
 	};
 
-	private void exportTable(JTable table) {
-		VRGTableExporter.exportTableToXLS(table);
+	private void exportTable(JTable[] tables) {
+		VRGTableExporter.exportTableToXLS(tables);
 	}
 
 	private javax.swing.JButton buttonAddVertex;
