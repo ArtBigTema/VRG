@@ -103,7 +103,7 @@ public class GraphFrame extends JFrame {
 	}
 
 	public void constuctGraph(mxGraph graph) {
-		if (graph == null) {
+		if (graph == null && !VRG.isValid()) {
 			return;
 		}
 		Object parent = graph.getDefaultParent();

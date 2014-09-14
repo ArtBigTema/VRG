@@ -63,13 +63,14 @@ public class VRGUtils {
 	public static final String TXT_IS_ALL = "Всего";// "All: ";
 	public static final String MSG_ERR_ROUTES = "Возможные пути исчерпаны \n "
 			+ "Сгенерировать другие?";// "Generate routes?";
+	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";//"Standard data";
 
 	public static final String SYBOLS_ON = "☑";
 	public static final String SYBOLS_OFF = "☐";
 	public static final String TXT_GRAPH = "V";
 	public static final String LABEL_BASE = "A ";// "Base";
 	public static final String LABEL_VERTEX = "X ";
-
+	
 	public static int getIntFromDialog(String text) {
 		int k = 0;
 		try {

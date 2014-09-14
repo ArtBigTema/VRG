@@ -32,6 +32,11 @@ public class VRG {
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 
+	public static boolean isValid() {
+		return (coordinates != null) && (coordinates.size() > 0)
+				&& (cars != null) && (cars.size() > 0);
+	}
+
 	public static void generateAllStandart() {
 		clearAll();
 

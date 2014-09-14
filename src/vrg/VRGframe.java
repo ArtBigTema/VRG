@@ -1,10 +1,6 @@
 package vrg;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -41,7 +37,7 @@ public class VRGframe extends JFrame {
 		buttonAddVertex = new javax.swing.JButton();
 		buttonGenerGraph = new javax.swing.JButton();
 		buttonDeleteVertex = new javax.swing.JButton();
-		jLabel5 = new javax.swing.JLabel();
+		buttonStandartData = new javax.swing.JButton();
 		jScrollPane4 = new javax.swing.JScrollPane();
 		tableCoordsDP = new javax.swing.JTable();
 		textCountCars = new javax.swing.JTextField();
@@ -140,11 +136,19 @@ public class VRGframe extends JFrame {
 														.addComponent(
 																buttonDeleteVertex))));
 
-		jLabel5.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 14));
-		jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		jLabel5.setText(VRGUtils.TXT_GAMERS_AUTO);
-		jLabel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-		jLabel5.addMouseListener(mouseListener);
+		buttonStandartData.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0,
+				14));
+		buttonStandartData
+				.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		buttonStandartData.setText(VRGUtils.TXT_GENERATE_STANDARD_DATA);
+		buttonStandartData.setBorder(javax.swing.BorderFactory
+				.createEtchedBorder());
+		buttonStandartData
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						buttonStandartDataActionPerformed(evt);
+					}
+				});
 
 		tableCoordsDP.setBorder(javax.swing.BorderFactory.createEtchedBorder(
 				null, new java.awt.Color(0, 0, 0)));
@@ -193,7 +197,7 @@ public class VRGframe extends JFrame {
 								jPanel4Layout
 										.createSequentialGroup()
 										.addComponent(
-												jLabel5,
+												buttonStandartData,
 												javax.swing.GroupLayout.PREFERRED_SIZE,
 												212,
 												javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -231,7 +235,8 @@ public class VRGframe extends JFrame {
 												jPanel4Layout
 														.createParallelGroup(
 																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(jLabel5)
+														.addComponent(
+																buttonStandartData)
 														.addComponent(
 																textCountCars,
 																javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -331,7 +336,6 @@ public class VRGframe extends JFrame {
 				frameCanvas));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_GRAPH, jPanel2);
-		jPanel2.addFocusListener(graphFocusListener);
 
 		tableTC.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 		setAllModel(tableTC, new String[] { VRGUtils.TXT_VERTEX, "", "", "" });
@@ -454,9 +458,8 @@ public class VRGframe extends JFrame {
 				VRGUtils.TXT_LOAD_VEHICLE, VRGUtils.TXT_PROFIT_LABEL });
 		tableResult.getColumnModel().getColumn(1).setMinWidth(213);
 		jScrollPane5.setViewportView(tableResult);
-		// FIXME
 
-		jLabel6.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 14)); // NOI18N
+		jLabel6.setFont(new java.awt.Font(VRGUtils.FONT_TAHOMA, 0, 14));
 		jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		jLabel6.setText(VRGUtils.TXT_ANALYS);
 		jLabel6.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -562,29 +565,6 @@ public class VRGframe extends JFrame {
 		pack();
 	}
 
-	MouseListener mouseListener = new MouseListener() {// FIXME
-		@Override
-		public void mousePressed(MouseEvent paramMouseEvent) {
-		}
-
-		@Override
-		public void mouseExited(MouseEvent paramMouseEvent) {
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent paramMouseEvent) {
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent paramMouseEvent) {
-			generateAllStandart();
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent paramMouseEvent) {
-		}
-	};
-
 	protected void generateAllStandart() {
 		clearAll();
 		isNeedToUpdate = true;
@@ -684,6 +664,11 @@ public class VRGframe extends JFrame {
 		buttonSaveCountCarsActionPerformed(evt);
 	}
 
+	private void buttonStandartDataActionPerformed(
+			java.awt.event.ActionEvent evt) {
+		generateAllStandart();
+	}
+
 	private void fillArrays(int n) {
 		isNeedToUpdate = true;
 		VRG.generateAll(n);
@@ -759,8 +744,10 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonAnSolveActionPerformed(java.awt.event.ActionEvent evt) {
-		VRG.generateGraphRoutes();
-		fillValueToResultTable();
+		if (VRG.isValid()) {
+			VRG.generateGraphRoutes();
+			fillValueToResultTable();
+		}
 	}
 
 	private void buttonBestSolveActionPerformed(java.awt.event.ActionEvent evt) {// FIXME
@@ -801,20 +788,6 @@ public class VRGframe extends JFrame {
 		VRG.main(new String[] { "" });
 	}
 
-	private FocusListener graphFocusListener = new FocusListener() {
-
-		@Override
-		public void focusLost(FocusEvent paramFocusEvent) {
-			tabbedPane.setSelectedIndex(0);
-			graphIsFirstOpened = true;
-		}
-
-		@Override
-		public void focusGained(FocusEvent paramFocusEvent) {
-			openGraphFrame();
-		}
-	};
-
 	private void openGraphFrame() {
 		if (graphIsFirstOpened) {
 			GraphFrame frame = new GraphFrame();
@@ -837,6 +810,7 @@ public class VRGframe extends JFrame {
 
 	private void clickTab(java.awt.event.MouseEvent evt) {
 		turnOffTimer();
+		isNeedToUpdate = false;
 		if (VRG.coordinates == null || VRG.cars == null
 				|| tableCoordsDP.getRowCount() < 3) {
 			VRGUtils.showErrorMess(this, VRGUtils.MSG_ERR_TITLE,
@@ -858,6 +832,7 @@ public class VRGframe extends JFrame {
 		case 1: {// GraphFrame
 			tabbedPane.setSelectedIndex(3);
 			fillTabResult();
+			graphIsFirstOpened = true;
 			openGraphFrame();
 			break;
 		}
@@ -865,26 +840,23 @@ public class VRGframe extends JFrame {
 			setModelForTC(tableTC, VRGUtils.TXT_VERTEX, VRG.coordinates.size());
 			fillValueToTransportTable();
 			setRoutesTable();
-			graphIsFirstOpened = true;
 			break;
 		}
 		case 3: {// Result
 			fillTabResult();
-			if (graphIsFirstOpened && isNeedToUpdate) {
+			if (graphIsFirstOpened) {
 				graphIsFirstOpened = false;
 				VRGUtils.showErrorMess(this, VRGUtils.MSG_ERR_ATTENTION,
 						VRGUtils.MSG_ERR_BODY_ATTENTION);
 				return;
 			}
-			isNeedToUpdate = false;
-
 			break;
 		}
 		}
 	}
 
 	private void fillTabResult() {
-		if (isNeedToUpdate) {
+		if (VRG.isValid()) {
 			fillColumnValueToResultTable();
 			fillValueToResultTable(VRGUtils.TXT_IS_ALL);
 		}
@@ -1151,12 +1123,12 @@ public class VRGframe extends JFrame {
 	private javax.swing.JButton buttonGenerGraph;
 	private javax.swing.JButton buttonGenerPath;
 	private javax.swing.JButton buttonSaveCountCars;
-	public javax.swing.JInternalFrame frameCanvas;
+	private javax.swing.JInternalFrame frameCanvas;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JLabel jLabel4;
-	private javax.swing.JLabel jLabel5;
+	private javax.swing.JButton buttonStandartData;
 	private javax.swing.JLabel jLabel6;
 	private javax.swing.JMenu jMenu1;
 	private javax.swing.JMenu jMenu2;
