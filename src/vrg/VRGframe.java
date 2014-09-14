@@ -9,6 +9,8 @@ import java.util.Vector;
 
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.table.DefaultTableModel;
@@ -21,6 +23,7 @@ public class VRGframe extends JFrame {
 	private java.util.Timer timer;
 	public static boolean isNeedToUpdate = false;
 	private boolean graphIsFirstOpened = true;
+	JTable[] tables = new JTable[5];
 
 	public interface onInnerWindowClosed {
 
@@ -70,8 +73,8 @@ public class VRGframe extends JFrame {
 		buttonAnSolve = new javax.swing.JButton();
 		buttonBestSolve = new javax.swing.JButton();
 		menuBar = new javax.swing.JMenuBar();
-		jMenu1 = new javax.swing.JMenu();
-		jMenu2 = new javax.swing.JMenu();
+		jMenu1 = new JMenu();
+		jMenu2 = new JMenu();
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -439,13 +442,7 @@ public class VRGframe extends JFrame {
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_RESULT, jPanel9);
 
-		jMenu1.setText("File");
-		menuBar.add(jMenu1);
-
-		jMenu2.setText("Edit");
-		menuBar.add(jMenu2);
-
-		setJMenuBar(menuBar);
+		constructMenuBar();
 
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
@@ -456,6 +453,115 @@ public class VRGframe extends JFrame {
 				409, S_MAX));
 
 		pack();
+	}
+
+	private void closeProgram() {
+		this.dispose();
+	}
+
+	private void fillArrayOfTable() {
+		tableCoordsDP.setName(VRGUtils.TXT_COORDS_DEMAND_PRICE);
+		tableCars.setName(VRGUtils.TXT_GAMERS_AUTO);
+		tableTC.setName(VRGUtils.TXT_TRANSPORTS_COSTS);
+		tableRoutes.setName(VRGUtils.TXT_ROUTES);
+		tableResult.setName(VRGUtils.TAB_TXT_RESULT);
+
+		tables[0] = tableCoordsDP;
+		tables[1] = tableCars;
+		tables[2] = tableTC;
+		tables[3] = tableRoutes;
+		tables[4] = tableResult;
+
+	}
+
+	private void constructMenuBar() {// FIXME
+		fillArrayOfTable();
+
+		jMenu1.setText("File");
+		menuBar.add(jMenu1);
+
+		jMenu2.setText("Edit");
+		menuBar.add(jMenu2);
+		setJMenuBar(menuBar);
+
+		JMenu menu;
+		{
+			JMenuItem menuItem = new JMenuItem();
+			menuItem.setText("Новый");
+			jMenu1.add(menuItem);
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					buttonDeleteVertexActionPerformed(evt);
+				}
+			});
+
+			menu = new JMenu();
+			menu.setText("Экспорт таблиц");
+			jMenu1.add(menu);
+		}
+
+		{
+			JMenuItem menuTable = new JMenuItem();
+			menuTable.setText("Таблица координат, спроса, цены");
+			menuTable.setToolTipText("0");
+			menuTable.addActionListener(actionListener);
+			menu.add(menuTable);
+
+			menuTable = new JMenuItem();
+			menuTable.setText("Таблица машин, загрузка ТС");
+			menuTable.setToolTipText("1");
+			menuTable.addActionListener(actionListener);
+			menu.add(menuTable);
+
+			menuTable = new JMenuItem();
+			menuTable.setText("Таблица транспортных затрат");
+			menuTable.setToolTipText("2");
+			menuTable.addActionListener(actionListener);
+			menu.add(menuTable);
+
+			menuTable = new JMenuItem();
+			menuTable.setText("Таблица маршрутов");
+			menuTable.setToolTipText("3");
+			menuTable.addActionListener(actionListener);
+			menu.add(menuTable);
+
+			menuTable = new JMenuItem();
+			menuTable.setText("Таблица результатов");
+			menuTable.setToolTipText("4");
+			menuTable.addActionListener(actionListener);
+			menu.add(menuTable);
+
+			menuTable = new JMenuItem();
+			menuTable.setText("Экспортировать все таблицы");
+			menuTable.setToolTipText("5");
+			menuTable.addActionListener(actionListener);
+			menu.add(menuTable);
+
+		}
+
+		{
+			menu = new JMenu();
+			menu.setText("Импорт файлов");
+			jMenu1.add(menu);
+
+			JMenuItem menuItem = new JMenuItem();
+			menuItem.setText("Файл с координатами");
+			menu.add(menuItem);
+		}
+		jMenu1.addSeparator();
+		{
+			JMenuItem menuItem = new JMenuItem();
+			menuItem.setText("Закрыть программу");
+			jMenu1.add(menuItem);
+
+			menuItem.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent paramActionEvent) {
+					closeProgram();
+				}
+			});
+		}
 	}
 
 	protected void generateAllStandart() {
@@ -693,7 +799,7 @@ public class VRGframe extends JFrame {
 			for (int j = 0; j < dtm.getRowCount(); j++) {
 				String s = VRG.getDistanceText(VRG.coordinates.get(i - 1),
 						VRG.coordinates.get(j));
-				dtm.setValueAt(s, j, i);
+				dtm.setValueAt(VRGUtils.get(s), j, i);
 			}
 		}
 	}
@@ -721,7 +827,7 @@ public class VRGframe extends JFrame {
 		}
 		case 1: {// GraphFrame
 			tabbedPane.setSelectedIndex(3);
-			fillTabResult();
+			fillResultTable();
 			graphIsFirstOpened = true;
 			openGraphFrame();
 			break;
@@ -733,7 +839,7 @@ public class VRGframe extends JFrame {
 			break;
 		}
 		case 3: {// Result
-			fillTabResult();
+			fillResultTable();
 			if (graphIsFirstOpened) {
 				graphIsFirstOpened = false;
 				VRGUtils.showErrorMess(this, VRGUtils.MSG_ERR_ATTENTION,
@@ -745,7 +851,7 @@ public class VRGframe extends JFrame {
 		}
 	}
 
-	private void fillTabResult() {
+	private void fillResultTable() {
 		if (VRG.isValid()) {
 			fillColumnValueToResultTable();
 			fillValueToResultTable(VRGUtils.TXT_IS_ALL);
@@ -777,7 +883,7 @@ public class VRGframe extends JFrame {
 
 		for (int j = 0; j < n; j++) {
 			// Third column is length of routes
-			dtm.setValueAt(VRG.getLengthOfRoutes(j + 1), j, 2);// getTextLengthOfRoutes
+			dtm.setValueAt(VRGUtils.get(VRG.getLengthOfRoutes(j + 1)), j, 2);// getTextLengthOfRoutes
 		}
 
 		for (int j = 0; j < n; j++) {
@@ -787,7 +893,7 @@ public class VRGframe extends JFrame {
 
 		for (int j = 0; j < n; j++) {
 			// Fiveth column is benefit of routes
-			dtm.setValueAt(VRG.getBenefit(j), j, 4);
+			dtm.setValueAt(VRGUtils.get(VRG.getBenefit(j)), j, 4);
 		}
 
 		setLastStroke(dtm);
@@ -804,9 +910,9 @@ public class VRGframe extends JFrame {
 				dtm.getRowCount() - 1, 1);
 
 		for (int j = 0; j < n; j++) {
-			result += Double.class.cast(dtm.getValueAt(j, 2));
+			result += VRGUtils.getDouble(dtm.getValueAt(j, 2));
 		}
-		dtm.setValueAt(result, dtm.getRowCount() - 1, 2);
+		dtm.setValueAt(VRGUtils.get(result), dtm.getRowCount() - 1, 2);
 
 		result = 0D;
 		for (int j = 0; j < n; j++) {
@@ -816,9 +922,9 @@ public class VRGframe extends JFrame {
 
 		result = 0D;
 		for (int j = 0; j < n; j++) {
-			result += Double.class.cast(dtm.getValueAt(j, 4));
+			result += VRGUtils.getDouble(dtm.getValueAt(j, 4));
 		}
-		dtm.setValueAt(result, dtm.getRowCount() - 1, 4);
+		dtm.setValueAt(VRGUtils.get(result), dtm.getRowCount() - 1, 4);
 	}
 
 	private void fillColumnValueToResultTable() {
@@ -1005,6 +1111,26 @@ public class VRGframe extends JFrame {
 			}
 		}
 	};
+
+	ActionListener actionListener = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			int index = VRGUtils.getIntFromText(((JMenuItem) actionEvent
+					.getSource()).getToolTipText());
+			if (index < 5) {
+				exportTable(tables[index]);
+			} else {
+				for (int i = 0; i < 5; i++) {
+					exportTable(tables[i]);
+				}
+			}
+		}
+	};
+
+	private void exportTable(JTable table) {
+		VRGTableExporter.exportTableToXLS(table);
+	}
 
 	private javax.swing.JButton buttonAddVertex;
 	private javax.swing.JButton buttonAnSolve;

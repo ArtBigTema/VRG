@@ -12,24 +12,45 @@ import javax.swing.JTable;
 public class VRGTableExporter {
 
 	public static void exportTableToXLS(JTable table) {
-		File temp_directory = new File(table.getName());
+		File directory = new File(VRGUtils.LABEL_VRG);
 		File filename = null;
 		try {
-			if (temp_directory.exists() && temp_directory.isDirectory()) {
-				filename = new File(temp_directory.getName() + "/TableExport"
-						+ (temp_directory.list().length + 1) + ".xls");
+			if (directory.exists() && directory.isDirectory()) {
+				filename = new File(directory.getName() + "/" + table.getName()
+						+ +(directory.list().length + 1) + ".xls");
 			} else {
-				temp_directory.mkdir();
-				filename = new File(temp_directory.getName() + "/TableExport"
-						+ (temp_directory.list().length + 1) + ".xls");
+				directory.mkdir();
+				filename = new File(directory.getName() + "/" + table.getName()
+						+ +(directory.list().length + 1) + ".xls");
 			}
 
 			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream(filename), "cp1251"));
+
+			writeFile(out, table);
+
+			out.flush();
+			out.close();
+			Desktop desk = Desktop.getDesktop();
+			desk.open(filename);
+			// filename.deleteOnExit();
+
+		} catch (IOException ex) {
+			filename.deleteOnExit();
+			JOptionPane.showMessageDialog(null, ex.toString(), "Ошибка",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private static void writeFile(BufferedWriter out, JTable table)
+			throws IOException {
+		try {
 			out.write("<html xmlns=\"http://www.w3.org/1999/xhtml\">"
 					+ "<head>"
 					+ "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />"
-					+ "<title>таблица</title>"
+					+ "<title>"
+					+ table.getName()
+					+ "</title>"
 					+ "</head>"
 					+ "<body>"
 					+ "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">"
@@ -58,13 +79,9 @@ public class VRGTableExporter {
 			}
 
 			out.write("</table></body></html>");
+		} catch (IOException ex) {
 			out.flush();
 			out.close();
-			Desktop desk = Desktop.getDesktop();
-			desk.open(filename);
-			// filename.deleteOnExit();
-		} catch (IOException ex) {
-			filename.deleteOnExit();
 			JOptionPane.showMessageDialog(null, ex.toString(), "Ошибка",
 					JOptionPane.ERROR_MESSAGE);
 		}

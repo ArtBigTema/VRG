@@ -15,6 +15,7 @@ public class VRGUtils {
 	public static final String TXT_DISTANCES = "Расстояния между вершинами (транспортные затраты)";// "Distances between vertices";
 	public static final String TXT_TYPE_OF_GAME = "Можете выбрать путь согласованной игры или выбрать автоматическую";// "You can choose the way of a coherent game or choose to automatically";
 	public static final String TXT_EXAMPLE = " Пример: 0, 3, 4, 7, 0.";// "Example: 0, 3, 4, 7, 0";
+	public static final String TXT_ROUTES = "Маршруты";// "Routes";
 	public static final String TXT_TRANSPORTS_COSTS = "Транспортные затраты";// "Transport Costs";
 	public static final String BTN_TXT_SAVE_COUNT = "Сохранить";// "Save";//Generate
 	public static final String FIELD_TXT_NUMBER_OF_ROWS = "Введите количество узлов";// "Enter count";
@@ -51,6 +52,7 @@ public class VRGUtils {
 			+ "entryX=0;entryY=1;entryPerimeter=0;";
 	public static final String GRAPH_PARAM_3 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
 
+	public static final String MSG_ERR_FILE_ISNT_CREATED = "Не возможно создать файл!";// "File is not created!";
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
 	public static final String MSG_ERR_ATTENTION = "Attention";
@@ -63,14 +65,16 @@ public class VRGUtils {
 	public static final String TXT_IS_ALL = "Всего";// "All: ";
 	public static final String MSG_ERR_ROUTES = "Возможные пути исчерпаны \n "
 			+ "Сгенерировать другие?";// "Generate routes?";
-	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";//"Standard data";
+	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";// "Standard data";
 
 	public static final String SYMBOLS_ON = "☑";
 	public static final String SYMBOLS_OFF = "☐";
 	public static final String TXT_GRAPH = "V";
 	public static final String LABEL_BASE = "A ";// "Base";
 	public static final String LABEL_VERTEX = "X ";
-	
+
+	public static final String LABEL_VRG = "VRG";
+
 	public static int getIntFromDialog(String text) {
 		int k = 0;
 		try {
@@ -112,6 +116,19 @@ public class VRGUtils {
 			return 0;
 		}
 		return k;
+	}
+
+	public static String get(Object o) {
+		String s = String.valueOf(o);
+		if (s.length() > 5) {
+			s = s.substring(0, 5);
+		}
+		return s.replace(".", ",");
+	}
+
+	public static Double getDouble(Object o) {
+		String s = String.valueOf(o);
+		return Double.valueOf(s.replace(",", "."));
 	}
 
 	public static void showErrorMess(javax.swing.JFrame frame, String title,
