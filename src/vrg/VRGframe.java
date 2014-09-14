@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -17,6 +18,10 @@ import javax.swing.table.TableColumnModel;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class VRGframe extends JFrame {
+	public static boolean isEnabled = false;
+	private java.util.Timer timer;
+	public static boolean isNeedToUpdate = false;
+	private boolean graphIsFirstOpened = true;
 
 	public interface onInnerWindowClosed {
 
@@ -675,8 +680,6 @@ public class VRGframe extends JFrame {
 		buttonSaveCountCarsActionPerformed(evt);
 	}
 
-	public static boolean isNeedToUpdate = false;
-
 	private void fillArrays(int n) {
 		isNeedToUpdate = true;
 		VRG.generateAll(n);
@@ -755,15 +758,43 @@ public class VRGframe extends JFrame {
 		fillValueToResultTable();
 	}
 
-	private void buttonBestSolveActionPerformed(java.awt.event.ActionEvent evt) {
-		// fillValueToResultTable(StrUtils.TXT_IS_ALL);// FIXME
+	private void buttonBestSolveActionPerformed(java.awt.event.ActionEvent evt) {// FIXME
+		turnOnTimer(evt);
+	}
+
+	private void turnOnTimer(final java.awt.event.ActionEvent evt) {
+		if (turnOffTimer()) {
+			return;
+		} else {
+			buttonBestSolve.setText(StrUtils.BTN_TXT_BEST_SOLUTION
+					+ StrUtils.SPACE + StrUtils.SYBOLS_ON);
+		}
+
+		timer = new java.util.Timer();
+		isEnabled = true;
+		timer.scheduleAtFixedRate(new TimerTask() {
+
+			public void run() {
+				buttonAnSolveActionPerformed(evt);
+			}
+		}, 10, 300);
+	}
+
+	private boolean turnOffTimer() {
+		if (isEnabled && timer != null) {
+			buttonBestSolve.setText(StrUtils.BTN_TXT_BEST_SOLUTION
+					+ StrUtils.SPACE + StrUtils.SYBOLS_OFF);
+			timer.cancel();
+			isEnabled = false;
+			return true;
+		}
+		return false;
 	}
 
 	public static void main(String args[]) {
 		VRG.main(new String[] { "" });
 	}
 
-	private boolean graphIsFirstOpened = true;
 	private FocusListener graphFocusListener = new FocusListener() {
 
 		@Override
@@ -799,6 +830,7 @@ public class VRGframe extends JFrame {
 	}
 
 	private void clickTab(java.awt.event.MouseEvent evt) {
+		turnOffTimer();
 		if (VRG.coordinates == null || VRG.cars == null
 				|| tableCoordsDP.getRowCount() < 3) {
 			showErrorMess(StrUtils.MSG_ERR_TITLE, StrUtils.MSG_ERR_BODY_NULL);
