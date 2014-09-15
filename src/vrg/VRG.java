@@ -1,6 +1,5 @@
 package vrg;
 
-import java.awt.Component;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -333,7 +332,7 @@ public class VRG {
 		return result;
 	}
 
-	public static void readTableFromFile(Component parent) {
+	public static void readTableFromFile(java.awt.Component parent) {
 		ArrayList<VRGvertexes> vertexes = VRGfile.readFromFile(parent);
 		clearAll();
 		countCoords = vertexes.size();

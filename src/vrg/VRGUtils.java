@@ -1,5 +1,17 @@
 package vrg;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.TimerTask;
+
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 public class VRGUtils {
@@ -60,8 +72,8 @@ public class VRGUtils {
 	public static final String MSG_ERR_FILE_ISNT_CREATED = "Не возможно создать файл!";// "File is not created!";
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
-	public static final String MSG_ERR_ATTENTION = "Attention";
-	public static final String MSG_ERR_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n "
+	public static final String MSG_ATTENTION = "Attention";
+	public static final String MSG_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n "
 			+ "чтобы посмотреть визуализацию";// "Click graph tab";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
 	public static final String LABEL_WEIGHT = "Масса: ";// "WEIGHT: ";
@@ -81,6 +93,7 @@ public class VRGUtils {
 	public static final String LABEL_VRG = "VRG";
 	public static final int DELAY = 400;
 	public static final int START = 10;
+	public static final int DISTANCE = 40;
 
 	public static final String TXT_FILES = "Файлы текста";// "Text files";
 	public static final String ENCODING = "cp1251";
@@ -141,19 +154,111 @@ public class VRGUtils {
 		return Double.valueOf(s.replace(",", "."));
 	}
 
-	public static void showErrorMess(javax.swing.JFrame frame, String title,
-			String body) {
-		JOptionPane.showMessageDialog(frame, body, title,
-				JOptionPane.ERROR_MESSAGE);
+	public static void showMessage(java.awt.Component frame, String title,
+			String body, int type) {
+		JOptionPane.showMessageDialog(frame, body, title, type);
 	}
 
-	public static boolean showInputDialog(javax.swing.JFrame frame,
+	public static void showErrorMess(java.awt.Component frame, String title,
+			String body) {
+		showMessage(frame, title, body, JOptionPane.ERROR_MESSAGE);
+	}
+
+	public static void showInfoMess(java.awt.Component frame, String title,
+			String body) {
+		showMessage(frame, title, body, JOptionPane.QUESTION_MESSAGE);
+	}
+
+	public static boolean showInputDialog(java.awt.Component frame,
 			String title, String body) {
 		return (JOptionPane.showConfirmDialog(frame, body, title,
 				JOptionPane.YES_OPTION) == JOptionPane.YES_OPTION);
 	}
 
 	public static void showInitMessage(javax.swing.JFrame frame, String text) {
-		JOptionPane.showMessageDialog(frame, text);
+		showInfoMess(frame, "", text);
 	}
+
+	public static void paintCarcass(Graphics paramGraphics) {
+		paramGraphics.setColor(Color.BLACK);
+
+		int numX = paramGraphics.getClipBounds().width / 10;
+		int numY = paramGraphics.getClipBounds().height / 10;
+
+		int offset = 5;
+		int dx = 0, dy = 0;
+		for (int i = 0; i < 10; i++) {
+			dx += numX;
+			dy += numY;
+			paramGraphics.drawLine(0, dy, offset, dy);
+			paramGraphics.drawString(String.valueOf(dy / DISTANCE), offset + 1,
+					dy);
+
+			paramGraphics.drawLine(dx, 0, dx, offset);
+			paramGraphics.drawString(String.valueOf(dx / DISTANCE), dx,
+					offset * 3);
+		}
+
+		paramGraphics.drawLine(0, 1, paramGraphics.getClipBounds().width, 1);
+
+		paramGraphics.drawLine(1, 0, 1, paramGraphics.getClipBounds().height);
+	}
+
+	public static void takeScreenCapture(javax.swing.JFrame frame) {
+		frame.setExtendedState(6);
+
+		java.util.Timer timer = new java.util.Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+
+			public void run() {
+				VRGUtils.takeScreenCapture();
+				this.cancel();
+			}
+		}, VRGUtils.DELAY, VRGUtils.START);
+	}
+
+	public static void takeScreenCapture() {
+		BufferedImage image;
+		try {
+			image = new Robot().createScreenCapture(new Rectangle(Toolkit
+					.getDefaultToolkit().getScreenSize()));
+
+			ImageIO.write(image, "png", getFile(new File(VRGUtils.LABEL_VRG)));
+
+		} catch (Exception e) {
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE,
+					VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
+		}
+	}
+
+	public static void takeScreenShotOfWindow(Component component) {
+		try {
+			BufferedImage image = new BufferedImage(component.getWidth(),
+					component.getHeight(), BufferedImage.TYPE_INT_RGB);
+			Graphics2D graphics2D = image.createGraphics();
+			component.paint(graphics2D);
+
+			File directory = new File(VRGUtils.LABEL_VRG);
+
+			ImageIO.write(image, "jpeg", getFile(directory));
+		} catch (Exception e) {
+			VRGUtils.showErrorMess(component, VRGUtils.MSG_ERR_TITLE,
+					VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
+		}
+	}
+
+	private static File getFile(File directory) {
+		File filename = null;
+
+		if (directory.exists() && directory.isDirectory()) {
+			filename = new File(directory.getName() + "/ScreenShots"
+					+ (directory.list().length + 1) + ".jpeg");
+		} else {
+			directory.mkdir();
+			filename = new File(directory.getName() + "/ScreenShots"
+					+ (directory.list().length + 1) + ".jpeg");
+		}
+		return filename;
+	}
+
 }

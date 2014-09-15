@@ -1,21 +1,12 @@
 package vrg;
 
-import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.TimerTask;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.mxgraph.canvas.mxICanvas;
@@ -31,7 +22,7 @@ public class GraphFrame extends JFrame {
 	public mxGraphComponent graphComponent;
 	public static final int length = 20;
 	public static final int baseLength = 15;
-	public static final int distance = 40;
+	public static final int distance = VRGUtils.DISTANCE;
 
 	public static ArrayList<VRGvertexes> vrgVertexes;
 	public int nymberOfSpace = 0;
@@ -69,7 +60,7 @@ public class GraphFrame extends JFrame {
 			public void paint(Graphics paramGraphics) {
 				super.paint(paramGraphics);
 
-				paintCarcass(paramGraphics.create());
+				VRGUtils.paintCarcass(paramGraphics.create());
 			}
 
 			// Sets global image base path
@@ -80,7 +71,6 @@ public class GraphFrame extends JFrame {
 		};
 
 		this.getContentPane().add(graphComponent);
-
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setSize(600, 450);
 		this.setVisible(true);
@@ -89,31 +79,6 @@ public class GraphFrame extends JFrame {
 
 		graphComponent.addKeyListener(keyListener);
 		graphComponent.addFocusListener(focusListener);
-	}
-
-	private void paintCarcass(Graphics paramGraphics) {
-		paramGraphics.setColor(Color.BLACK);
-
-		int numX = paramGraphics.getClipBounds().width / 10;
-		int numY = paramGraphics.getClipBounds().height / 10;
-
-		int offset = 5;
-		int dx = 0, dy = 0;
-		for (int i = 0; i < 10; i++) {
-			dx += numX;
-			dy += numY;
-			paramGraphics.drawLine(0, dy, offset, dy);
-			paramGraphics.drawString(String.valueOf(dy / distance), offset + 1,
-					dy);
-
-			paramGraphics.drawLine(dx, 0, dx, offset);
-			paramGraphics.drawString(String.valueOf(dx / distance), dx,
-					offset * 3);
-		}
-
-		paramGraphics.drawLine(0, 1, paramGraphics.getClipBounds().width, 1);
-
-		paramGraphics.drawLine(1, 0, 1, paramGraphics.getClipBounds().height);
 	}
 
 	public void constuctGraph(mxGraph graph) {
@@ -205,7 +170,7 @@ public class GraphFrame extends JFrame {
 
 		if ((nymberOfSpace + 1) > VRG.routes.size()) {
 			VRGframe.isNeedToUpdate = false;
-			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ERR_ATTENTION,
+			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION,
 					VRGUtils.MSG_ERR_ROUTES)) {
 				VRG.generateGraphRoutes();
 			}
@@ -256,66 +221,12 @@ public class GraphFrame extends JFrame {
 			}
 
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ALT) {
-				takeScreenShotOfWindow();
+				VRGUtils.takeScreenShotOfWindow(GraphFrame.this);
 			}
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_CONTROL) {
-				setExtendedState(MAXIMIZED_BOTH);
-
-				java.util.Timer timer = new java.util.Timer();
-				timer.scheduleAtFixedRate(new TimerTask() {
-
-					public void run() {
-						takeScreenCapture();
-						this.cancel();
-					}
-				}, VRGUtils.DELAY, VRGUtils.START);
+				VRGUtils.takeScreenCapture(GraphFrame.this);
 			}
 		};
-
-		private void takeScreenCapture() {
-			BufferedImage image;
-			try {
-				image = new Robot().createScreenCapture(new Rectangle(Toolkit
-						.getDefaultToolkit().getScreenSize()));
-
-				ImageIO.write(image, "png",
-						getFile(new File(VRGUtils.LABEL_VRG)));
-
-			} catch (Exception e) {
-				VRGUtils.showErrorMess(GraphFrame.this, VRGUtils.MSG_ERR_TITLE,
-						VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
-			}
-		}
-
-		private void takeScreenShotOfWindow() {
-			try {
-				BufferedImage image = new BufferedImage(getWidth(),
-						getHeight(), BufferedImage.TYPE_INT_RGB);
-				Graphics2D graphics2D = image.createGraphics();
-				GraphFrame.this.paint(graphics2D);
-
-				File directory = new File(VRGUtils.LABEL_VRG);
-
-				ImageIO.write(image, "jpeg", getFile(directory));
-			} catch (Exception e) {
-				VRGUtils.showErrorMess(GraphFrame.this, VRGUtils.MSG_ERR_TITLE,
-						VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
-			}
-		}
-
-		private File getFile(File directory) {
-			File filename = null;
-
-			if (directory.exists() && directory.isDirectory()) {
-				filename = new File(directory.getName() + "/ScreenShots"
-						+ (directory.list().length + 1) + ".jpeg");
-			} else {
-				directory.mkdir();
-				filename = new File(directory.getName() + "/ScreenShots"
-						+ (directory.list().length + 1) + ".jpeg");
-			}
-			return filename;
-		}
 
 		@Override
 		public void keyTyped(KeyEvent paramKeyEvent) {

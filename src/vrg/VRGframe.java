@@ -1,8 +1,13 @@
 package vrg;
 
+import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -16,6 +21,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
+
+import ru.amse.smyshlyaev.grapheditor.ui.JGraphComponent;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class VRGframe extends JFrame {
@@ -56,7 +63,6 @@ public class VRGframe extends JFrame {
 		buttonSaveCountCars = new javax.swing.JButton();
 		jLabel2 = new javax.swing.JLabel();
 		jPanel2 = new javax.swing.JPanel();
-		frameCanvas = new javax.swing.JInternalFrame();
 		jPanel3 = new javax.swing.JPanel();
 		jScrollPane1 = new javax.swing.JScrollPane();
 		tableTC = new javax.swing.JTable();
@@ -75,6 +81,12 @@ public class VRGframe extends JFrame {
 		menuBar = new javax.swing.JMenuBar();
 		jMenu1 = new JMenu();
 		jMenu2 = new JMenu();
+
+		this.addComponentListener(new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				reSize();
+			}
+		});
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -256,24 +268,23 @@ public class VRGframe extends JFrame {
 				clickTab(evt);
 			}
 		});
-		frameCanvas.setVisible(true);
+		graph = new VRGgraph();
+		graphComponent = new JGraphComponent(graph.getGraph(), this.getWidth(),
+				this.getHeight()) {
 
-		GroupLayout frameCanvasLayout = new GroupLayout(
-				frameCanvas.getContentPane());
-		frameCanvas.getContentPane().setLayout(frameCanvasLayout);
-		frameCanvasLayout.setHorizontalGroup(frameCanvasLayout
-				.createParallelGroup(GroupLayout.Alignment.LEADING).addGap(0,
-						490, S_MAX));
-		frameCanvasLayout.setVerticalGroup(frameCanvasLayout
-				.createParallelGroup(GroupLayout.Alignment.LEADING).addGap(0,
-						355, S_MAX));
+			@Override
+			public void paint(Graphics g) {
+				super.paint(g);
+				VRGUtils.paintCarcass(g.create());
+			}
 
+		};
 		GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
 		jPanel2.setLayout(jPanel2Layout);
 		jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(
-				GroupLayout.Alignment.LEADING).addComponent(frameCanvas));
+				GroupLayout.Alignment.LEADING).addComponent(graphComponent));
 		jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(
-				GroupLayout.Alignment.LEADING).addComponent(frameCanvas));
+				GroupLayout.Alignment.LEADING).addComponent(graphComponent));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_GRAPH, jPanel2);
 
@@ -441,9 +452,6 @@ public class VRGframe extends JFrame {
 						.addComponent(jScrollPane5, P_SIZE, 302, P_SIZE)));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_RESULT, jPanel9);
-
-		constructMenuBar();
-
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup(
@@ -452,7 +460,22 @@ public class VRGframe extends JFrame {
 				GroupLayout.Alignment.LEADING).addComponent(tabbedPane, P_SIZE,
 				409, S_MAX));
 
+		constructMenuBar();
+		fillArrayOfTable();
+		addKeyListener();
 		pack();
+	}
+
+	private void addKeyListener() {
+		for (Component component : this.getContentPane().getComponents()) {
+			component.addKeyListener(keyListener);
+		}
+		for (Component component : this.getComponents()) {
+			component.addKeyListener(keyListener);
+		}
+		for (JTable table : tables) {
+			table.addKeyListener(keyListener);
+		}
 	}
 
 	private void closeProgram() {
@@ -471,12 +494,9 @@ public class VRGframe extends JFrame {
 		tables[2] = tableTC;
 		tables[3] = tableRoutes;
 		tables[4] = tableResult;
-
 	}
 
 	private void constructMenuBar() {// FIXME
-		fillArrayOfTable();
-
 		jMenu1.setText("File");
 		menuBar.add(jMenu1);
 
@@ -856,8 +876,8 @@ public class VRGframe extends JFrame {
 			fillResultTable();
 			if (graphIsFirstOpened) {
 				graphIsFirstOpened = false;
-				VRGUtils.showErrorMess(this, VRGUtils.MSG_ERR_ATTENTION,
-						VRGUtils.MSG_ERR_BODY_ATTENTION);
+				VRGUtils.showInfoMess(this, VRGUtils.MSG_ATTENTION,
+						VRGUtils.MSG_BODY_ATTENTION);
 				return;
 			}
 			break;
@@ -1144,6 +1164,31 @@ public class VRGframe extends JFrame {
 		VRGTableExporter.exportTableToXLS(tables);
 	}
 
+	public void reSize() {
+		repaint();
+	}
+
+	public KeyListener keyListener = new KeyListener() {
+		@Override
+		public void keyReleased(KeyEvent paramKeyEvent) {
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ALT) {
+				VRGUtils.takeScreenShotOfWindow(VRGframe.this);
+			}
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_CONTROL) {
+				VRGUtils.takeScreenCapture(VRGframe.this);
+			}
+		}
+
+		@Override
+		public void keyPressed(KeyEvent e) {
+		}
+
+		@Override
+		public void keyTyped(KeyEvent e) {
+		}
+
+	};
+
 	private javax.swing.JButton buttonAddVertex;
 	private javax.swing.JButton buttonAnSolve;
 	private javax.swing.JButton buttonBestSolve;
@@ -1151,7 +1196,6 @@ public class VRGframe extends JFrame {
 	private javax.swing.JButton buttonGenerGraph;
 	private javax.swing.JButton buttonGenerPath;
 	private javax.swing.JButton buttonSaveCountCars;
-	private javax.swing.JInternalFrame frameCanvas;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
@@ -1179,4 +1223,6 @@ public class VRGframe extends JFrame {
 	private javax.swing.JTable tableResult;
 	private javax.swing.JTable tableTC;
 	private javax.swing.JTextField textCountCars;
+	private VRGgraph graph;
+	private JGraphComponent graphComponent;
 }
