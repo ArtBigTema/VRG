@@ -90,7 +90,7 @@ public class VRGUtils {
 	public static final String LABEL_BASE = "A ";// "Base";
 	public static final String LABEL_VERTEX = "X ";
 
-	public static final String LABEL_VRG = "VRG";
+	public static final String LABEL_VRG = "VRG Folder";
 	public static final int DELAY = 400;
 	public static final int START = 10;
 	public static final int DISTANCE = 40;
