@@ -29,47 +29,8 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		graph = new Graph();
 	}
 
-	public void testAddVertex() {
-		Vertex vertex = new Vertex(2 * distance, 3 * distance);
-		graph.addVertex(vertex);
-	}
-
-	public void testRemoveVertex() {
-		Vertex vertex = new Vertex(0, 0);
-
-		graph.addVertex(vertex);
-		graph.removeVertex(vertex);
-	}
-
-	public void testAddEdge() {
-		Vertex vertex1 = new Vertex(1 * distance, 5 * distance);
-		Vertex vertex2 = new Vertex(4 * distance, 2 * distance);
-		Edge edge = new Edge(vertex1, vertex2);
-
-		graph.addVertex(vertex1);
-		graph.addVertex(vertex2);
-		graph.addEdge(edge);
-	}
-
-	public void testRemoveEdge() {
-		Vertex vertex1 = new Vertex(0, 0);
-		Vertex vertex2 = new Vertex(0, 0);
-		Edge edge = new Edge(vertex1, vertex2);
-
-		graph.addVertex(vertex1);
-		graph.addVertex(vertex2);
-		graph.addEdge(edge);
-		graph.removeEdge(edge);
-	}
-
-	public void main(String[] args) {
-		new VRGgraph();
-	}
-
 	public VRGgraph() {
 		setUp();
-		testAddVertex();
-		testAddEdge();
 	}
 
 	public VRGgraph(Object o) {
@@ -154,7 +115,7 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 			VRG.generateGraphRoutes();
 		}
 
-		if ((numberOfSpace + 1) > VRG.routes.size()) {
+		if ((numberOfSpace + 1) > VRG.routes.size()) {// FIXME
 			VRGframe.isNeedToUpdate = false;
 			if (VRGUtils.showInputDialog(null, VRGUtils.MSG_ATTENTION,
 					VRGUtils.MSG_ERR_ROUTES)) {

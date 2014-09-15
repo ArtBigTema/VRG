@@ -14,6 +14,12 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
+import ru.amse.smyshlyaev.grapheditor.graph.Graph;
+import ru.amse.smyshlyaev.grapheditor.io.GraphXMLFileReader;
+import ru.amse.smyshlyaev.grapheditor.io.GraphXMLFileWriter;
+import ru.amse.smyshlyaev.grapheditor.ui.JGraphComponent;
+import ru.amse.smyshlyaev.grapheditor.ui.filechooser.FileChooser;
+
 public class VRGUtils {
 	public static final String OPENEDBKT = "(";
 	public static final String CLOSEDBKT = ")";
@@ -29,7 +35,8 @@ public class VRGUtils {
 	public static final String TXT_EXAMPLE = " Пример: 0, 3, 4, 7, 0.";// "Example: 0, 3, 4, 7, 0";
 	public static final String TXT_ROUTES = "Маршруты";// "Routes";
 	public static final String TXT_TRANSPORTS_COSTS = "Транспортные затраты";// "Transport Costs";
-	public static final String BTN_TXT_SAVE_COUNT = "Сохранить";// "Save";//Generate
+	public static final String BTN_TXT_SAVE = "Сохранить";// "Save";//Generate
+	public static final String BTN_TXT_OPEN = "Открыть";// "Open";
 	public static final String FIELD_TXT_NUMBER_OF_ROWS = "Введите количество узлов";// "Enter count";
 	public static final String TXT_COORDS_DEMAND_PRICE = "Координаты, спрос и цены клиентов";//
 	public static final String TXT_GAMERS_AUTO = "Игроки (Авто)";// "Gamers";
@@ -109,6 +116,8 @@ public class VRGUtils {
 	public static final String MENU_IMPORT = "Импортировать файлы";// "Importing files";
 	public static final String MENU_COORDS = "Файл с координатами";// "File with the coordinates";
 	public static final String MENU_CLOSE = "Закрыть программу";// "Close the program";
+	public static final String MENU_EXPORT_GRAPH = "XML граф";
+	public static final String MENU_IMPORT_GRAPH = "Файл с графом";
 
 	public static final String TXT_FILES = "Файлы текста";// "Text files";
 	public static final String ENCODING = "cp1251";
@@ -276,4 +285,44 @@ public class VRGUtils {
 		return filename;
 	}
 
+	private static boolean openGraph(Component component) {
+		boolean result = false;
+		File file = FileChooser.choose(component, BTN_TXT_OPEN);
+
+		if (file == null) {
+			return result;
+		}
+		Graph graph = GraphXMLFileReader.readGraph(file);
+
+		if (graph == null) {
+			return result;
+		}
+		((JGraphComponent) component).setGraph(graph);
+		component.repaint();
+		return result;
+	}
+
+	private static boolean saveGraph(Component component) {
+		boolean result = false;
+		File file = FileChooser.choose(component, BTN_TXT_SAVE);
+		if (file == null) {
+			return result;
+		}
+		try {
+			GraphXMLFileWriter.writeGraph(file,
+					((JGraphComponent) component).getGraph());
+			result = true;
+		} catch (Exception e) {
+			showErrorMess(component, MSG_ERR_TITLE, e.toString());
+		}
+		return result;
+	}
+
+	public static boolean IOGraph(Component component, boolean isSave) {
+		if (isSave) {
+			return saveGraph(component);
+		} else {
+			return openGraph(component);
+		}
+	}
 }

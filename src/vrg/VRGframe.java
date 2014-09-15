@@ -555,6 +555,12 @@ public class VRGframe extends JFrame {
 			menuTable.addActionListener(actionListener);
 			menu.add(menuTable);
 
+			menuTable = new JMenuItem();
+			menuTable.setText(VRGUtils.MENU_EXPORT_GRAPH);
+			menuTable.setAutoscrolls(true);
+			menu.add(menuTable);
+			menuTable.addActionListener(actionGraph);
+
 		}
 
 		{
@@ -574,7 +580,14 @@ public class VRGframe extends JFrame {
 					fillAllStandart();
 				}
 			});
+
+			menuItem = new JMenuItem();
+			menuItem.setText(VRGUtils.MENU_EXPORT_GRAPH);
+			menuItem.setAutoscrolls(false);
+			menu.add(menuItem);
+			menuItem.addActionListener(actionGraph);
 		}
+
 		jMenu1.addSeparator();
 		{
 			JMenuItem menuItem = new JMenuItem();
@@ -815,23 +828,19 @@ public class VRGframe extends JFrame {
 		VRG.main(new String[] { "" });
 	}
 
-	private void openGraphFrame() {
-		if (graphIsFirstOpened) {
-			openGraph(true);
-		}
-		graphIsFirstOpened = false;
-	}
-
 	private void openGraph(boolean isNewStyle) {
 		if (isNewStyle) {
 			graph = new VRGgraph(this);
 			graphComponent.setGraph(graph.getGraph());
 			repaint();
 		} else {
-			tabbedPane.setSelectedIndex(3);
-			GraphFrame frame = new GraphFrame();
-			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			if (graphIsFirstOpened) {
+				tabbedPane.setSelectedIndex(3);
+				GraphFrame frame = new GraphFrame();
+				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			}
 		}
+		graphIsFirstOpened = false;
 	}
 
 	private void fillValueToTransportTable() {
@@ -845,6 +854,8 @@ public class VRGframe extends JFrame {
 			}
 		}
 	}
+
+	private long ms = 0;
 
 	private void clickTab(java.awt.event.MouseEvent evt) {
 		turnOffTimer();
@@ -870,7 +881,10 @@ public class VRGframe extends JFrame {
 		case 1: {// GraphFrame
 			fillResultTable();
 			graphIsFirstOpened = true;
-			openGraphFrame();
+
+			openGraph(!((ms + 300) > System.currentTimeMillis()));// DoubleClick
+
+			ms = System.currentTimeMillis();
 			break;
 		}
 		case 2: {// Transports costs
@@ -1170,6 +1184,15 @@ public class VRGframe extends JFrame {
 	private void exportTable(JTable[] tables) {
 		VRGTableExporter.exportTableToXLS(tables);
 	}
+
+	ActionListener actionGraph = new ActionListener() {
+
+		@Override
+		public void actionPerformed(ActionEvent evt) {
+			VRGUtils.IOGraph(graphComponent,
+					((JMenuItem) evt.getSource()).getAutoscrolls());
+		}
+	};
 
 	public void reSize() {
 		repaint();
