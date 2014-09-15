@@ -25,7 +25,7 @@ public class GraphFrame extends JFrame {
 	public static final int distance = VRGUtils.DISTANCE;
 
 	public static ArrayList<VRGvertexes> vrgVertexes;
-	public int nymberOfSpace = 0;
+	public int numberOfSpace = 0;
 
 	private void showInitMessage() {
 		VRGUtils.showInitMessage(this, VRGUtils.MSG_INIT);
@@ -168,17 +168,17 @@ public class GraphFrame extends JFrame {
 
 		Object parent = graph.getDefaultParent();
 
-		if ((nymberOfSpace + 1) > VRG.routes.size()) {
+		if ((numberOfSpace + 1) > VRG.routes.size()) {
 			VRGframe.isNeedToUpdate = false;
 			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION,
 					VRGUtils.MSG_ERR_ROUTES)) {
 				VRG.generateGraphRoutes();
 			}
 			VRGframe.isNeedToUpdate = true;
-			nymberOfSpace = 0;
+			numberOfSpace = 0;
 		}
 
-		ArrayList<Integer> tmp = VRG.routes.get(nymberOfSpace);
+		ArrayList<Integer> tmp = VRG.routes.get(numberOfSpace);
 
 		int in = 0;
 		for (int index : tmp) {
@@ -216,7 +216,7 @@ public class GraphFrame extends JFrame {
 		public void keyReleased(KeyEvent paramKeyEvent) {
 			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE)
 					&& VRG.routes != null && VRG.routes.size() > 0) {
-				nymberOfSpace++;
+				numberOfSpace++;
 				updateEdges(graphComponent.getGraph());
 			}
 

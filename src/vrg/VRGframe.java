@@ -32,10 +32,6 @@ public class VRGframe extends JFrame {
 	private boolean graphIsFirstOpened = true;
 	JTable[] tables = new JTable[5];
 
-	public interface onInnerWindowClosed {
-
-	}
-
 	public VRGframe() {
 		initComponents();
 	}
@@ -476,6 +472,7 @@ public class VRGframe extends JFrame {
 		for (JTable table : tables) {
 			table.addKeyListener(keyListener);
 		}
+		graphComponent.addKeyListener(keyListener);
 	}
 
 	private void closeProgram() {
@@ -820,10 +817,21 @@ public class VRGframe extends JFrame {
 
 	private void openGraphFrame() {
 		if (graphIsFirstOpened) {
+			openGraph(true);
+		}
+		graphIsFirstOpened = false;
+	}
+
+	private void openGraph(boolean isNewStyle) {
+		if (isNewStyle) {
+			graph = new VRGgraph(this);
+			graphComponent.setGraph(graph.getGraph());
+			repaint();
+		} else {
+			tabbedPane.setSelectedIndex(3);
 			GraphFrame frame = new GraphFrame();
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		}
-		graphIsFirstOpened = false;
 	}
 
 	private void fillValueToTransportTable() {
@@ -860,7 +868,6 @@ public class VRGframe extends JFrame {
 			break;
 		}
 		case 1: {// GraphFrame
-			tabbedPane.setSelectedIndex(3);
 			fillResultTable();
 			graphIsFirstOpened = true;
 			openGraphFrame();
@@ -1177,6 +1184,12 @@ public class VRGframe extends JFrame {
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_CONTROL) {
 				VRGUtils.takeScreenCapture(VRGframe.this);
 			}
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_SPACE) {
+				if (spaceListener != null) {
+					spaceListener.spacePressed();
+					repaint();
+				}
+			}
 		}
 
 		@Override
@@ -1189,6 +1202,15 @@ public class VRGframe extends JFrame {
 
 	};
 
+	public interface onSpacePressed {
+		public void spacePressed();
+	}
+
+	public void setListener(onSpacePressed listener) {
+		this.spaceListener = listener;
+	}
+
+	public onSpacePressed spaceListener;
 	private javax.swing.JButton buttonAddVertex;
 	private javax.swing.JButton buttonAnSolve;
 	private javax.swing.JButton buttonBestSolve;

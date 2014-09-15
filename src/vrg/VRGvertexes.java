@@ -32,6 +32,7 @@ public class VRGvertexes {
 	public int price = 0;
 	public Object objectVertex;
 	public VertexCoords vertexCoords;
+	public Object edges;
 
 	public static double getDistance(VertexCoords p1, VertexCoords p2) {
 		return Math.sqrt((p2.getPoint().x - p1.getPoint().x)
