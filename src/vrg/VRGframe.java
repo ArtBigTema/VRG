@@ -497,17 +497,17 @@ public class VRGframe extends JFrame {
 	}
 
 	private void constructMenuBar() {// FIXME
-		jMenu1.setText("File");
+		jMenu1.setText(VRGUtils.MENU_FILE);
 		menuBar.add(jMenu1);
 
-		jMenu2.setText("Edit");
+		jMenu2.setText(VRGUtils.MENU_EDIT);
 		menuBar.add(jMenu2);
 		setJMenuBar(menuBar);
 
 		JMenu menu;
 		{
 			JMenuItem menuItem = new JMenuItem();
-			menuItem.setText("Новый");
+			menuItem.setText(VRGUtils.MENU_NEW);
 			jMenu1.add(menuItem);
 			menuItem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent evt) {
@@ -517,43 +517,43 @@ public class VRGframe extends JFrame {
 			});
 
 			menu = new JMenu();
-			menu.setText("Экспорт таблиц");
+			menu.setText(VRGUtils.MENU_EXPORT);
 			jMenu1.add(menu);
 		}
 
 		{
 			JMenuItem menuTable = new JMenuItem();
-			menuTable.setText("Таблица координат, спроса, цены");
+			menuTable.setText(VRGUtils.MENU_COORDS_D_P);
 			menuTable.setToolTipText("0");
 			menuTable.addActionListener(actionListener);
 			menu.add(menuTable);
 
 			menuTable = new JMenuItem();
-			menuTable.setText("Таблица машин, загрузка ТС");
+			menuTable.setText(VRGUtils.MENU_CARS);
 			menuTable.setToolTipText("1");
 			menuTable.addActionListener(actionListener);
 			menu.add(menuTable);
 
 			menuTable = new JMenuItem();
-			menuTable.setText("Таблица транспортных затрат");
+			menuTable.setText(VRGUtils.MENU_COSTS);
 			menuTable.setToolTipText("2");
 			menuTable.addActionListener(actionListener);
 			menu.add(menuTable);
 
 			menuTable = new JMenuItem();
-			menuTable.setText("Таблица маршрутов");
+			menuTable.setText(VRGUtils.MENU_ROUTES);
 			menuTable.setToolTipText("3");
 			menuTable.addActionListener(actionListener);
 			menu.add(menuTable);
 
 			menuTable = new JMenuItem();
-			menuTable.setText("Таблица результатов");
+			menuTable.setText(VRGUtils.MENU_RESULT);
 			menuTable.setToolTipText("4");
 			menuTable.addActionListener(actionListener);
 			menu.add(menuTable);
 
 			menuTable = new JMenuItem();
-			menuTable.setText("Экспортировать все таблицы");
+			menuTable.setText(VRGUtils.MENU_EXPORT_ALL);
 			menuTable.setToolTipText("5");
 			menuTable.addActionListener(actionListener);
 			menu.add(menuTable);
@@ -562,11 +562,11 @@ public class VRGframe extends JFrame {
 
 		{
 			menu = new JMenu();
-			menu.setText("Импорт файлов");
+			menu.setText(VRGUtils.MENU_IMPORT);
 			jMenu1.add(menu);
 
 			JMenuItem menuItem = new JMenuItem();
-			menuItem.setText("Файл с координатами");
+			menuItem.setText(VRGUtils.MENU_COORDS);
 			menu.add(menuItem);
 
 			menuItem.addActionListener(new ActionListener() {
@@ -581,7 +581,7 @@ public class VRGframe extends JFrame {
 		jMenu1.addSeparator();
 		{
 			JMenuItem menuItem = new JMenuItem();
-			menuItem.setText("Закрыть программу");
+			menuItem.setText(VRGUtils.MENU_CLOSE);
 			jMenu1.add(menuItem);
 
 			menuItem.addActionListener(new ActionListener() {

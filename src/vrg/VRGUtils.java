@@ -95,6 +95,21 @@ public class VRGUtils {
 	public static final int START = 10;
 	public static final int DISTANCE = 40;
 
+	public static final String MENU_FILE = "Файл";// "File";
+	public static final String MENU_EDIT = "Изменить";// "Edit";
+	public static final String MENU_NEW = "Новый";// "New";
+	public static final String MENU_EXPORT = "Экспорт таблиц";// "Export table";
+	public static final String MENU_TABLE = "Таблица ";// "Table";
+	public static final String MENU_COORDS_D_P = "Таблица координат, спроса, цены";// "Table of coordinates, demand, prices";
+	public static final String MENU_CARS = "Таблица машин, загрузка ТС";// "Table cars, loading vehicle";
+	public static final String MENU_COSTS = "Таблица транспортных затрат";// "Table of transportation costs";
+	public static final String MENU_ROUTES = "Таблица маршрутов";// "The routing table";
+	public static final String MENU_RESULT = "Таблица результатов";// "results table";
+	public static final String MENU_EXPORT_ALL = "Экспортировать все таблицы";// "Export all tables";
+	public static final String MENU_IMPORT = "Импортировать файлы";// "Importing files";
+	public static final String MENU_COORDS = "Файл с координатами";// "File with the coordinates";
+	public static final String MENU_CLOSE = "Закрыть программу";// "Close the program";
+
 	public static final String TXT_FILES = "Файлы текста";// "Text files";
 	public static final String ENCODING = "cp1251";
 
