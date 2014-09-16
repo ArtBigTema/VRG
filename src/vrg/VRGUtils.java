@@ -101,6 +101,7 @@ public class VRGUtils {
 	public static final int DELAY = 400;
 	public static final int START = 10;
 	public static final int DISTANCE = 40;
+	public static final int MAX_SIZE = 1000;
 
 	public static final String MENU_FILE = "Файл";// "File";
 	public static final String MENU_EDIT = "Изменить";// "Edit";
@@ -203,7 +204,7 @@ public class VRGUtils {
 		showInfoMess(frame, "", text);
 	}
 
-	public static void paintCarcass(Graphics paramGraphics) {
+	public static void paintCarcass(Graphics paramGraphics) {// FIXME
 		paramGraphics.setColor(Color.BLACK);
 
 		int numX = paramGraphics.getClipBounds().width / 10;

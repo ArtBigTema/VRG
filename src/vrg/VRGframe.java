@@ -14,6 +14,7 @@ import java.util.Vector;
 
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JTable;
@@ -58,7 +59,6 @@ public class VRGframe extends JFrame {
 		textCountCars = new javax.swing.JTextField();
 		buttonSaveCountCars = new javax.swing.JButton();
 		jLabel2 = new javax.swing.JLabel();
-		jPanel2 = new javax.swing.JPanel();
 		jPanel3 = new javax.swing.JPanel();
 		jScrollPane1 = new javax.swing.JScrollPane();
 		tableTC = new javax.swing.JTable();
@@ -77,6 +77,7 @@ public class VRGframe extends JFrame {
 		menuBar = new javax.swing.JMenuBar();
 		jMenu1 = new JMenu();
 		jMenu2 = new JMenu();
+		internalFrame = new JInternalFrame();
 
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
@@ -265,24 +266,30 @@ public class VRGframe extends JFrame {
 			}
 		});
 		graph = new VRGgraph();
-		graphComponent = new JGraphComponent(graph.getGraph(), this.getWidth(),
-				this.getHeight()) {
+		graphComponent = new JGraphComponent(graph.getGraph(),
+				VRGUtils.MAX_SIZE, VRGUtils.MAX_SIZE) {
 
 			@Override
 			public void paint(Graphics g) {
 				super.paint(g);
 				VRGUtils.paintCarcass(g.create());
 			}
-
 		};
-		GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
-		jPanel2.setLayout(jPanel2Layout);
-		jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(
-				GroupLayout.Alignment.LEADING).addComponent(graphComponent));
-		jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(
-				GroupLayout.Alignment.LEADING).addComponent(graphComponent));
+		internalFrame.setVisible(true);
+		javax.swing.JScrollPane jScrollPane = new javax.swing.JScrollPane();
+		jScrollPane.setViewportView(graphComponent);
 
-		tabbedPane.addTab(VRGUtils.TAB_TXT_GRAPH, jPanel2);
+		javax.swing.GroupLayout jInternalFrame2Layout = new javax.swing.GroupLayout(
+				internalFrame.getContentPane());
+		internalFrame.getContentPane().setLayout(jInternalFrame2Layout);
+		jInternalFrame2Layout.setHorizontalGroup(jInternalFrame2Layout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addComponent(jScrollPane, D_SIZE, 0, S_MAX));
+		jInternalFrame2Layout.setVerticalGroup(jInternalFrame2Layout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addComponent(jScrollPane, D_SIZE, 0, S_MAX));
+
+		tabbedPane.addTab(VRGUtils.TAB_TXT_GRAPH, internalFrame);
 
 		tableTC.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 		setAllModel(tableTC, new String[] { VRGUtils.TXT_VERTEX, "", "", "" });
@@ -1250,7 +1257,6 @@ public class VRGframe extends JFrame {
 	private javax.swing.JMenu jMenu1;
 	private javax.swing.JMenu jMenu2;
 	private javax.swing.JPanel jPanel1;
-	private javax.swing.JPanel jPanel2;
 	private javax.swing.JPanel jPanel3;
 	private javax.swing.JPanel jPanel4;
 	private javax.swing.JPanel jPanel8;
@@ -1270,4 +1276,5 @@ public class VRGframe extends JFrame {
 	private javax.swing.JTextField textCountCars;
 	private VRGgraph graph;
 	private JGraphComponent graphComponent;
+	private javax.swing.JInternalFrame internalFrame;
 }
