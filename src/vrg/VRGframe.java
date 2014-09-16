@@ -8,6 +8,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -319,6 +320,12 @@ public class VRGframe extends JFrame {
 			public void mouseClicked(java.awt.event.MouseEvent evt) {
 				clickTab(evt);
 			}
+
+			@Override
+			public void mousePressed(MouseEvent paramMouseEvent) {
+				pressTab(paramMouseEvent);
+			}
+
 		});
 
 		javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(p8);
@@ -925,7 +932,7 @@ public class VRGframe extends JFrame {
 
 	private void buttonAnSolveActionPerformed(ActionEvent evt) {
 		if (VRG.isValid()) {
-			VRG.generateGraphRoutes();
+			VRG.generateOptimalRoutes();
 			fillValueToResultTable();
 		}
 	}
@@ -993,6 +1000,10 @@ public class VRGframe extends JFrame {
 				dtm.setValueAt(VRGUtils.get(s), j, i);
 			}
 		}
+	}
+
+	public void pressTab(MouseEvent paramMouseEvent) {
+		clickTab(null);
 	}
 
 	private long ms = 0;

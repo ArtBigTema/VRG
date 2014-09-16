@@ -1,11 +1,16 @@
 package vrg;
 
 import java.awt.Point;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
 
 import javax.swing.JFrame;
 
@@ -15,7 +20,7 @@ public class VRG {
 			{ 13, 45 } };
 	public static final int[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
 	public static final int[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
-	public static final int[] CARS_WEIGHT = { 2, 2, 3 };
+	public static final int[] CARS_WEIGHT = { 3, 3, 5 };// { 2, 2, 3 };
 	public static final int[][] CARS = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
 	public static final int[][] ROUTES = { { 0, 1, 2, 0 }, { 0, 3, 4, 0 },
 			{ 0, 5, 6, 7, 0 } };
@@ -31,6 +36,7 @@ public class VRG {
 	public static ArrayList<Point> carsCoordinates = new ArrayList<Point>();
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
+	public static ArrayList<Double> benefits = new ArrayList<Double>();
 
 	public static boolean isValid() {
 		return (coordinates != null) && (coordinates.size() > 0)
@@ -193,6 +199,90 @@ public class VRG {
 
 			routes.add(tmp);
 		}
+	}
+
+	public static void generateOptimalRoutes() {
+		//routes.clear();
+		benefits.clear();
+
+		ArrayList<Integer> path = new ArrayList<Integer>();
+		Double result = 0D;
+		Double sum = 0D;
+		for (int i = 1; i < cars.size(); i++) {
+
+		//ArrayList<ArrayList<Integer>> copy = getRoutes(cars.get(i), demand);
+			
+			for (ArrayList<Integer> arr : routes) {
+				//arr.add(0);
+				Collections.sort(arr);
+				int index = 0;
+				for (int j = 1; j < arr.size(); j++) {
+					sum = 0D;
+					index = arr.get(j);
+					sum += price.get(index) * demand.get(index);
+					sum -= lengthOfRoutes.get(index).get(arr.get(j - 1));
+					result += sum;
+				}
+				result -= lengthOfRoutes.get(0).get(index);
+				
+				if (result > 0) {
+					benefits.add(result);
+				}
+			}
+
+			Double max = Collections.max(benefits);
+			routes.add(path);
+			path.clear();
+		}
+	}
+
+	private static ArrayList<ArrayList<Integer>> getIndexes(
+			ArrayList<Integer> costs) {
+		Set<ArrayList<Integer>> set = new HashSet<ArrayList<Integer>>();
+		costs.remove(0);
+
+		int n = (int) Math.pow(costs.size(), costs.size());
+		for (int j = 0; j < n; j++) {
+			ArrayList<Integer> values = new ArrayList<Integer>();
+			ArrayList<Integer> valuesShort = new ArrayList<Integer>();
+			for (int i = 0; i < costs.size(); i++) {
+				values.add(i + 1);
+			}
+			Collections.shuffle(values);
+
+			for (int i = 0; i < random(1, values.size()); i++) {
+				valuesShort.add(values.get(i));
+			}
+			Collections.sort(valuesShort);
+			set.add(valuesShort);
+		}
+		return new ArrayList<ArrayList<Integer>>(set);
+	}
+
+	private static ArrayList<ArrayList<Integer>> getRoutes(int max,
+			ArrayList<Integer> costs) {
+		ArrayList<ArrayList<Integer>> allRoutes = getIndexes(new ArrayList<Integer>(
+				costs));
+		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
+
+		for (ArrayList<Integer> arr : allRoutes) {
+			ArrayList<Integer> tmp = new ArrayList<Integer>();
+			for (int i : arr) {
+				tmp.add(costs.get(i));
+			}
+			if (getSumArr(tmp) <= max) {
+				result.add(arr);
+			}
+		}
+		return result;
+	}
+
+	private static int getSumArr(ArrayList<Integer> path) {
+		int result = 0;
+		for (int i : path) {
+			result += i;
+		}
+		return result;
 	}
 
 	public static int[][] getRoutes() {
