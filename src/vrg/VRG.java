@@ -39,13 +39,9 @@ public class VRG {
 
 	public static void generateAllStandart() {
 		clearAll();
-		int xZoom = VRGUtils.windowWidth / 100;
-		int yZoom = VRGUtils.windowHeight / 100;
-		VRGgraph.setZoom(3);
 
 		for (int i = 0; i < countCoords; i++) {
-			coordinates.add(new Point(COORDINATES[i][0] * xZoom,
-					COORDINATES[i][1] * yZoom));
+			coordinates.add(new Point(COORDINATES[i][0], COORDINATES[i][1]));
 			price.add(PRICE[i]);
 			demand.add(DEMAND[i]);
 		}
@@ -86,13 +82,14 @@ public class VRG {
 		carsCoordinates.clear();
 	}
 
-	public static void generateCoordinates(int n) {// FIXME
+	public static void generateCoordinates(int n) {
 		coordinates.clear();
 		int x = VRGUtils.windowWidth;
 		int y = VRGUtils.windowHeight;
-		coordinates.add(new Point(random(x / 2, x), random(x / 2, x)));
+		coordinates
+				.add(new Point(random(x / 20, x / 2), random(y / 20, y / 2)));
 		for (int i = 1; i < n; i++) {
-			coordinates.add(new Point(random(1, y), random(1, y)));
+			coordinates.add(new Point(random(y / 20, y), random(y / 20, y)));
 		}
 	}
 
@@ -171,29 +168,6 @@ public class VRG {
 
 		Collections.shuffle(indexes);
 		return indexes;
-	}
-
-	public static void generateRoutes() {// FIXME
-		routes.clear();
-
-		for (int i = 0; i < countCars; i++) {
-
-			ArrayList<Integer> tmp = new ArrayList<Integer>();
-			ArrayList<Integer> indexes = getCoordsIndexes();
-
-			if (indexes == null || coordinates == null
-					|| coordinates.size() < 2) {
-				return;
-			}
-			tmp.add(0);
-			int m = random(Math.max(indexes.size() / 3, 1), indexes.size());
-			for (int j = 0; j <= m; j++) {
-				tmp.add(indexes.get(j));
-			}
-			tmp.add(0);
-
-			routes.add(tmp);
-		}
 	}
 
 	public static void generateGraphRoutes() {
