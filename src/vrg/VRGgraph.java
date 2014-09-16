@@ -12,6 +12,7 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 	public static int length = 20;
 	public static int baseLength = 15;
 	public static int distance = VRGUtils.DISTANCE;
+	public static int zoom = 1;
 	public int height = 100;
 	public int width = 100;
 	public int numberOfSpace = 0;
@@ -27,6 +28,11 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 	public void setUp() {
 		vrgVertexes = new ArrayList<VRGvertexes>();
 		graph = new Graph();
+	}
+
+	public static void setZoom(int z) {
+		zoom = z;
+		distance = z;
 	}
 
 	public VRGgraph() {
@@ -97,8 +103,8 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 
 	private void addCars(Graph graph) {
 		for (int i = 1; i < VRG.carsCoordinates.size(); i++) {
-			Vertex vertex = new Vertex(distance, distance + i
-					+ VRG.carsCoordinates.get(i).y * distance,
+			Vertex vertex = new Vertex(radius, radius + i
+					+ VRG.carsCoordinates.get(i).y * radius,
 					VRGUtils.LABEL_CARS + i);
 			graph.addVertex(vertex);
 		}

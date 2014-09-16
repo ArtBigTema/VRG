@@ -28,8 +28,8 @@ import ru.amse.smyshlyaev.grapheditor.ui.JGraphComponent;
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class VRGframe extends JFrame {
 	public static boolean isEnabled = false;
-	private java.util.Timer timer;
 	public static boolean isNeedToUpdate = false;
+	private java.util.Timer timer;
 	private boolean graphIsFirstOpened = true;
 	JTable[] tables = new JTable[5];
 
@@ -75,8 +75,6 @@ public class VRGframe extends JFrame {
 		buttonAnSolve = new javax.swing.JButton();
 		buttonBestSolve = new javax.swing.JButton();
 		menuBar = new javax.swing.JMenuBar();
-		jMenu1 = new JMenu();
-		jMenu2 = new JMenu();
 		internalFrame = new JInternalFrame();
 
 		this.addComponentListener(new ComponentAdapter() {
@@ -220,8 +218,8 @@ public class VRGframe extends JFrame {
 														.addComponent(
 																buttonSaveCountCars))
 										.addGap(18, 18, 18)
-										.addComponent(jScrollPane2, P_SIZE, 50,
-												P_SIZE).addContainerGap())
+										.addComponent(jScrollPane2, P_SIZE, 61,
+												P_SIZE))
 						.addGroup(
 								jPanel4Layout
 										.createParallelGroup(
@@ -359,26 +357,34 @@ public class VRGframe extends JFrame {
 																				D_SIZE,
 																				S_MAX)))
 										.addContainerGap()));
-		jPanel3Layout.setVerticalGroup(jPanel3Layout.createParallelGroup(
-				GroupLayout.Alignment.LEADING).addGroup(
-				GroupLayout.Alignment.TRAILING,
-				jPanel3Layout
-						.createSequentialGroup()
-						.addComponent(jLabel1, P_SIZE, 25, P_SIZE)
-						.addGap(18, 18, 18)
-						.addComponent(jScrollPane1, P_SIZE, 172, P_SIZE)
-						.addGap(18, 18, 18)
-						.addComponent(jLabel3)
-						.addPreferredGap(ComponentPlacement.RELATED)
+		jPanel3Layout
+				.setVerticalGroup(jPanel3Layout
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addGroup(
+								GroupLayout.Alignment.TRAILING,
 								jPanel3Layout
-										.createParallelGroup(
-												GroupLayout.Alignment.BASELINE)
-										.addComponent(buttonGenerPath)
-										.addComponent(jLabel4))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(jScrollPane3, P_SIZE, 85, P_SIZE)
-						.addContainerGap()));
+										.createSequentialGroup()
+										.addComponent(jLabel1, P_SIZE, 25,
+												P_SIZE)
+										.addGap(18, 18, 18)
+										.addComponent(jScrollPane1, P_SIZE,
+												184, P_SIZE)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(jLabel3)
+										.addPreferredGap(
+												ComponentPlacement.RELATED)
+										.addGroup(
+												jPanel3Layout
+														.createParallelGroup(
+																GroupLayout.Alignment.BASELINE)
+														.addComponent(
+																buttonGenerPath)
+														.addComponent(jLabel4))
+										.addPreferredGap(
+												ComponentPlacement.RELATED)
+										.addComponent(jScrollPane3, P_SIZE, 96,
+												P_SIZE)));
 		tabbedPane.addTab(VRGUtils.TXT_TRANSPORTS_COSTS, jPanel3);
 
 		tableResult.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -437,22 +443,28 @@ public class VRGframe extends JFrame {
 																		.addComponent(
 																				buttonBestSolve)))
 										.addContainerGap()));
-		jPanel9Layout.setVerticalGroup(jPanel9Layout.createParallelGroup(
-				GroupLayout.Alignment.LEADING).addGroup(
-				GroupLayout.Alignment.TRAILING,
-				jPanel9Layout
-						.createSequentialGroup()
-						.addGap(4, 4, 4)
-						.addComponent(jLabel6)
-						.addGap(18, 18, 18)
+		jPanel9Layout
+				.setVerticalGroup(jPanel9Layout
+						.createParallelGroup(GroupLayout.Alignment.LEADING)
 						.addGroup(
+								GroupLayout.Alignment.TRAILING,
 								jPanel9Layout
-										.createParallelGroup(
-												GroupLayout.Alignment.BASELINE)
-										.addComponent(buttonAnSolve)
-										.addComponent(buttonBestSolve))
-						.addPreferredGap(ComponentPlacement.RELATED, 13, S_MAX)
-						.addComponent(jScrollPane5, P_SIZE, 302, P_SIZE)));
+										.createSequentialGroup()
+										.addGap(4, 4, 4)
+										.addComponent(jLabel6)
+										.addGap(18, 18, 18)
+										.addGroup(
+												jPanel9Layout
+														.createParallelGroup(
+																GroupLayout.Alignment.BASELINE)
+														.addComponent(
+																buttonAnSolve)
+														.addComponent(
+																buttonBestSolve))
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(jScrollPane5, D_SIZE,
+												309, S_MAX)));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_RESULT, jPanel9);
 		GroupLayout layout = new GroupLayout(getContentPane());
@@ -501,6 +513,9 @@ public class VRGframe extends JFrame {
 	}
 
 	private void constructMenuBar() {// FIXME
+		JMenu jMenu1 = new JMenu();
+		JMenu jMenu2 = new JMenu();
+
 		jMenu1.setText(VRGUtils.MENU_FILE);
 		menuBar.add(jMenu1);
 
@@ -1203,6 +1218,8 @@ public class VRGframe extends JFrame {
 
 	public void reSize() {
 		repaint();
+		VRGUtils.windowWidth = getWidth();
+		VRGUtils.windowHeight = getHeight();
 	}
 
 	public KeyListener keyListener = new KeyListener() {
@@ -1217,7 +1234,7 @@ public class VRGframe extends JFrame {
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_SPACE) {
 				if (spaceListener != null) {
 					spaceListener.spacePressed();
-					repaint();
+					reSize();
 				}
 			}
 		}
@@ -1254,8 +1271,6 @@ public class VRGframe extends JFrame {
 	private javax.swing.JLabel jLabel4;
 	private javax.swing.JButton buttonStandartData;
 	private javax.swing.JLabel jLabel6;
-	private javax.swing.JMenu jMenu1;
-	private javax.swing.JMenu jMenu2;
 	private javax.swing.JPanel jPanel1;
 	private javax.swing.JPanel jPanel3;
 	private javax.swing.JPanel jPanel4;

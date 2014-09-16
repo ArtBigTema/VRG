@@ -39,9 +39,13 @@ public class VRG {
 
 	public static void generateAllStandart() {
 		clearAll();
+		int xZoom = VRGUtils.windowWidth / 100;
+		int yZoom = VRGUtils.windowHeight / 100;
+		VRGgraph.setZoom(3);
 
 		for (int i = 0; i < countCoords; i++) {
-			coordinates.add(new Point(COORDINATES[i][0], COORDINATES[i][1]));
+			coordinates.add(new Point(COORDINATES[i][0] * xZoom,
+					COORDINATES[i][1] * yZoom));
 			price.add(PRICE[i]);
 			demand.add(DEMAND[i]);
 		}
@@ -82,11 +86,13 @@ public class VRG {
 		carsCoordinates.clear();
 	}
 
-	public static void generateCoordinates(int n) {
+	public static void generateCoordinates(int n) {// FIXME
 		coordinates.clear();
-		coordinates.add(new Point(random(n / 2, n), random(n / 2, n)));
+		int x = VRGUtils.windowWidth;
+		int y = VRGUtils.windowHeight;
+		coordinates.add(new Point(random(x / 2, x), random(x / 2, x)));
 		for (int i = 1; i < n; i++) {
-			coordinates.add(new Point(random(1, n), random(1, n)));
+			coordinates.add(new Point(random(1, y), random(1, y)));
 		}
 	}
 
@@ -256,7 +262,8 @@ public class VRG {
 		});
 
 		for (int i = 0; i < cars.size(); i++) {
-			carsCoordinates.add(new Point(max.x + 4, i));
+			carsCoordinates.add(new Point(max.x + VRGUtils.windowWidth / 20, i
+					* (VRGUtils.windowHeight / cars.size())));
 		}
 	}
 
@@ -303,8 +310,8 @@ public class VRG {
 	public static void generateCoordTableAtIndex(int row, int column) {
 		switch (column) {
 		case 1: {
-			coordinates.set(row,
-					new Point(random(1, countCoords), random(1, countCoords)));
+			coordinates.set(row, new Point(random(1, VRGUtils.windowWidth),
+					random(1, VRGUtils.windowHeight)));
 			break;
 		}
 		case 2: {
