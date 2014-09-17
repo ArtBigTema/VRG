@@ -163,7 +163,7 @@ public class GraphFrame extends JFrame {
 			return;
 		}
 		if (VRG.routes == null || VRG.routes.size() == 0) {
-			VRG.generateGraphRoutes();
+			VRG.generateEdges();
 		}
 
 		Object parent = graph.getDefaultParent();
@@ -172,7 +172,7 @@ public class GraphFrame extends JFrame {
 			VRGframe.isNeedToUpdate = false;
 			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION,
 					VRGUtils.MSG_ERR_ROUTES)) {
-				VRG.generateGraphRoutes();
+				VRG.generateEdges();
 			}
 			VRGframe.isNeedToUpdate = true;
 			numberOfSpace = 0;

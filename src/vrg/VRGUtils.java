@@ -41,6 +41,7 @@ public class VRGUtils {
 	public static final String TXT_COORDS_DEMAND_PRICE = "Координаты, спрос и цены клиентов";//
 	public static final String TXT_GAMERS_AUTO = "Игроки (Авто)";// "Gamers";
 	public static final String BTN_TXT_BEST_SOLUTION = "Лучшее решение";// "Best solution";
+	public static final String BTN_TXT_SEARCH_SOLUTION = "Поиск решения";// "Search solution";
 	public static final String BTN_TXT_ANOTHER_SOLUTION = "Другое решение";// "Another solution";
 	public static final String TXT_PLAYER_NUMBER = "Игрок, i";// "Player, i";
 	public static final String TXT_ROUTE_NUMBER = "Маршрут, r[i]";// "Route, r[i]";
@@ -88,7 +89,7 @@ public class VRGUtils {
 	public static final String MSG_ERR_ADD_VERTEX = "Добавьте несколько вершин";// "Add more vertexes";
 	public static final String TXT_IS_ALL = "Всего";// "All: ";
 	public static final String MSG_ERR_ROUTES = "Возможные пути исчерпаны \n "
-			+ "Сгенерировать другие?";// "Generate routes?";
+			+ "Сгенерировать другие?";// "Generate routes?";//yes, no, cancel
 	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";// "Standard data";
 
 	public static final String SYMBOLS_ON = "☑";
@@ -98,9 +99,9 @@ public class VRGUtils {
 	public static final String LABEL_VERTEX = "X ";
 
 	public static final String LABEL_VRG = "VRG Folder";
-	public static final int DELAY = 400;
+	public static final int DELAY = 100;
 	public static final int START = 10;
-	public static final int DISTANCE = 1;//FIXME
+	public static final int DISTANCE = 1;// FIXME
 	public static final int MAX_SIZE = 1000;
 	public static int windowWidth = 100;
 	public static int windowHeight = 100;
@@ -206,29 +207,26 @@ public class VRGUtils {
 		showInfoMess(frame, "", text);
 	}
 
-	public static void paintCarcass(Graphics paramGraphics) {// FIXME
-		paramGraphics.setColor(Color.BLACK);
+	public static void paintCarcass(Graphics graphics) {// FIXME
+		graphics.setColor(Color.BLACK);
 
-		int numX = paramGraphics.getClipBounds().width / 10;
-		int numY = paramGraphics.getClipBounds().height / 10;
+		int numX = graphics.getClipBounds().width / 10;
+		int numY = graphics.getClipBounds().height / 10;
 
 		int offset = 5;
 		int dx = 0, dy = 0;
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < MAX_SIZE / 10; i++) {
 			dx += numX;
 			dy += numY;
-			paramGraphics.drawLine(0, dy, offset, dy);
-			paramGraphics.drawString(String.valueOf(dy / DISTANCE), offset + 1,
-					dy);
+			graphics.drawLine(0, dy, offset, dy);
+			graphics.drawString(String.valueOf(dy / DISTANCE), offset + 1, dy);
 
-			paramGraphics.drawLine(dx, 0, dx, offset);
-			paramGraphics.drawString(String.valueOf(dx / DISTANCE), dx,
-					offset * 3);
+			graphics.drawLine(dx, 0, dx, offset);
+			graphics.drawString(String.valueOf(dx / DISTANCE), dx - numX / 5,
+					offset * 4);
 		}
-
-		paramGraphics.drawLine(0, 1, paramGraphics.getClipBounds().width, 1);
-
-		paramGraphics.drawLine(1, 0, 1, paramGraphics.getClipBounds().height);
+		// paramGraphics.drawLine(0, 1, MAX_SIZE, 1);
+		// paramGraphics.drawLine(1, 0, 1, MAX_SIZE);
 	}
 
 	public static void takeScreenCapture(javax.swing.JFrame frame) {

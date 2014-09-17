@@ -30,7 +30,8 @@ public class VRGframe extends JFrame {
 	public static boolean isNeedToUpdate = false;
 	private java.util.Timer timer;
 	private boolean graphIsFirstOpened = true;
-	JTable[] tables = new JTable[5];
+	private JTable[] tables = new JTable[5];
+	private long ms = 0;
 
 	public VRGframe() {
 		initComponents();
@@ -57,6 +58,7 @@ public class VRGframe extends JFrame {
 		tableTC = new javax.swing.JTable();
 		tableResult = new javax.swing.JTable();
 		buttonAnSolve = new javax.swing.JButton();
+		buttonSolve = new javax.swing.JButton();
 		buttonBestSolve = new javax.swing.JButton();
 		buttonStandartData = new javax.swing.JButton();
 		menuBar = new javax.swing.JMenuBar();
@@ -128,7 +130,7 @@ public class VRGframe extends JFrame {
 		buttonStandartData.setHorizontalAlignment(0);
 		buttonStandartData.setText(VRGUtils.TXT_GENERATE_STANDARD_DATA);
 		buttonStandartData.setBorder(javax.swing.BorderFactory
-				.createEtchedBorder());
+				.createEtchedBorder(null, new java.awt.Color(0, 0, 0)));
 		buttonStandartData.addActionListener(new ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				buttonStandartDataActionPerformed(evt);
@@ -210,7 +212,9 @@ public class VRGframe extends JFrame {
 														.createParallelGroup(
 																javax.swing.GroupLayout.Alignment.BASELINE)
 														.addComponent(
-																buttonStandartData)
+																buttonStandartData,
+																28, D_SIZE,
+																P_SIZE)
 														.addComponent(
 																textCountCars,
 																P_SIZE, D_SIZE,
@@ -316,16 +320,12 @@ public class VRGframe extends JFrame {
 										.addContainerGap()));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_ENTER_COORDS, p4);
-		tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
-			public void mouseClicked(java.awt.event.MouseEvent evt) {
-				clickTab(evt);
-			}
 
+		tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent paramMouseEvent) {
 				pressTab(paramMouseEvent);
 			}
-
 		});
 
 		javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(p8);
@@ -347,7 +347,6 @@ public class VRGframe extends JFrame {
 		internalFrame.setVisible(true);
 		javax.swing.JScrollPane jScrollPane = new javax.swing.JScrollPane();
 		jScrollPane.setViewportView(graphComponent);
-
 		javax.swing.GroupLayout jInternalFrame2Layout = new javax.swing.GroupLayout(
 				internalFrame.getContentPane());
 		internalFrame.getContentPane().setLayout(jInternalFrame2Layout);
@@ -357,7 +356,7 @@ public class VRGframe extends JFrame {
 		jInternalFrame2Layout.setVerticalGroup(jInternalFrame2Layout
 				.createParallelGroup(LEADING).addComponent(jScrollPane, D_SIZE,
 						0, S_MAX));
-
+		jScrollPane.getViewport().setViewPosition(new java.awt.Point(0, 0));
 		tabbedPane.addTab(VRGUtils.TAB_TXT_GRAPH, internalFrame);
 
 		jLabel1.setFont(font);
@@ -529,10 +528,18 @@ public class VRGframe extends JFrame {
 			}
 		});
 
-		buttonBestSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION);
+		buttonSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION);
+		buttonSolve.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				buttonSolveActionPerformed(evt);
+			}
+		});
+
+		buttonBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION
+				+ VRGUtils.SPACE + VRGUtils.SYMBOLS_OFF);
 		buttonBestSolve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				buttonBestSolveActionPerformed(evt);
+				buttonSearchSolveActionPerformed(evt);
 			}
 		});
 
@@ -558,10 +565,17 @@ public class VRGframe extends JFrame {
 																		.createSequentialGroup()
 																		.addComponent(
 																				buttonAnSolve)
-																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-																				D_SIZE,
-																				S_MAX)
+																		.addGap(18,
+																				18,
+																				18)
+																		.addComponent(
+																				buttonSolve,
+																				javax.swing.GroupLayout.DEFAULT_SIZE,
+																				javax.swing.GroupLayout.DEFAULT_SIZE,
+																				Short.MAX_VALUE)
+																		.addGap(18,
+																				18,
+																				18)
 																		.addComponent(
 																				buttonBestSolve)))
 										.addContainerGap()));
@@ -581,6 +595,8 @@ public class VRGframe extends JFrame {
 																javax.swing.GroupLayout.Alignment.BASELINE)
 														.addComponent(
 																buttonAnSolve)
+														.addComponent(
+																buttonSolve)
 														.addComponent(
 																buttonBestSolve))
 										.addPreferredGap(
@@ -723,8 +739,11 @@ public class VRGframe extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent evt) {
+					tabbedPane.setSelectedIndex(0);
+					buttonDeleteVertexActionPerformed(evt);
 					VRG.readTableFromFile(VRGframe.this);
 					fillAllStandart();
+					VRG.generateGraphRoutes();
 				}
 			});
 
@@ -840,6 +859,9 @@ public class VRGframe extends JFrame {
 		fillCarsArray(k + 1);
 		fillCarsTable();
 		VRG.generateGraphRoutes();
+		setAllModel(tableResult, new String[] { VRGUtils.TXT_PLAYER_NUMBER,
+				VRGUtils.TXT_ROUTE_NUMBER, VRGUtils.TXT_LENGTH_OF_ROUTE,
+				VRGUtils.TXT_LOAD_VEHICLE, VRGUtils.TXT_PROFIT_LABEL });
 	}
 
 	private void buttonGenerGraphActionPerformed(ActionEvent evt) {
@@ -931,45 +953,76 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonAnSolveActionPerformed(ActionEvent evt) {
+		generateSolution();
+	}
+
+	private void generateSolution() {
 		if (VRG.isValid()) {
-			VRG.generateGraphRoutes();
 			VRG.generateOptimalRoutes();
 			fillValueToResultTable();
 		}
 	}
 
-	private void buttonBestSolveActionPerformed(ActionEvent evt) {// FIXME
+	private void buttonSearchSolveActionPerformed(ActionEvent evt) {
 		turnOnTimer(evt);
+	}
+
+	private void buttonSolveActionPerformed(ActionEvent evt) {
+		VRG.generateOptimalRoutes(3);
+		fillValueToResultTable();
 	}
 
 	private void turnOnTimer(final ActionEvent evt) {
 		if (turnOffTimer()) {
 			return;
 		} else {
-			buttonBestSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION
-					+ VRGUtils.SPACE + VRGUtils.SYMBOLS_ON);
+			setButtonText(true);
 		}
-
+		ms = System.currentTimeMillis();
 		timer = new java.util.Timer();
 		isEnabled = true;
 		timer.scheduleAtFixedRate(new TimerTask() {
 
-			public void run() {
-				buttonAnSolveActionPerformed(evt);
+			public void run() {// FIXME
+				if (VRG.searchOptimalSolutions(getOldProfits())) {
+					setButtonText(false);
+					this.cancel();
+				} else {
+					fillValueToResultTable();
+				}
+				if (!((ms + 3000) > System.currentTimeMillis())) {
+					setButtonText(false);
+					buttonSolveActionPerformed(null);
+					this.cancel();
+
+				}
 			}
 		}, VRGUtils.START, VRGUtils.DELAY);
 	}
 
+	private Double getOldProfits() {
+		return VRGUtils.getDouble(tableResult.getValueAt(
+				tableResult.getRowCount() - 1, 4));
+	}
+
 	private boolean turnOffTimer() {
-		// if ((isEnabled || isNeedToUpdate) && (timer != null)) {
 		if ((isEnabled) && (timer != null)) {
-			buttonBestSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION
-					+ VRGUtils.SPACE + VRGUtils.SYMBOLS_OFF);
+			setButtonText(false);
 			timer.cancel();
 			isEnabled = false;
 			return true;
 		}
 		return false;
+	}
+
+	private void setButtonText(boolean b) {
+		if (b) {
+			buttonBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION
+					+ VRGUtils.SPACE + VRGUtils.SYMBOLS_ON);
+		} else {
+			buttonBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION
+					+ VRGUtils.SPACE + VRGUtils.SYMBOLS_OFF);
+		}
 	}
 
 	public static void main(String args[]) {
@@ -1004,12 +1057,10 @@ public class VRGframe extends JFrame {
 	}
 
 	public void pressTab(MouseEvent paramMouseEvent) {
-		clickTab(null);
+		clickTab();
 	}
 
-	private long ms = 0;
-
-	private void clickTab(java.awt.event.MouseEvent evt) {
+	private void clickTab() {
 		turnOffTimer();
 		isNeedToUpdate = false;
 		if (VRG.coordinates == null || VRG.cars == null
@@ -1090,7 +1141,7 @@ public class VRGframe extends JFrame {
 
 		for (int j = 0; j < n; j++) {
 			// Third column is length of routes
-			dtm.setValueAt(VRGUtils.get(VRG.getLengthOfRoutes(j + 1)), j, 2);// getTextLengthOfRoutes
+			dtm.setValueAt(VRGUtils.get(VRG.getLengthOfRoutes(j + 1)), j, 2);
 		}
 
 		for (int j = 0; j < n; j++) {
@@ -1390,6 +1441,7 @@ public class VRGframe extends JFrame {
 	public onSpacePressed spaceListener;
 	private javax.swing.JButton buttonAddVertex;
 	private javax.swing.JButton buttonAnSolve;
+	private javax.swing.JButton buttonSolve;
 	private javax.swing.JButton buttonBestSolve;
 	private javax.swing.JButton buttonDeleteVertex;
 	private javax.swing.JButton buttonGenerGraph;

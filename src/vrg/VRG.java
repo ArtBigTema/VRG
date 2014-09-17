@@ -25,6 +25,7 @@ public class VRG {
 	public static int countCoords = 8;
 	public static int countCars = 3;
 	public static final int ZOOM = 5;
+	public static int numberProfits = 0;
 
 	public static ArrayList<Integer> cars = new ArrayList<Integer>();
 	public static ArrayList<Integer> price = new ArrayList<Integer>();
@@ -70,6 +71,7 @@ public class VRG {
 		generateCars(n);
 		generateDemand(n);
 		generatePrice(n);
+		createTableOfRoutes();
 		generateGraphRoutes();
 	}
 
@@ -188,7 +190,7 @@ public class VRG {
 		for (int i = 0; i < countCars; i++) {
 			tmp = new ArrayList<Integer>();
 			tmp.add(0);
-			int m = random(1, Math.max(indexQ.size() / 2, 0));// FIXME
+			int m = random(1, Math.max(indexQ.size() / 2, 0));
 			for (int j = 0; j < Math.min(indexQ.size(), m); j++) {
 				tmp.add(indexQ.poll());
 			}
@@ -198,23 +200,44 @@ public class VRG {
 		}
 	}
 
+	public static Boolean searchOptimalSolutions(Double oldProfits) {
+		generateOptimalRoutes(2);
+		Double allProfits = getSumDoubleArr(benefits);
+
+		if (allProfits.intValue() == oldProfits.intValue()) {
+			numberProfits++;
+		} else {
+			numberProfits = 0;
+		}
+		if ((allProfits.intValue() == oldProfits.intValue())
+				&& (oldProfits.intValue() == 0)) {
+			numberProfits += countCoords / 4;
+		}
+		return numberProfits > countCoords;
+	}
+
 	public static void generateOptimalRoutes() {
+		generateOptimalRoutes(1);
+	}
+
+	public static void generateOptimalRoutes(int accuracy) {
 		routes.clear();
 		benefits.clear();
+		if (lengthOfRoutes.size() < 1) {
+			generateGraphRoutes();
+		}
 
-		ArrayList<Double> benefitss = new ArrayList<Double>();
+		ArrayList<Double> localBenefits = new ArrayList<Double>();
 
 		ArrayList<ArrayList<Integer>> pathMaxDel = new ArrayList<ArrayList<Integer>>();
 		ArrayList<ArrayList<Integer>> pathMax = new ArrayList<ArrayList<Integer>>();
-		Double result = 0D;
-		Double sum = 0D;
 
 		for (int i = 1; i < cars.size(); i++) {
 
 			ArrayList<ArrayList<Integer>> allRoutes = getRoutes(cars.get(i),
-					demand);
+					demand, accuracy);
 			ArrayList<ArrayList<Integer>> copy = new ArrayList<ArrayList<Integer>>(
-					allRoutes);// allRoutes
+					allRoutes);
 			for (ArrayList<Integer> tmp : pathMax) {
 				deleteArray(copy, tmp);
 			}
@@ -222,13 +245,14 @@ public class VRG {
 			ArrayList<Integer> paths = new ArrayList<Integer>();
 
 			for (ArrayList<Integer> arr : copy) {
+				Double result = 0D;
 				if (arr.size() < 1) {
 					continue;
 				}
 
 				int index = 0;
 				for (int j = 1; j < arr.size() - 1; j++) {
-					sum = 0D;
+					Double sum = 0D;
 					index = arr.get(j);
 					sum += price.get(index) * demand.get(index);
 					sum -= lengthOfRoutes.get(index).get(arr.get(j - 1));
@@ -241,12 +265,11 @@ public class VRG {
 					benefits.add(result);
 					pathMaxDel.add(new ArrayList<Integer>(paths));
 				}
-				result = 0D;
 				paths.clear();
 			}
 
 			if (benefits.size() < 1) {
-				benefitss.add(0D);
+				localBenefits.add(0D);
 				pathMax.add(new ArrayList<Integer>());
 				continue;
 			}
@@ -254,13 +277,21 @@ public class VRG {
 			Double max = Collections.max(benefits);
 			int in = benefits.indexOf(max);
 
-			benefitss.add(max);
+			localBenefits.add(max);
 			pathMax.add(pathMaxDel.get(in));
 			deleteArray(routes, pathMaxDel.get(in));
 			pathMaxDel.clear();
 			benefits.clear();
 		}
-		createOptimaRoutesAndBenefits(pathMax, benefitss);
+		createOptimumRoutesAndBenefits(pathMax, localBenefits);
+	}
+
+	public static void generateEdges() {
+		if (getSumDoubleArr(benefits).intValue() == 0) {
+			generateGraphRoutes();
+		} else {
+			generateOptimalRoutes();
+		}
 	}
 
 	private static void deleteArray(ArrayList<ArrayList<Integer>> copy,
@@ -276,10 +307,12 @@ public class VRG {
 		}
 	}
 
-	private static ArrayList<ArrayList<Integer>> getRandomIndexes(int costSize) {
+	private static ArrayList<ArrayList<Integer>> getRandomIndexes(int costSize,
+			int accuracy) {
 		Set<ArrayList<Integer>> set = new HashSet<ArrayList<Integer>>();
 
-		int n = (int) Math.pow(costSize, costSize / 2);
+		int n = (int) Math.pow(costSize, accuracy);
+
 		for (int j = 0; j < n; j++) {
 			ArrayList<Integer> values = new ArrayList<Integer>();
 			ArrayList<Integer> valuesShort = new ArrayList<Integer>();
@@ -300,9 +333,10 @@ public class VRG {
 	}
 
 	private static ArrayList<ArrayList<Integer>> getRoutes(int max,
-			ArrayList<Integer> costs) {
+			ArrayList<Integer> costs, int accuracy) {
 
-		ArrayList<ArrayList<Integer>> allRoutes = getRandomIndexes(costs.size());
+		ArrayList<ArrayList<Integer>> allRoutes = getRandomIndexes(
+				costs.size(), accuracy);
 		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
 
 		for (ArrayList<Integer> arr : allRoutes) {
@@ -310,7 +344,8 @@ public class VRG {
 			for (int i : arr) {
 				tmp.add(costs.get(i));
 			}
-			if (getSumArr(tmp) <= max) {
+
+			if (getSumIntArr(tmp) <= max) {
 				tmp = new ArrayList<Integer>(arr);
 				tmp.add(0, 0);
 				tmp.add(0);
@@ -320,7 +355,7 @@ public class VRG {
 		return result;
 	}
 
-	private static void createOptimaRoutesAndBenefits(
+	private static void createOptimumRoutesAndBenefits(
 			ArrayList<ArrayList<Integer>> pathMax, ArrayList<Double> benefitss) {
 		routes.clear();
 		benefits.clear();
@@ -332,9 +367,17 @@ public class VRG {
 		benefits = new ArrayList<Double>(benefitss);
 	}
 
-	private static int getSumArr(ArrayList<Integer> path) {
+	private static int getSumIntArr(ArrayList<Integer> path) {
 		int result = 0;
 		for (int i : path) {
+			result += i;
+		}
+		return result;
+	}
+
+	private static Double getSumDoubleArr(ArrayList<Double> path) {
+		Double result = 0D;
+		for (double i : path) {
 			result += i;
 		}
 		return result;
@@ -353,6 +396,7 @@ public class VRG {
 	}
 
 	public static Double getLengthOfRoutes(int k) {
+		
 		int n = routes.size();
 		Double result = 0D;
 
@@ -455,7 +499,7 @@ public class VRG {
 	}
 
 	public static void generateCarsTableAtIndex(int column) {
-		cars.set(column, random(1, countCars + 1, cars.get(column)));
+		cars.set(column, random(1, countCars * 2, cars.get(column)));
 	}
 
 	public static String getStringDifferenceBetweenSets() {

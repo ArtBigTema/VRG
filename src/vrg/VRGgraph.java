@@ -118,14 +118,14 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 			return;
 		}
 		if (VRG.routes == null || VRG.routes.size() == 0) {
-			VRG.generateGraphRoutes();
+			VRG.generateEdges();
 		}
 
-		if ((numberOfSpace + 1) > VRG.routes.size()) {// FIXME
+		if ((numberOfSpace + 1) > VRG.routes.size()) {
 			VRGframe.isNeedToUpdate = false;
 			if (VRGUtils.showInputDialog(null, VRGUtils.MSG_ATTENTION,
 					VRGUtils.MSG_ERR_ROUTES)) {
-				VRG.generateGraphRoutes();
+				VRG.generateEdges();
 			}
 			VRGframe.isNeedToUpdate = true;
 			numberOfSpace = 0;
