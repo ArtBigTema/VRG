@@ -207,6 +207,13 @@ public class VRGUtils {
 		showInfoMess(frame, "", text);
 	}
 
+	public static void saveWindowSize(int w, int h) {
+		windowWidth = w;
+		windowHeight = h;
+		VRGgraph.reSize(w, h);
+		GraphFrame.reSize(w, h);
+	}
+
 	public static void paintCarcass(Graphics graphics) {// FIXME
 		graphics.setColor(Color.BLACK);
 
