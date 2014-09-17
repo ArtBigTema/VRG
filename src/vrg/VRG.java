@@ -1,12 +1,9 @@
 package vrg;
 
 import java.awt.Point;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,7 +17,7 @@ public class VRG {
 			{ 13, 45 } };
 	public static final int[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
 	public static final int[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
-	public static final int[] CARS_WEIGHT = { 3, 3, 5 };// { 2, 2, 3 };
+	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
 	public static final int[][] CARS = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
 	public static final int[][] ROUTES = { { 0, 1, 2, 0 }, { 0, 3, 4, 0 },
 			{ 0, 5, 6, 7, 0 } };
@@ -52,6 +49,7 @@ public class VRG {
 			demand.add(DEMAND[i]);
 		}
 
+		cars.add(CARS_WEIGHT[0]);
 		for (int i = 0; i < countCars; i++) {
 			cars.add(CARS_WEIGHT[i]);
 
@@ -61,7 +59,6 @@ public class VRG {
 			}
 			routes.add(tmp);
 		}
-		cars.add(CARS_WEIGHT[countCars - 1]);
 
 		fillCarsCoords();
 		createTableOfRoutes();
@@ -195,57 +192,99 @@ public class VRG {
 			for (int j = 0; j < Math.min(indexQ.size(), m); j++) {
 				tmp.add(indexQ.poll());
 			}
+			Collections.sort(tmp);
 			tmp.add(0);
-
 			routes.add(tmp);
 		}
 	}
 
 	public static void generateOptimalRoutes() {
-		//routes.clear();
+		routes.clear();
 		benefits.clear();
 
-		ArrayList<Integer> path = new ArrayList<Integer>();
+		ArrayList<Double> benefitss = new ArrayList<Double>();
+
+		ArrayList<ArrayList<Integer>> pathMaxDel = new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> pathMax = new ArrayList<ArrayList<Integer>>();
 		Double result = 0D;
 		Double sum = 0D;
+
 		for (int i = 1; i < cars.size(); i++) {
 
-		//ArrayList<ArrayList<Integer>> copy = getRoutes(cars.get(i), demand);
-			
-			for (ArrayList<Integer> arr : routes) {
-				//arr.add(0);
-				Collections.sort(arr);
+			ArrayList<ArrayList<Integer>> allRoutes = getRoutes(cars.get(i),
+					demand);
+			ArrayList<ArrayList<Integer>> copy = new ArrayList<ArrayList<Integer>>(
+					allRoutes);// allRoutes
+			for (ArrayList<Integer> tmp : pathMax) {
+				deleteArray(copy, tmp);
+			}
+
+			ArrayList<Integer> paths = new ArrayList<Integer>();
+
+			for (ArrayList<Integer> arr : copy) {
+				if (arr.size() < 1) {
+					continue;
+				}
+
 				int index = 0;
-				for (int j = 1; j < arr.size(); j++) {
+				for (int j = 1; j < arr.size() - 1; j++) {
 					sum = 0D;
 					index = arr.get(j);
 					sum += price.get(index) * demand.get(index);
 					sum -= lengthOfRoutes.get(index).get(arr.get(j - 1));
 					result += sum;
+					paths.add(index);
 				}
 				result -= lengthOfRoutes.get(0).get(index);
-				
+
 				if (result > 0) {
 					benefits.add(result);
+					pathMaxDel.add(new ArrayList<Integer>(paths));
 				}
+				result = 0D;
+				paths.clear();
+			}
+
+			if (benefits.size() < 1) {
+				benefitss.add(0D);
+				pathMax.add(new ArrayList<Integer>());
+				continue;
 			}
 
 			Double max = Collections.max(benefits);
-			routes.add(path);
-			path.clear();
+			int in = benefits.indexOf(max);
+
+			benefitss.add(max);
+			pathMax.add(pathMaxDel.get(in));
+			deleteArray(routes, pathMaxDel.get(in));
+			pathMaxDel.clear();
+			benefits.clear();
+		}
+		createOptimaRoutesAndBenefits(pathMax, benefitss);
+	}
+
+	private static void deleteArray(ArrayList<ArrayList<Integer>> copy,
+			ArrayList<Integer> paths) {
+		for (int j = copy.size() - 1; j >= 0; j--) {
+			for (int p : paths) {
+				int in = copy.get(j).indexOf(p);
+				if (in != -1) {
+					copy.set(j, new ArrayList<Integer>());
+					break;
+				}
+			}
 		}
 	}
 
-	private static ArrayList<ArrayList<Integer>> getIndexes(
-			ArrayList<Integer> costs) {
+	private static ArrayList<ArrayList<Integer>> getRandomIndexes(int costSize) {
 		Set<ArrayList<Integer>> set = new HashSet<ArrayList<Integer>>();
-		costs.remove(0);
 
-		int n = (int) Math.pow(costs.size(), costs.size());
+		int n = (int) Math.pow(costSize, costSize / 2);
 		for (int j = 0; j < n; j++) {
 			ArrayList<Integer> values = new ArrayList<Integer>();
 			ArrayList<Integer> valuesShort = new ArrayList<Integer>();
-			for (int i = 0; i < costs.size(); i++) {
+
+			for (int i = 0; i < costSize - 1; i++) {
 				values.add(i + 1);
 			}
 			Collections.shuffle(values);
@@ -253,6 +292,7 @@ public class VRG {
 			for (int i = 0; i < random(1, values.size()); i++) {
 				valuesShort.add(values.get(i));
 			}
+
 			Collections.sort(valuesShort);
 			set.add(valuesShort);
 		}
@@ -261,8 +301,8 @@ public class VRG {
 
 	private static ArrayList<ArrayList<Integer>> getRoutes(int max,
 			ArrayList<Integer> costs) {
-		ArrayList<ArrayList<Integer>> allRoutes = getIndexes(new ArrayList<Integer>(
-				costs));
+
+		ArrayList<ArrayList<Integer>> allRoutes = getRandomIndexes(costs.size());
 		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
 
 		for (ArrayList<Integer> arr : allRoutes) {
@@ -271,10 +311,25 @@ public class VRG {
 				tmp.add(costs.get(i));
 			}
 			if (getSumArr(tmp) <= max) {
-				result.add(arr);
+				tmp = new ArrayList<Integer>(arr);
+				tmp.add(0, 0);
+				tmp.add(0);
+				result.add(tmp);
 			}
 		}
 		return result;
+	}
+
+	private static void createOptimaRoutesAndBenefits(
+			ArrayList<ArrayList<Integer>> pathMax, ArrayList<Double> benefitss) {
+		routes.clear();
+		benefits.clear();
+		for (ArrayList<Integer> tmp : pathMax) {
+			tmp.add(0, 0);
+			tmp.add(0);
+			routes.add(tmp);
+		}
+		benefits = new ArrayList<Double>(benefitss);
 	}
 
 	private static int getSumArr(ArrayList<Integer> path) {
@@ -353,6 +408,16 @@ public class VRG {
 		return (int) (start + Math.round((end - start) * Math.random()));
 	}
 
+	public static int random(int start, int end, int oldValue) {
+		int result = 0;
+
+		do {
+			result = random(start, end);
+		} while (result == oldValue);
+
+		return result;
+	}
+
 	public static String getDifferenceBetweenSets() {
 		ArrayList<Integer> allIndexes = new ArrayList<Integer>();
 
@@ -379,18 +444,18 @@ public class VRG {
 			break;
 		}
 		case 2: {
-			demand.set(row, random(1, countCoords));
+			demand.set(row, random(1, countCoords, demand.get(row)));
 			break;
 		}
 		case 3: {
-			price.set(row, random(1, countCoords));
+			price.set(row, random(1, countCoords, price.get(row)));
 			break;
 		}
 		}
 	}
 
-	public static void generateCarsTableAtIndex(int row, int column) {
-		cars.set(column, random(1, countCars));
+	public static void generateCarsTableAtIndex(int column) {
+		cars.set(column, random(1, countCars + 1, cars.get(column)));
 	}
 
 	public static String getStringDifferenceBetweenSets() {
