@@ -932,6 +932,7 @@ public class VRGframe extends JFrame {
 
 	private void buttonAnSolveActionPerformed(ActionEvent evt) {
 		if (VRG.isValid()) {
+			VRG.generateGraphRoutes();
 			VRG.generateOptimalRoutes();
 			fillValueToResultTable();
 		}
@@ -1303,7 +1304,7 @@ public class VRGframe extends JFrame {
 	};
 
 	public void generateCarsValue(int row, int column) {
-		VRG.generateCarsTableAtIndex(row, column);
+		VRG.generateCarsTableAtIndex(column);
 		fillCarsTable();
 	}
 
