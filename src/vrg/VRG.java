@@ -396,7 +396,7 @@ public class VRG {
 	}
 
 	public static Double getLengthOfRoutes(int k) {
-		
+
 		int n = routes.size();
 		Double result = 0D;
 
@@ -417,12 +417,7 @@ public class VRG {
 
 	private static void fillCarsCoords() {
 		carsCoordinates.clear();
-		Point max = Collections.max(coordinates, new Comparator<Point>() {
-			@Override
-			public int compare(Point paramInt1, Point paramInt2) {
-				return Integer.compare(paramInt1.x, paramInt2.x);
-			}
-		});
+		Point max = getMaxMinX(true);
 
 		for (int i = 0; i < cars.size(); i++) {
 			carsCoordinates.add(new Point(max.x + VRGUtils.windowWidth / 20, i
@@ -510,6 +505,64 @@ public class VRG {
 			result = VRGUtils.SPACE + VRGUtils.SLASH + VRGUtils.SPACE + result;
 		}
 		return result;
+	}
+
+	public static Point getMaxCoords() {
+		Point result;
+
+		Point maxX = getMaxMinX(true);
+		Point maxY = getMaxMinY(true);
+		result = new Point(maxX.x, maxY.y);
+		return result;
+	}
+
+	public static Point getMinCoords() {
+		Point result;
+
+		Point maxX = getMaxMinX(false);
+		Point maxY = getMaxMinY(false);
+		result = new Point(maxX.x, maxY.y);
+		return result;
+	}
+
+	private static Point getMaxMinX(boolean isMax) {
+		Point x;
+		if (isMax) {
+			x = Collections.max(coordinates, new Comparator<Point>() {
+				@Override
+				public int compare(Point paramInt1, Point paramInt2) {
+					return Integer.compare(paramInt1.x, paramInt2.x);
+				}
+			});
+		} else {
+			x = Collections.min(coordinates, new Comparator<Point>() {
+				@Override
+				public int compare(Point paramInt1, Point paramInt2) {
+					return Integer.compare(paramInt1.x, paramInt2.x);
+				}
+			});
+		}
+		return x;
+	}
+
+	private static Point getMaxMinY(boolean isMax) {
+		Point y;
+		if (isMax) {
+			y = Collections.max(coordinates, new Comparator<Point>() {
+				@Override
+				public int compare(Point paramInt1, Point paramInt2) {
+					return Integer.compare(paramInt1.y, paramInt2.y);
+				}
+			});
+		} else {
+			y = Collections.min(coordinates, new Comparator<Point>() {
+				@Override
+				public int compare(Point paramInt1, Point paramInt2) {
+					return Integer.compare(paramInt1.y, paramInt2.y);
+				}
+			});
+		}
+		return y;
 	}
 
 	public static void readTableFromFile(java.awt.Component parent) {
