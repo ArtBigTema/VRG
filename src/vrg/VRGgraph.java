@@ -13,10 +13,12 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 	public static int baseLength = 15;
 	public static int distance = VRGUtils.DISTANCE;
 	public static int zoom = 1;
-	public int height = 100;
-	public int width = 100;
+	public static int height = 100;
+	public static int width = 100;
 	public int numberOfSpace = 0;
 	public int radius = 40;
+	public int translateX = 0;
+	public int translateY = 0;
 
 	ArrayList<VRGvertexes> vrgVertexes;
 
@@ -52,9 +54,11 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 			return;
 		}
 		vrgVertexes.clear();
+		setZoomIfNeed();
 
-		Vertex vertexA = new Vertex(VRG.coordinates.get(0).x * distance,
-				VRG.coordinates.get(0).y * distance, VRGUtils.LABEL_BASE);
+		Vertex vertexA = new Vertex(translateX + VRG.coordinates.get(0).x
+				* distance, translateY + VRG.coordinates.get(0).y * distance,
+				VRGUtils.LABEL_BASE);
 		graph.addVertex(vertexA);
 
 		VRGvertexes a = new VRGvertexes();
@@ -64,12 +68,12 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		a.vertexCoords = new VRGvertexes.VertexCoords(VRG.coordinates.get(0));
 		vrgVertexes.add(a);
 
-		addCars(graph);
+		// addCars(graph);//FIXME
 
 		for (int i = 1; i < VRG.coordinates.size(); i++) {
-			Vertex vertex = new Vertex(VRG.coordinates.get(i).x * distance,
-					VRG.coordinates.get(i).y * distance, VRGUtils.LABEL_VERTEX
-							+ i);
+			Vertex vertex = new Vertex(translateX + VRG.coordinates.get(i).x
+					* distance, translateY + VRG.coordinates.get(i).y
+					* distance, VRGUtils.LABEL_VERTEX + i);
 			graph.addVertex(vertex);
 
 			VRGvertexes vertexes = new VRGvertexes();
@@ -82,6 +86,23 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 			vrgVertexes.add(vertexes);
 		}
 		updateEdges(graph);
+	}
+
+	private void setZoomIfNeed() {
+		java.awt.Point point = VRG.getMaxCoords();
+		if ((point.x < width / 3) || (point.y < height / 4)) {
+			distance = (width + height) / 50;
+		} else {
+			distance = 1;
+		}
+		point = VRG.getMinCoords();
+		if ((point.x < width / 10) || (point.y < height / 10)) {
+			translateX = -point.x * distance + 2 * radius;
+			translateY = -point.y * distance + 2 * radius;
+		} else {
+			translateX = 0;
+			translateY = 0;
+		}
 	}
 
 	public void constructVertexes() {
@@ -169,15 +190,9 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		return graph;
 	}
 
-	public void reSize(int w, int h) {
-		this.width = w;
-		this.height = h;
-
-		rePaint();
-	}
-
-	private void rePaint() {
-
+	public static void reSize(int w, int h) {
+		width = w;
+		height = h;
 	}
 
 	@Override

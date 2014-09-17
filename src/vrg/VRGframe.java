@@ -1399,8 +1399,7 @@ public class VRGframe extends JFrame {
 
 	public void reSize() {
 		repaint();
-		VRGUtils.windowWidth = getWidth();
-		VRGUtils.windowHeight = getHeight();
+		VRGUtils.saveWindowSize(getWidth(), getHeight());
 	}
 
 	public KeyListener keyListener = new KeyListener() {

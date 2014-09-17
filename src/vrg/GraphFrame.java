@@ -22,7 +22,14 @@ public class GraphFrame extends JFrame {
 	public mxGraphComponent graphComponent;
 	public static final int length = 20;
 	public static final int baseLength = 15;
-	public static final int distance = VRGUtils.DISTANCE;
+
+	public static int distance = VRGUtils.DISTANCE;
+	public static int zoom = 1;
+	public static int height = 100;
+	public static int width = 100;
+	public int radius = 40;
+	public int translateX = 0;
+	public int translateY = 0;
 
 	public static ArrayList<VRGvertexes> vrgVertexes;
 	public int numberOfSpace = 0;
@@ -81,10 +88,33 @@ public class GraphFrame extends JFrame {
 		graphComponent.addFocusListener(focusListener);
 	}
 
+	public static void reSize(int w, int h) {
+		width = w;
+		height = h;
+	}
+
+	private void setZoomIfNeed() {
+		java.awt.Point point = VRG.getMaxCoords();
+		if ((point.x < width / 3) || (point.y < height / 4)) {
+			distance = (width + height) / 50;
+		} else {
+			distance = 1;
+		}
+		point = VRG.getMinCoords();
+		if ((point.x < width / 10) || (point.y < height / 10)) {
+			translateX = -point.x * distance + 2 * radius;
+			translateY = -point.y * distance + 2 * radius;
+		} else {
+			translateX = 0;
+			translateY = 0;
+		}
+	}
+
 	public void constuctGraph(mxGraph graph) {
 		if (graph == null && !VRG.isValid()) {
 			return;
 		}
+		setZoomIfNeed();
 		Object parent = graph.getDefaultParent();
 
 		graph.getModel().beginUpdate();
@@ -92,12 +122,12 @@ public class GraphFrame extends JFrame {
 			{
 				VRGvertexes a = new VRGvertexes();
 
-				a.objectVertex = graph
-						.insertVertex(parent, null, VRGUtils.LABEL_BASE,
-								(VRG.coordinates.get(0).x) * distance,
-								VRG.coordinates.get(0).y * distance,
-								baseLength, baseLength,
-								"shape=ellipse;perimeter=trianglePerimeter");// x,y,width,height
+				a.objectVertex = graph.insertVertex(parent, null,
+						VRGUtils.LABEL_BASE,
+						translateX + (VRG.coordinates.get(0).x) * distance,
+						translateY + VRG.coordinates.get(0).y * distance,
+						baseLength, baseLength,
+						"shape=ellipse;perimeter=trianglePerimeter");// x,y,width,height
 				a.demand = 0;
 				a.price = 0;
 				a.vertexCoords = new VRGvertexes.VertexCoords(
@@ -105,15 +135,16 @@ public class GraphFrame extends JFrame {
 				vrgVertexes.add(a);
 			}
 
-			addCars(graph);
+			// addCars(graph);//FIXME
 
 			for (int i = 1; i < VRG.coordinates.size(); i++) {
 				VRGvertexes vertex = new VRGvertexes();
 
 				vertex.objectVertex = graph.insertVertex(parent, null,
-						VRGUtils.LABEL_VERTEX + i, VRG.coordinates.get(i).x
-								* distance,
-						VRG.coordinates.get(i).y * distance, length, length);// x,y,width,height//StrUtils.GRAPH_PARAM_3
+						VRGUtils.LABEL_VERTEX + i,
+						translateX + VRG.coordinates.get(i).x * distance,
+						translateY + VRG.coordinates.get(i).y * distance,
+						length, length);// x,y,width,height//StrUtils.GRAPH_PARAM_3
 
 				vertex.demand = VRG.demand.get(i);
 				vertex.price = VRG.price.get(i);
