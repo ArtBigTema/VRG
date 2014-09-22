@@ -135,7 +135,7 @@ public class GraphFrame extends JFrame {
 				vrgVertexes.add(a);
 			}
 
-			// addCars(graph);//FIXME
+			addCars(graph);
 
 			for (int i = 1; i < VRG.coordinates.size(); i++) {
 				VRGvertexes vertex = new VRGvertexes();
@@ -180,9 +180,8 @@ public class GraphFrame extends JFrame {
 	private void addCars(mxGraph graph) {
 		for (int i = 1; i < VRG.carsCoordinates.size(); i++) {
 			graph.insertVertex(graph.getDefaultParent(), null,
-					VRGUtils.LABEL_CARS + i, VRG.carsCoordinates.get(i).x
-							* distance, distance + VRG.carsCoordinates.get(i).y
-							* distance, 3 * length, length);// x,y,width,height
+					VRGUtils.LABEL_CARS + i, 50,
+					VRG.carsCoordinates.get(i).y / 2, 3 * length, length);
 		}
 	}
 

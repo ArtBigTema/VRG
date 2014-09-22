@@ -968,7 +968,7 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonSolveActionPerformed(ActionEvent evt) {
-		VRG.generateOptimalRoutes(3);
+		VRG.getMaxBenefits(true);
 		fillValueToResultTable();
 	}
 
@@ -983,7 +983,7 @@ public class VRGframe extends JFrame {
 		isEnabled = true;
 		timer.scheduleAtFixedRate(new TimerTask() {
 
-			public void run() {// FIXME
+			public void run() {
 				if (VRG.searchOptimalSolutions(getOldProfits())) {
 					setButtonText(false);
 					this.cancel();
@@ -1133,7 +1133,7 @@ public class VRGframe extends JFrame {
 			}
 		}
 
-		VRG.createTableOfRoutes();
+		// VRG.createTableOfRoutes();//FIXME
 		for (int j = 0; j < n; j++) {
 			// Second column is routes
 			dtm.setValueAt(VRG.routes.get(j).toString(), j, 1);
@@ -1364,7 +1364,7 @@ public class VRGframe extends JFrame {
 		public void mouseClicked(java.awt.event.MouseEvent evt) {
 			int row = tableCars.rowAtPoint(evt.getPoint());
 			int col = tableCars.columnAtPoint(evt.getPoint());
-			if (row >= 0 && col >= 1 && tableCars.getValueAt(row, col) != null) {
+			if (row >= 0 && col >= 0 && tableCars.getValueAt(row, col) != null) {
 				generateCarsValue(row, col);
 			}
 		}

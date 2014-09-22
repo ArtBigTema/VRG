@@ -3,6 +3,8 @@ package vrg;
 import java.awt.Component;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -18,7 +20,6 @@ public class VRGfile {
 		FileFilter ff = new FileNameExtensionFilter(VRGUtils.TXT_FILES, "txt",
 				"adb");
 		chooser.setFileFilter(ff);
-
 		return chooser;
 	}
 
@@ -56,4 +57,37 @@ public class VRGfile {
 		return readFromFile(openFile(parent));
 	}
 
+	public static File file = VRGUtils.getFile(new File(VRGUtils.LABEL_VRG),
+			".txt");
+	public static FileWriter out;
+
+	public static void openFile() {
+		try {
+			out = new FileWriter(file);
+		} catch (IOException e) {
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, e.toString());
+		}
+	}
+
+	public static void closeFile() {
+		try {
+			out.flush();
+			out.close();
+			// Desktop desk = Desktop.getDesktop();
+			// desk.open(file);
+		} catch (IOException e) {
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, e.toString());
+		}
+	}
+
+	public static void write(Object s) {
+		try {
+			String n = "\n";
+			out.append(n);
+			out.append(String.valueOf(s));
+			out.flush();
+		} catch (IOException e) {
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, e.toString());
+		}
+	}
 }

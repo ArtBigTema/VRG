@@ -1,6 +1,7 @@
 package vrg;
 
 import java.awt.Point;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -35,6 +36,8 @@ public class VRG {
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<Double> benefits = new ArrayList<Double>();
+	public static Set<Double> benefitsSet = new HashSet<Double>();
+	public static DecimalFormat df = VRGUtils.df;
 
 	public static boolean isValid() {
 		return (coordinates != null) && (coordinates.size() > 0)
@@ -85,6 +88,8 @@ public class VRG {
 		lengthOfRoutes.clear();
 		routes.clear();
 		carsCoordinates.clear();
+		benefits.clear();
+		benefitsSet.clear();
 	}
 
 	public static void generateCoordinates(int n) {
@@ -203,6 +208,7 @@ public class VRG {
 	public static Boolean searchOptimalSolutions(Double oldProfits) {
 		generateOptimalRoutes(2);
 		Double allProfits = getSumDoubleArr(benefits);
+		benefitsSet.add(allProfits);
 
 		if (allProfits.intValue() == oldProfits.intValue()) {
 			numberProfits++;
@@ -218,6 +224,7 @@ public class VRG {
 
 	public static void generateOptimalRoutes() {
 		generateOptimalRoutes(1);
+		benefitsSet.clear();
 	}
 
 	public static void generateOptimalRoutes(int accuracy) {
@@ -273,17 +280,198 @@ public class VRG {
 				pathMax.add(new ArrayList<Integer>());
 				continue;
 			}
-
 			Double max = Collections.max(benefits);
 			int in = benefits.indexOf(max);
 
 			localBenefits.add(max);
 			pathMax.add(pathMaxDel.get(in));
 			deleteArray(routes, pathMaxDel.get(in));
+
 			pathMaxDel.clear();
 			benefits.clear();
 		}
 		createOptimumRoutesAndBenefits(pathMax, localBenefits);
+	}
+
+	public static void generateAllRoutes(int accuracy) {
+		routes.clear();
+		benefits.clear();
+		if (lengthOfRoutes.size() < 1) {
+			generateGraphRoutes();
+		}
+
+		ArrayList<ArrayList<ArrayList<Integer>>> pathMax = new ArrayList<ArrayList<ArrayList<Integer>>>();
+		ArrayList<ArrayList<ArrayList<Integer>>> pathAll = new ArrayList<ArrayList<ArrayList<Integer>>>();
+		ArrayList<Double> benefitsRoutes = new ArrayList<Double>();
+		VRGfile.openFile();
+
+		for (int i = 1; i < cars.size(); i++) {
+			ArrayList<ArrayList<Integer>> allRoutes = getRoutes(cars.get(i),
+					demand, 4);
+			pathAll.add(allRoutes);
+		}
+
+		ArrayList<ArrayList<ArrayList<Integer>>> paths = constructRoutes(pathAll);
+		VRGfile.write(paths.toString());
+		VRGfile.write(paths.size());
+
+		System.out.println(paths.size());
+		for (ArrayList<ArrayList<Integer>> allRoutes : paths) {
+			for (ArrayList<Integer> arrr : allRoutes) {
+				ArrayList<Integer> arr = new ArrayList<Integer>(arrr);
+				Double result = 0D;
+				if (arr.size() < 1) {
+					continue;
+				}
+				arr.add(0, 0);
+				arr.add(0);
+
+				int index = 0;
+				for (int j = 1; j < arr.size() - 1; j++) {
+					Double sum = 0D;
+					index = arr.get(j);
+					sum += price.get(index) * demand.get(index);
+					sum -= lengthOfRoutes.get(index).get(arr.get(j - 1));
+					result += sum;
+				}
+				result -= lengthOfRoutes.get(0).get(index);
+
+				benefits.add(VRGUtils.getDouble(result));
+			}
+			if (getSumDoubleArr(benefits) > 0D) {
+				VRGfile.write(allRoutes.toString());
+				benefitsRoutes.add(getSumDoubleArr(benefits));
+				pathMax.add(allRoutes);
+			}
+			benefits.clear();
+		}
+		if (benefitsRoutes.size() < 1) {
+			benefitsRoutes.add(0D);
+			pathMax.add(new ArrayList<ArrayList<Integer>>());
+		}
+		Double max = Collections.max(benefitsRoutes);
+		int in = benefitsRoutes.indexOf(max);
+
+		VRGfile.write(pathMax.get(in).toString());
+		createOptimumRoutesAndBenefits(pathMax.get(in));
+		VRGfile.closeFile();
+	}
+
+	private static void createOptimumRoutesAndBenefits(
+			ArrayList<ArrayList<Integer>> arrayList) {
+		routes.clear();
+		benefits.clear();
+
+		for (ArrayList<Integer> arr : arrayList) {
+			routes.add(arr);
+			Double result = 0D;
+			if (arr.size() < 1) {
+				System.out.println("Error " + arr.toString());
+			}
+			arr.add(0, 0);
+			arr.add(0);
+
+			int index = 0;
+			for (int j = 1; j < arr.size() - 1; j++) {
+				Double sum = 0D;
+				index = arr.get(j);
+				sum += price.get(index) * demand.get(index);
+				sum -= lengthOfRoutes.get(index).get(arr.get(j - 1));
+				result += sum;
+			}
+			result -= lengthOfRoutes.get(0).get(index);
+
+			benefits.add(VRGUtils.getDouble(result));
+		}
+		benefitsSet.add(getSumDoubleArr(benefits));
+	}
+
+	private static ArrayList<ArrayList<ArrayList<Integer>>> constructRoutes(
+			ArrayList<ArrayList<ArrayList<Integer>>> pathAll) {
+
+		Set<ArrayList<ArrayList<Integer>>> allroutes = new HashSet<ArrayList<ArrayList<Integer>>>();
+		ArrayList<ArrayList<Integer>> firstLine = new ArrayList<ArrayList<Integer>>(
+				pathAll.get(0));
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+		ArrayList<Integer> indexes0 = new ArrayList<Integer>();
+
+		for (int l = 0; l < firstLine.size(); l++) {
+			ArrayList<ArrayList<ArrayList<Integer>>> paths = new ArrayList<ArrayList<ArrayList<Integer>>>();
+			ArrayList<ArrayList<Integer>> arrValue = new ArrayList<ArrayList<Integer>>();
+			arrValue.add(firstLine.get(l));
+
+			indexes.clear();
+			indexes0.clear();
+			int n = 1;
+			for (int i = 1; i < pathAll.size(); i++) {
+				indexes.add(pathAll.get(i).size() - 1);
+				n = getSumIntArr(indexes);
+				indexes0.add(0);
+			}
+			indexes0.add(0);
+
+			int m = 0;
+			while (m != n) {
+				ArrayList<ArrayList<Integer>> arr2dim = new ArrayList<ArrayList<Integer>>(
+						arrValue);
+
+				for (int i = 1; i < pathAll.size(); i++) {
+					arr2dim.add(pathAll.get(i).get(indexes0.get(i - 1)));
+				}
+				paths.add(new ArrayList<ArrayList<Integer>>(arr2dim));
+
+				m = incrementIndex(indexes0, indexes, 0);
+			}
+			getNotContainsValue(paths);
+			allroutes.addAll(paths);
+		}
+
+		return new ArrayList<ArrayList<ArrayList<Integer>>>(allroutes);
+	}
+
+	private static int incrementIndex(ArrayList<Integer> indexes0,
+			ArrayList<Integer> indexesAll, int j) {
+		if (j >= indexesAll.size()
+				|| getSumIntArr(indexes0) == getSumIntArr(indexesAll)) {
+			VRGfile.write("eerrror");
+			return getSumIntArr(indexes0);
+		}
+		if (getSumIntArr(indexes0) != getSumIntArr(indexesAll))
+			if ((indexes0.get(j) - indexesAll.get(j)) == 0) {
+				indexes0.set(j, 0);
+				incrementIndex(indexes0, indexesAll, j + 1);
+			} else {
+				indexes0.set(j, indexes0.get(j) + 1);
+			}
+		return getSumIntArr(indexes0);
+	}
+
+	private static void getNotContainsValue(
+			ArrayList<ArrayList<ArrayList<Integer>>> paths) {// XXX
+		for (int i = paths.size() - 1; i >= 0; i--) {
+			ArrayList<ArrayList<Integer>> tmp = paths.get(i);
+			ArrayList<Integer> all = new ArrayList<Integer>();
+			for (int j = 1; j < tmp.size(); j++) {
+				ArrayList<Integer> tmpp = tmp.get(j);
+				for (int k = j - 1; k >= 0; k--) {
+					all.addAll(tmp.get(k));
+				}
+				tmp.set(j, getDifferenceBetweenSets(tmpp, all));
+				all.clear();
+				if (tmp.size() < 2) {
+					System.out.println(tmp.toString());
+					tmp.add(new ArrayList<Integer>());
+				}
+				if (tmp.size() > 3) {
+					System.out.println(tmp.toString());
+					tmp.remove(0);
+				}
+				if (tmp.size() < 3) {
+					System.out.println(tmp.toString());
+					tmp.add(new ArrayList<Integer>());
+				}
+			}
+		}
 	}
 
 	public static void generateEdges() {
@@ -310,8 +498,9 @@ public class VRG {
 	private static ArrayList<ArrayList<Integer>> getRandomIndexes(int costSize,
 			int accuracy) {
 		Set<ArrayList<Integer>> set = new HashSet<ArrayList<Integer>>();
-
-		int n = (int) Math.pow(costSize, accuracy);
+		int k = 0;
+		int count = 0;
+		int n = (int) Math.pow(20, accuracy);// FIXME
 
 		for (int j = 0; j < n; j++) {
 			ArrayList<Integer> values = new ArrayList<Integer>();
@@ -321,13 +510,22 @@ public class VRG {
 				values.add(i + 1);
 			}
 			Collections.shuffle(values);
+			Collections.shuffle(values);
 
 			for (int i = 0; i < random(1, values.size()); i++) {
 				valuesShort.add(values.get(i));
 			}
-
 			Collections.sort(valuesShort);
+			k = set.size();
 			set.add(valuesShort);
+			if (k != set.size()) {
+				count = 0;
+			} else {
+				count++;
+			}
+			if (count > countCoords) {
+				break;
+			}
 		}
 		return new ArrayList<ArrayList<Integer>>(set);
 	}
@@ -347,8 +545,10 @@ public class VRG {
 
 			if (getSumIntArr(tmp) <= max) {
 				tmp = new ArrayList<Integer>(arr);
-				tmp.add(0, 0);
-				tmp.add(0);
+				if (accuracy != 4) {
+					tmp.add(0, 0);
+					tmp.add(0);
+				}
 				result.add(tmp);
 			}
 		}
@@ -365,6 +565,15 @@ public class VRG {
 			routes.add(tmp);
 		}
 		benefits = new ArrayList<Double>(benefitss);
+		benefitsSet.add(getSumDoubleArr(benefitss));
+	}
+
+	public static Double getMaxBenefits(boolean isClear) {
+		if (isClear) {
+			benefitsSet.clear();
+		}
+		generateAllRoutes(2);
+		return Collections.max(benefits);
 	}
 
 	private static int getSumIntArr(ArrayList<Integer> path) {
@@ -430,12 +639,7 @@ public class VRG {
 		if (p1 instanceof Point) {
 			distanse = getDistance(Point.class.cast(p1), Point.class.cast(p2));
 		}
-
-		if (distanse.toString().length() < 5) {
-			return distanse.toString();
-		} else {
-			return distanse.toString().substring(0, 5);
-		}
+		return VRGUtils.df.format(distanse).replace(",", ".");
 	}
 
 	public static double getDistance(Point p1, Point p2) {
@@ -455,6 +659,16 @@ public class VRG {
 		} while (result == oldValue);
 
 		return result;
+	}
+
+	public static ArrayList<Integer> getDifferenceBetweenSets(
+			ArrayList<Integer> path, ArrayList<Integer> first) {
+		ArrayList<Integer> diff = new ArrayList<Integer>(path);
+
+		diff.removeAll(first);
+		Collections.sort(diff);
+
+		return diff;
 	}
 
 	public static String getDifferenceBetweenSets() {
@@ -494,7 +708,10 @@ public class VRG {
 	}
 
 	public static void generateCarsTableAtIndex(int column) {
-		cars.set(column, random(1, countCars * 2, cars.get(column)));
+		if (column == 0) {
+			Collections.fill(cars, 35);
+		} else
+			cars.set(column, random(1, countCars * 2, cars.get(column)));
 	}
 
 	public static String getStringDifferenceBetweenSets() {
@@ -519,9 +736,9 @@ public class VRG {
 	public static Point getMinCoords() {
 		Point result;
 
-		Point maxX = getMaxMinX(false);
-		Point maxY = getMaxMinY(false);
-		result = new Point(maxX.x, maxY.y);
+		Point minX = getMaxMinX(false);
+		Point minY = getMaxMinY(false);
+		result = new Point(minX.x, minY.y);
 		return result;
 	}
 

@@ -68,7 +68,7 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		a.vertexCoords = new VRGvertexes.VertexCoords(VRG.coordinates.get(0));
 		vrgVertexes.add(a);
 
-		// addCars(graph);//FIXME
+		addCars(graph);// XXX
 
 		for (int i = 1; i < VRG.coordinates.size(); i++) {
 			Vertex vertex = new Vertex(translateX + VRG.coordinates.get(i).x
@@ -124,8 +124,7 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 
 	private void addCars(Graph graph) {
 		for (int i = 1; i < VRG.carsCoordinates.size(); i++) {
-			Vertex vertex = new Vertex(radius, radius + i
-					+ VRG.carsCoordinates.get(i).y * radius,
+			Vertex vertex = new Vertex(50, VRG.carsCoordinates.get(i).y / 2,
 					VRGUtils.LABEL_CARS + i);
 			graph.addVertex(vertex);
 		}

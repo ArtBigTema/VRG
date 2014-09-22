@@ -9,6 +9,7 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
@@ -101,7 +102,7 @@ public class VRGUtils {
 	public static final String LABEL_VRG = "VRG Folder";
 	public static final int DELAY = 100;
 	public static final int START = 10;
-	public static final int DISTANCE = 1;// FIXME
+	public static final int DISTANCE = 1;
 	public static final int MAX_SIZE = 1000;
 	public static int windowWidth = 100;
 	public static int windowHeight = 100;
@@ -125,6 +126,8 @@ public class VRGUtils {
 
 	public static final String TXT_FILES = "Файлы текста";// "Text files";
 	public static final String ENCODING = "cp1251";
+
+	public static DecimalFormat df = new DecimalFormat("#.####");
 
 	public static int getIntFromDialog(String text) {
 		int k = 0;
@@ -171,10 +174,7 @@ public class VRGUtils {
 
 	public static String get(Object o) {
 		String s = String.valueOf(o);
-		if (s.length() > 5) {
-			s = s.substring(0, 5);
-		}
-		return s.replace(".", ",");
+		return VRGUtils.df.format(Double.parseDouble(s));
 	}
 
 	public static Double getDouble(Object o) {
@@ -279,16 +279,20 @@ public class VRGUtils {
 		}
 	}
 
-	private static File getFile(File directory) {
+	public static File getFile(File directory) {
+		return getFile(directory, ".jpg");
+	}
+
+	public static File getFile(File directory, String extension) {
 		File filename = null;
 
 		if (directory.exists() && directory.isDirectory()) {
 			filename = new File(directory.getName() + "/ScreenShots"
-					+ (directory.list().length + 1) + ".jpeg");
+					+ (directory.list().length + 1) + extension);
 		} else {
 			directory.mkdir();
 			filename = new File(directory.getName() + "/ScreenShots"
-					+ (directory.list().length + 1) + ".jpeg");
+					+ (directory.list().length + 1) + extension);
 		}
 		return filename;
 	}
