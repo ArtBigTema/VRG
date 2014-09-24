@@ -94,6 +94,7 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 			distance = (width + height) / 50;
 		} else {
 			distance = 1;
+			VRGUtils.DISTANCE = distance;
 		}
 		point = VRG.getMinCoords();
 		if ((point.x < width / 10) || (point.y < height / 10)) {

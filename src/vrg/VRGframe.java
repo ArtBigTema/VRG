@@ -9,6 +9,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -35,6 +37,7 @@ public class VRGframe extends JFrame {
 
 	public VRGframe() {
 		initComponents();
+		VRGfile.openFile();
 	}
 
 	private void initComponents() {
@@ -93,6 +96,13 @@ public class VRGframe extends JFrame {
 		});
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent we) {
+				VRGfile.closeFile();
+				System.exit(0);
+			}
+		});
 
 		tableCoordsDP.setBorder(javax.swing.BorderFactory.createEtchedBorder(
 				null, new java.awt.Color(0, 0, 0)));
@@ -676,6 +686,16 @@ public class VRGframe extends JFrame {
 				}
 			});
 
+			menuItem = new JMenuItem();
+			menuItem.setText(VRGUtils.MENU_OPEN_LOG);
+			jMenu1.add(menuItem);
+			menuItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					VRGfile.openFileInDesktop();
+				}
+			});
+
 			menu = new JMenu();
 			menu.setText(VRGUtils.MENU_EXPORT);
 			jMenu1.add(menu);
@@ -717,6 +737,7 @@ public class VRGframe extends JFrame {
 			menuTable.setToolTipText("5");
 			menuTable.addActionListener(actionListener);
 			menu.add(menuTable);
+			menu.addSeparator();
 
 			menuTable = new JMenuItem();
 			menuTable.setText(VRGUtils.MENU_EXPORT_GRAPH);
@@ -742,8 +763,13 @@ public class VRGframe extends JFrame {
 					tabbedPane.setSelectedIndex(0);
 					buttonDeleteVertexActionPerformed(evt);
 					VRG.readTableFromFile(VRGframe.this);
-					fillAllStandart();
-					VRG.generateGraphRoutes();
+					if (VRG.isValid()) {
+						fillAllStandart();
+						VRG.generateGraphRoutes();
+					} else {
+						VRGUtils.showErrorMess(VRGframe.this,
+								VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_FNF);
+					}
 				}
 			});
 
@@ -968,7 +994,7 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonSolveActionPerformed(ActionEvent evt) {
-		VRG.getMaxBenefits(true);
+		VRG.constructSolution();
 		fillValueToResultTable();
 	}
 
@@ -992,7 +1018,7 @@ public class VRGframe extends JFrame {
 				}
 				if (!((ms + 3000) > System.currentTimeMillis())) {
 					setButtonText(false);
-					buttonSolveActionPerformed(null);
+					buttonSolveActionPerformed(null);// FIXME
 					this.cancel();
 
 				}

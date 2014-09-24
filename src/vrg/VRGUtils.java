@@ -82,6 +82,7 @@ public class VRGUtils {
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
 	public static final String MSG_ATTENTION = "Attention";
+	public static final String MSG_ERR_FNF = "Файл не найден";// "File not found";
 	public static final String MSG_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n "
 			+ "чтобы посмотреть визуализацию";// "Click graph tab";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
@@ -102,13 +103,14 @@ public class VRGUtils {
 	public static final String LABEL_VRG = "VRG Folder";
 	public static final int DELAY = 100;
 	public static final int START = 10;
-	public static final int DISTANCE = 1;
+	public static int DISTANCE = 1;
 	public static final int MAX_SIZE = 1000;
 	public static int windowWidth = 100;
 	public static int windowHeight = 100;
 
 	public static final String MENU_FILE = "Файл";// "File";
 	public static final String MENU_EDIT = "Изменить";// "Edit";
+	public static final String MENU_OPEN_LOG = "Открыть LOG";// "Edit";
 	public static final String MENU_NEW = "Новый";// "New";
 	public static final String MENU_EXPORT = "Экспорт таблиц";// "Export table";
 	public static final String MENU_TABLE = "Таблица ";// "Table";

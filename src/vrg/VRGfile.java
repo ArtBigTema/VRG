@@ -1,11 +1,13 @@
 package vrg;
 
 import java.awt.Component;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Scanner;
 
 import javax.swing.JFileChooser;
@@ -35,6 +37,9 @@ public class VRGfile {
 
 	@SuppressWarnings("resource")
 	public static ArrayList<VRGvertexes> readFromFile(File f) {
+		if (f == null) {
+			return null;
+		}
 		ArrayList<VRGvertexes> result = null;
 		try {
 			Scanner scanner = new Scanner(f);
@@ -47,8 +52,7 @@ public class VRGfile {
 			}
 
 		} catch (FileNotFoundException ex) {
-			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE,
-					"File not found");
+			return null;
 		}
 		return result;
 	}
@@ -64,17 +68,33 @@ public class VRGfile {
 	public static void openFile() {
 		try {
 			out = new FileWriter(file);
+			writeDate();
 		} catch (IOException e) {
 			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, e.toString());
 		}
 	}
 
+	public static void writeDate() {
+		write(Calendar.getInstance().getTime().toString());
+		write("ms: " + System.currentTimeMillis());
+		write("\n");
+	}
+
 	public static void closeFile() {
+		writeDate();
 		try {
 			out.flush();
 			out.close();
-			// Desktop desk = Desktop.getDesktop();
-			// desk.open(file);
+			// openFileInDesktop();
+		} catch (IOException e) {
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, e.toString());
+		}
+	}
+
+	public static void openFileInDesktop() {
+		Desktop desk = Desktop.getDesktop();
+		try {
+			desk.open(file);
 		} catch (IOException e) {
 			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, e.toString());
 		}
