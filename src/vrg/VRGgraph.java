@@ -133,38 +133,36 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		if (graph == null) {
 			return;
 		}
-		if (VRG.routes == null || VRG.routes.size() == 0) {
-			VRG.generateEdges();
-		}
+		VRG.generateEdges();// FIXME
 
 		if ((numberOfSpace + 1) > VRG.routes.size()) {
 			VRGframe.isNeedToUpdate = false;
 			if (VRGUtils.showInputDialog(null, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
-				VRG.generateEdges();
+				VRG.constructSolution();
 			}
 			VRGframe.isNeedToUpdate = true;
 			numberOfSpace = 0;
 		}
 
-		ArrayList<Integer> tmp = VRG.routes.get(numberOfSpace);
+		for (ArrayList<Integer> tmp : VRG.routes) {
+			int in = 0;
+			for (int index : tmp) {
+				distance = VRGvertexes.getDistance(vrgVertexes.get(in).vertexCoords, vrgVertexes.get(index).vertexCoords);
 
-		int in = 0;
-		for (int index : tmp) {
-			distance = VRGvertexes.getDistance(vrgVertexes.get(in).vertexCoords, vrgVertexes.get(index).vertexCoords);
+				Vertex vertex1 = null;
+				Vertex vertex2 = null;
+				if (vrgVertexes.get(in).objectVertex instanceof Vertex && vrgVertexes.get(index).objectVertex instanceof Vertex) {
+					vertex1 = Vertex.class.cast(vrgVertexes.get(in).objectVertex);
+					vertex2 = Vertex.class.cast(vrgVertexes.get(index).objectVertex);
+				} else {
+					continue;
+				}
 
-			Vertex vertex1 = null;
-			Vertex vertex2 = null;
-			if (vrgVertexes.get(in).objectVertex instanceof Vertex && vrgVertexes.get(index).objectVertex instanceof Vertex) {
-				vertex1 = Vertex.class.cast(vrgVertexes.get(in).objectVertex);
-				vertex2 = Vertex.class.cast(vrgVertexes.get(index).objectVertex);
-			} else {
-				continue;
+				Edge edge = new Edge(vertex1, vertex2, VRGUtils.get(distance));
+				graph.addEdge(edge);
+				vrgVertexes.get(in).edges = edge;
+				in = index;
 			}
-
-			Edge edge = new Edge(vertex1, vertex2, VRGUtils.get(distance));
-			graph.addEdge(edge);
-			vrgVertexes.get(in).edges = edge;
-			in = index;
 		}
 	}
 
