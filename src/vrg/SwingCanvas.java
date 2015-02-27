@@ -19,8 +19,7 @@ public class SwingCanvas extends mxInteractiveCanvas {
 	public SwingCanvas(mxGraphComponent graphComponent) {
 		this.graphComponent = graphComponent;
 
-		vertexRenderer.setBorder(BorderFactory
-				.createBevelBorder(BevelBorder.RAISED));
+		vertexRenderer.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 		vertexRenderer.setHorizontalAlignment(JLabel.CENTER);
 		vertexRenderer.setBackground(graphComponent.getBackground().darker());
 		vertexRenderer.setOpaque(true);
@@ -29,10 +28,8 @@ public class SwingCanvas extends mxInteractiveCanvas {
 	public void drawVertex(mxCellState state, String label) {
 		vertexRenderer.setText(label);
 
-		rendererPane.paintComponent(g, vertexRenderer, graphComponent,
-				(int) state.getX() + translate.x, (int) state.getY()
-						+ translate.y, (int) state.getWidth(),
-				(int) state.getHeight(), true);
+		rendererPane.paintComponent(g, vertexRenderer, graphComponent, (int) state.getX() + translate.x, (int) state.getY()
+				+ translate.y, (int) state.getWidth(), (int) state.getHeight(), true);
 	}
 
 }

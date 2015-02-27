@@ -23,8 +23,7 @@ public class VRGTableExporter {
 			}
 
 			filename = createFile(name);
-			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(filename), VRGUtils.ENCODING));
+			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), VRGUtils.ENCODING));
 
 			for (JTable table : tables) {
 				writeFile(out, table);
@@ -40,17 +39,14 @@ public class VRGTableExporter {
 	private static File createFile(String name) {
 		File directory = new File(VRGUtils.LABEL_VRG);
 		if (directory.exists() && directory.isDirectory()) {
-			return new File(directory.getName() + "/" + name
-					+ +(directory.list().length + 1) + ".xls");
+			return new File(directory.getName() + "/" + name + +(directory.list().length + 1) + ".xls");
 		} else {
 			directory.mkdir();
-			return new File(directory.getName() + "/" + name
-					+ +(directory.list().length + 1) + ".xls");
+			return new File(directory.getName() + "/" + name + +(directory.list().length + 1) + ".xls");
 		}
 	}
 
-	private static void flushAndOpenFile(BufferedWriter out, File filename)
-			throws IOException {
+	private static void flushAndOpenFile(BufferedWriter out, File filename) throws IOException {
 		out.flush();
 		out.close();
 		Desktop desk = Desktop.getDesktop();
@@ -60,20 +56,12 @@ public class VRGTableExporter {
 
 	private static void writeFile(BufferedWriter out, JTable table) {
 		try {
-			out.write("<html>"
-					+ "<head>"
-					+ "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />"
-					+ "<title>"
-					+ table.getName()
-					+ "</title>"
-					+ "</head>"
-					+ "<body>"
-					+ "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">"
-					+ "<tr>");
+			out.write("<html>" + "<head>" + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />"
+					+ "<title>" + table.getName() + "</title>" + "</head>" + "<body>"
+					+ "<table border=\"1\" cellspacing=\"0\" cellpadding=\"0\">" + "<tr>");
 
 			for (int i = 0; i < table.getColumnCount(); i++) {
-				out.write("<td bgcolor=\"#EEEECC\" align=\"center\" width=\""
-						+ table.getColumnModel().getColumn(i).getWidth()
+				out.write("<td bgcolor=\"#EEEECC\" align=\"center\" width=\"" + table.getColumnModel().getColumn(i).getWidth()
 						+ "\"><B>" + table.getColumnName(i) + "</B></td>");
 			}
 
@@ -84,8 +72,7 @@ public class VRGTableExporter {
 
 				for (int j = 0; j < table.getColumnCount(); j++) {
 					if (table.getValueAt(i, j) != null)
-						out.write("<td>" + table.getValueAt(i, j).toString()
-								+ " </td>");
+						out.write("<td>" + table.getValueAt(i, j).toString() + " </td>");
 					else
 
 						out.write("<td> </td>");
@@ -96,16 +83,9 @@ public class VRGTableExporter {
 
 			out.write("</table></body></html>");
 
-			out.write("<html>"
-					+ "<head>"
-					+ "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />"
-					+ "<title>"
-					+ "\t"
-					+ "</title>"
-					+ "</head>"
-					+ "<body>"
-					+ "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">"
-					+ "<tr>");
+			out.write("<html>" + "<head>" + "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\" />"
+					+ "<title>" + "\t" + "</title>" + "</head>" + "<body>"
+					+ "<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">" + "<tr>");
 			out.write("</table></body></html>");
 
 		} catch (IOException ex) {

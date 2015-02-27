@@ -14,18 +14,17 @@ import java.util.Set;
 import javax.swing.JFrame;
 
 public class VRG {
-	/*public static final int[][] COORDINATES = { { 19, 45 }, { 18, 46 },
-			{ 20, 47 }, { 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 },
-			{ 13, 45 } };*/
-	public static final int[][] COORDINATES = { {4,3}, { 5,2 }, { 3,1 },
-		{ 1,6 }, { 3,7 }, { 9,8 }, { 11,4 }, { 10,3 },
-	};
+	/*
+	 * public static final int[][] COORDINATES = { { 19, 45 }, { 18, 46 }, { 20,
+	 * 47 }, { 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 }, { 13, 45 } };
+	 */
+	public static final int[][] COORDINATES = { { 4, 3 }, { 5, 2 }, { 3, 1 }, { 1, 6 }, { 3, 7 }, { 9, 8 }, { 11, 4 },
+			{ 10, 3 }, };
 	public static final int[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
 	public static final int[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
 	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
 	public static final int[][] CARS = { { 11, 39 }, { 15, 39 }, { 20, 39 } };
-	public static final int[][] ROUTES = { { 0, 1, 2, 0 }, { 0, 3, 4, 0 },
-			{ 0, 5, 6, 7, 0 } };
+	public static final int[][] ROUTES = { { 0, 1, 2, 0 }, { 0, 3, 4, 0 }, { 0, 5, 6, 7, 0 } };
 
 	public static int countCoords = 8;
 	public static int countCars = 3;
@@ -43,8 +42,7 @@ public class VRG {
 	public static DecimalFormat df = VRGUtils.df;
 
 	public static boolean isValid() {
-		return (coordinates != null) && (coordinates.size() > 0)
-				&& (cars != null) && (cars.size() > 0);
+		return (coordinates != null) && (coordinates.size() > 0) && (cars != null) && (cars.size() > 0);
 	}
 
 	public static void generateAllStandart() {
@@ -98,8 +96,7 @@ public class VRG {
 		coordinates.clear();
 		int x = VRGUtils.windowWidth;
 		int y = VRGUtils.windowHeight;
-		coordinates
-				.add(new Point(random(x / 20, x / 2), random(y / 20, y / 2)));
+		coordinates.add(new Point(random(x / 20, x / 2), random(y / 20, y / 2)));
 		for (int i = 1; i < n; i++) {
 			coordinates.add(new Point(random(y / 20, y), random(y / 20, y)));
 		}
@@ -138,8 +135,7 @@ public class VRG {
 			ArrayList<Double> tmp = new ArrayList<Double>();
 
 			for (int j = 0; j < coordinates.size(); j++) {
-				String s = getDistanceText(coordinates.get(i),
-						coordinates.get(j));
+				String s = getDistanceText(coordinates.get(i), coordinates.get(j));
 				tmp.add(Double.valueOf(s));
 			}
 
@@ -190,8 +186,7 @@ public class VRG {
 		Queue<Integer> indexQ = new LinkedList<Integer>();
 		indexQ.addAll(getCoordsIndexes());
 
-		if (indexQ == null || coordinates == null || coordinates.size() < 2
-				|| indexQ.size() < 2) {
+		if (indexQ == null || coordinates == null || coordinates.size() < 2 || indexQ.size() < 2) {
 			return;
 		}
 		for (int i = 0; i < countCars; i++) {
@@ -216,8 +211,7 @@ public class VRG {
 		} else {
 			numberProfits = 0;
 		}
-		if ((allProfits.intValue() == oldProfits.intValue())
-				&& (oldProfits.intValue() == 0)) {
+		if ((allProfits.intValue() == oldProfits.intValue()) && (oldProfits.intValue() == 0)) {
 			numberProfits += countCoords / 4;
 		}
 		return numberProfits > countCoords;
@@ -241,10 +235,8 @@ public class VRG {
 
 		for (int i = 1; i < cars.size(); i++) {
 
-			ArrayList<ArrayList<Integer>> allRoutes = getRoutes(cars.get(i),
-					demand, accuracy);
-			ArrayList<ArrayList<Integer>> copy = new ArrayList<ArrayList<Integer>>(
-					allRoutes);
+			ArrayList<ArrayList<Integer>> allRoutes = getRoutes(cars.get(i), demand, accuracy);
+			ArrayList<ArrayList<Integer>> copy = new ArrayList<ArrayList<Integer>>(allRoutes);
 			for (ArrayList<Integer> tmp : pathMax) {
 				deleteArray(copy, tmp);
 			}
@@ -305,8 +297,7 @@ public class VRG {
 		ArrayList<Double> benefitsRoutes = new ArrayList<Double>();
 
 		for (int i = 1; i < cars.size(); i++) {
-			ArrayList<ArrayList<Integer>> allRoutes = getRoutes(cars.get(i),
-					demand, accuracy, true);
+			ArrayList<ArrayList<Integer>> allRoutes = getRoutes(cars.get(i), demand, accuracy, true);
 			pathAll.add(allRoutes);
 		}
 
@@ -354,8 +345,7 @@ public class VRG {
 		createOptimumRoutesAndBenefits(pathMax.get(in));
 	}
 
-	private static void createOptimumRoutesAndBenefits(
-			ArrayList<ArrayList<Integer>> arrayList) {
+	private static void createOptimumRoutesAndBenefits(ArrayList<ArrayList<Integer>> arrayList) {
 		routes.clear();
 		benefits.clear();
 
@@ -380,12 +370,10 @@ public class VRG {
 		}
 	}
 
-	private static ArrayList<ArrayList<ArrayList<Integer>>> constructRoutes(
-			ArrayList<ArrayList<ArrayList<Integer>>> pathAll) {
+	private static ArrayList<ArrayList<ArrayList<Integer>>> constructRoutes(ArrayList<ArrayList<ArrayList<Integer>>> pathAll) {
 
 		Set<ArrayList<ArrayList<Integer>>> allroutes = new HashSet<ArrayList<ArrayList<Integer>>>();
-		ArrayList<ArrayList<Integer>> firstLine = new ArrayList<ArrayList<Integer>>(
-				pathAll.get(0));
+		ArrayList<ArrayList<Integer>> firstLine = new ArrayList<ArrayList<Integer>>(pathAll.get(0));
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
 		ArrayList<Integer> indexes0 = new ArrayList<Integer>();
 
@@ -406,8 +394,7 @@ public class VRG {
 
 			int m = 0;
 			while (m != n) {
-				ArrayList<ArrayList<Integer>> arr2dim = new ArrayList<ArrayList<Integer>>(
-						arrValue);
+				ArrayList<ArrayList<Integer>> arr2dim = new ArrayList<ArrayList<Integer>>(arrValue);
 
 				for (int i = 1; i < pathAll.size(); i++) {
 					arr2dim.add(pathAll.get(i).get(indexes0.get(i - 1)));
@@ -423,10 +410,8 @@ public class VRG {
 		return new ArrayList<ArrayList<ArrayList<Integer>>>(allroutes);
 	}
 
-	private static int incrementIndex(ArrayList<Integer> indexes0,
-			ArrayList<Integer> indexesAll, int j) {
-		if (j >= indexesAll.size()
-				|| getSumIntArr(indexes0) == getSumIntArr(indexesAll)) {
+	private static int incrementIndex(ArrayList<Integer> indexes0, ArrayList<Integer> indexesAll, int j) {
+		if (j >= indexesAll.size() || getSumIntArr(indexes0) == getSumIntArr(indexesAll)) {
 			VRGfile.write("eerrror");
 			return getSumIntArr(indexes0);
 		}
@@ -440,8 +425,7 @@ public class VRG {
 		return getSumIntArr(indexes0);
 	}
 
-	private static void getNotContainsValue(
-			ArrayList<ArrayList<ArrayList<Integer>>> paths) {// FIXME
+	private static void getNotContainsValue(ArrayList<ArrayList<ArrayList<Integer>>> paths) {// FIXME
 		for (int i = paths.size() - 1; i >= 0; i--) {
 			ArrayList<ArrayList<Integer>> tmp = paths.get(i);
 			ArrayList<Integer> all = new ArrayList<Integer>();
@@ -473,8 +457,7 @@ public class VRG {
 		}
 	}
 
-	private static void deleteArray(ArrayList<ArrayList<Integer>> copy,
-			ArrayList<Integer> paths) {
+	private static void deleteArray(ArrayList<ArrayList<Integer>> copy, ArrayList<Integer> paths) {
 		for (int j = copy.size() - 1; j >= 0; j--) {
 			for (int p : paths) {
 				int in = copy.get(j).indexOf(p);
@@ -486,8 +469,7 @@ public class VRG {
 		}
 	}
 
-	private static ArrayList<ArrayList<Integer>> getRandomIndexes(int costSize,
-			int accuracy) {
+	private static ArrayList<ArrayList<Integer>> getRandomIndexes(int costSize, int accuracy) {
 		Set<ArrayList<Integer>> set = new HashSet<ArrayList<Integer>>();
 		int k = 0;
 		int count = 0;
@@ -521,16 +503,13 @@ public class VRG {
 		return new ArrayList<ArrayList<Integer>>(set);
 	}
 
-	private static ArrayList<ArrayList<Integer>> getRoutes(int max,
-			ArrayList<Integer> costs, int accuracy) {
+	private static ArrayList<ArrayList<Integer>> getRoutes(int max, ArrayList<Integer> costs, int accuracy) {
 		return getRoutes(max, costs, accuracy, false);
 	}
 
-	private static ArrayList<ArrayList<Integer>> getRoutes(int max,
-			ArrayList<Integer> costs, int accuracy, boolean b) {
+	private static ArrayList<ArrayList<Integer>> getRoutes(int max, ArrayList<Integer> costs, int accuracy, boolean b) {
 
-		ArrayList<ArrayList<Integer>> allRoutes = getRandomIndexes(
-				costs.size(), accuracy);
+		ArrayList<ArrayList<Integer>> allRoutes = getRandomIndexes(costs.size(), accuracy);
 		ArrayList<ArrayList<Integer>> result = new ArrayList<ArrayList<Integer>>();
 
 		for (ArrayList<Integer> arr : allRoutes) {
@@ -551,8 +530,7 @@ public class VRG {
 		return result;
 	}
 
-	private static void createOptimumRoutesAndBenefits(
-			ArrayList<ArrayList<Integer>> pathMax, ArrayList<Double> benefitss) {
+	private static void createOptimumRoutesAndBenefits(ArrayList<ArrayList<Integer>> pathMax, ArrayList<Double> benefitss) {
 		routes.clear();
 		benefits.clear();
 		for (ArrayList<Integer> tmp : pathMax) {
@@ -633,8 +611,7 @@ public class VRG {
 		Point max = getMaxMinX(true);
 
 		for (int i = 0; i < cars.size(); i++) {
-			carsCoordinates.add(new Point(max.x + VRGUtils.windowWidth / 20, i
-					* (VRGUtils.windowHeight / cars.size())));
+			carsCoordinates.add(new Point(max.x + VRGUtils.windowWidth / 20, i * (VRGUtils.windowHeight / cars.size())));
 		}
 	}
 
@@ -647,8 +624,7 @@ public class VRG {
 	}
 
 	public static double getDistance(Point p1, Point p2) {
-		return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y)
-				* (p2.y - p1.y));
+		return Math.sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
 	}
 
 	public static int random(int start, int end) {
@@ -667,8 +643,7 @@ public class VRG {
 		return result;
 	}
 
-	public static ArrayList<Integer> getDifferenceBetweenSets(
-			ArrayList<Integer> path, ArrayList<Integer> first) {
+	public static ArrayList<Integer> getDifferenceBetweenSets(ArrayList<Integer> path, ArrayList<Integer> first) {
 		ArrayList<Integer> diff = new ArrayList<Integer>(path);
 
 		diff.removeAll(first);
@@ -698,8 +673,7 @@ public class VRG {
 	public static void generateCoordTableAtIndex(int row, int column) {
 		switch (column) {
 		case 1: {
-			coordinates.set(row, new Point(random(1, VRGUtils.windowWidth),
-					random(1, VRGUtils.windowHeight)));
+			coordinates.set(row, new Point(random(1, VRGUtils.windowWidth), random(1, VRGUtils.windowHeight)));
 			break;
 		}
 		case 2: {

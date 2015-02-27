@@ -56,9 +56,8 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		vrgVertexes.clear();
 		setZoomIfNeed();
 
-		Vertex vertexA = new Vertex(translateX + VRG.coordinates.get(0).x
-				* distance, translateY + VRG.coordinates.get(0).y * distance,
-				VRGUtils.LABEL_BASE);
+		Vertex vertexA = new Vertex(translateX + VRG.coordinates.get(0).x * distance, translateY + VRG.coordinates.get(0).y
+				* distance, VRGUtils.LABEL_BASE);
 		graph.addVertex(vertexA);
 
 		VRGvertexes a = new VRGvertexes();
@@ -71,16 +70,14 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		addCars(graph);// XXX
 
 		for (int i = 1; i < VRG.coordinates.size(); i++) {
-			Vertex vertex = new Vertex(translateX + VRG.coordinates.get(i).x
-					* distance, translateY + VRG.coordinates.get(i).y
+			Vertex vertex = new Vertex(translateX + VRG.coordinates.get(i).x * distance, translateY + VRG.coordinates.get(i).y
 					* distance, VRGUtils.LABEL_VERTEX + i);
 			graph.addVertex(vertex);
 
 			VRGvertexes vertexes = new VRGvertexes();
 			vertexes.demand = VRG.demand.get(i);
 			vertexes.price = VRG.price.get(i);
-			vertexes.vertexCoords = new VRGvertexes.VertexCoords(
-					VRG.coordinates.get(i));
+			vertexes.vertexCoords = new VRGvertexes.VertexCoords(VRG.coordinates.get(i));
 			vertexes.objectVertex = vertex;
 
 			vrgVertexes.add(vertexes);
@@ -117,16 +114,14 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 			VRGvertexes vertex = new VRGvertexes();
 			vertex.demand = VRG.demand.get(i);
 			vertex.price = VRG.price.get(i);
-			vertex.vertexCoords = new VRGvertexes.VertexCoords(
-					VRG.coordinates.get(i));
+			vertex.vertexCoords = new VRGvertexes.VertexCoords(VRG.coordinates.get(i));
 			vrgVertexes.add(vertex);
 		}
 	}
 
 	private void addCars(Graph graph) {
 		for (int i = 1; i < VRG.carsCoordinates.size(); i++) {
-			Vertex vertex = new Vertex(50, VRG.carsCoordinates.get(i).y / 2,
-					VRGUtils.LABEL_CARS + i);
+			Vertex vertex = new Vertex(50, VRG.carsCoordinates.get(i).y / 2, VRGUtils.LABEL_CARS + i);
 			graph.addVertex(vertex);
 		}
 	}
@@ -144,8 +139,7 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 
 		if ((numberOfSpace + 1) > VRG.routes.size()) {
 			VRGframe.isNeedToUpdate = false;
-			if (VRGUtils.showInputDialog(null, VRGUtils.MSG_ATTENTION,
-					VRGUtils.MSG_ERR_ROUTES)) {
+			if (VRGUtils.showInputDialog(null, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
 				VRG.generateEdges();
 			}
 			VRGframe.isNeedToUpdate = true;
@@ -156,17 +150,13 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 
 		int in = 0;
 		for (int index : tmp) {
-			distance = VRGvertexes.getDistance(
-					vrgVertexes.get(in).vertexCoords,
-					vrgVertexes.get(index).vertexCoords);
+			distance = VRGvertexes.getDistance(vrgVertexes.get(in).vertexCoords, vrgVertexes.get(index).vertexCoords);
 
 			Vertex vertex1 = null;
 			Vertex vertex2 = null;
-			if (vrgVertexes.get(in).objectVertex instanceof Vertex
-					&& vrgVertexes.get(index).objectVertex instanceof Vertex) {
+			if (vrgVertexes.get(in).objectVertex instanceof Vertex && vrgVertexes.get(index).objectVertex instanceof Vertex) {
 				vertex1 = Vertex.class.cast(vrgVertexes.get(in).objectVertex);
-				vertex2 = Vertex.class
-						.cast(vrgVertexes.get(index).objectVertex);
+				vertex2 = Vertex.class.cast(vrgVertexes.get(index).objectVertex);
 			} else {
 				continue;
 			}

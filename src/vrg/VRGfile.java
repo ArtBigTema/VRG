@@ -19,8 +19,7 @@ public class VRGfile {
 
 	public static JFileChooser getFileChooser() {
 		JFileChooser chooser = new JFileChooser();
-		FileFilter ff = new FileNameExtensionFilter(VRGUtils.TXT_FILES, "txt",
-				"adb");
+		FileFilter ff = new FileNameExtensionFilter(VRGUtils.TXT_FILES, "txt", "adb");
 		chooser.setFileFilter(ff);
 		return chooser;
 	}
@@ -35,7 +34,6 @@ public class VRGfile {
 		return file;
 	}
 
-	@SuppressWarnings("resource")
 	public static ArrayList<VRGvertexes> readFromFile(File f) {
 		if (f == null) {
 			return null;
@@ -50,7 +48,7 @@ public class VRGfile {
 			for (int i = 0; i < n; i++) {
 				result.add(new VRGvertexes(scanner.nextLine().split("\\s+")));
 			}
-
+			scanner.close();
 		} catch (FileNotFoundException ex) {
 			return null;
 		}
@@ -61,8 +59,7 @@ public class VRGfile {
 		return readFromFile(openFile(parent));
 	}
 
-	public static File file = VRGUtils.getFile(new File(VRGUtils.LABEL_VRG),
-			".txt");
+	public static File file = VRGUtils.getFile(new File(VRGUtils.LABEL_VRG), ".txt");
 	public static FileWriter out;
 
 	public static void openFile() {

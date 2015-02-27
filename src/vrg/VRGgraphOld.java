@@ -18,7 +18,7 @@ import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 @SuppressWarnings("serial")
-public class graphSmall extends JFrame {
+public class VRGgraphOld extends JFrame {
 	public mxGraphComponent graphComponent;
 	public static final int length = 20;
 	public static final int baseLength = 15;
@@ -38,21 +38,17 @@ public class graphSmall extends JFrame {
 		VRGUtils.showInitMessage(this, VRGUtils.MSG_INIT);
 	}
 
-	public graphSmall() {
+	public VRGgraphOld() {
 		vrgVertexes = new ArrayList<VRGvertexes>();
 
 		mxGraph graph = new mxGraph() {
-			public void drawState(mxICanvas canvas, mxCellState state,
-					boolean drawLabel) {
+			public void drawState(mxICanvas canvas, mxCellState state, boolean drawLabel) {
 				String label = (drawLabel) ? state.getLabel() : "";
 
-				if (getModel().isVertex(state.getCell())
-						&& canvas instanceof mxImageCanvas
+				if (getModel().isVertex(state.getCell()) && canvas instanceof mxImageCanvas
 						&& ((mxImageCanvas) canvas).getGraphicsCanvas() instanceof SwingCanvas) {
-					((SwingCanvas) ((mxImageCanvas) canvas).getGraphicsCanvas())
-							.drawVertex(state, label);
-				} else if (getModel().isVertex(state.getCell())
-						&& canvas instanceof SwingCanvas) {
+					((SwingCanvas) ((mxImageCanvas) canvas).getGraphicsCanvas()).drawVertex(state, label);
+				} else if (getModel().isVertex(state.getCell()) && canvas instanceof SwingCanvas) {
 					((SwingCanvas) canvas).drawVertex(state, label);
 				} else {
 					super.drawState(canvas, state, drawLabel);
@@ -123,16 +119,12 @@ public class graphSmall extends JFrame {
 			{
 				VRGvertexes a = new VRGvertexes();
 
-				a.objectVertex = graph.insertVertex(parent, null,
-						VRGUtils.LABEL_BASE,
-						translateX + (VRG.coordinates.get(0).x) * distance,
-						translateY + VRG.coordinates.get(0).y * distance,
-						baseLength, baseLength,
+				a.objectVertex = graph.insertVertex(parent, null, VRGUtils.LABEL_BASE, translateX + (VRG.coordinates.get(0).x)
+						* distance, translateY + VRG.coordinates.get(0).y * distance, baseLength, baseLength,
 						"shape=ellipse;perimeter=trianglePerimeter");// x,y,width,height
 				a.demand = 0;
 				a.price = 0;
-				a.vertexCoords = new VRGvertexes.VertexCoords(
-						VRG.coordinates.get(0));
+				a.vertexCoords = new VRGvertexes.VertexCoords(VRG.coordinates.get(0));
 				vrgVertexes.add(a);
 			}
 
@@ -141,16 +133,13 @@ public class graphSmall extends JFrame {
 			for (int i = 1; i < VRG.coordinates.size(); i++) {
 				VRGvertexes vertex = new VRGvertexes();
 
-				vertex.objectVertex = graph.insertVertex(parent, null,
-						VRGUtils.LABEL_VERTEX + i,
-						translateX + VRG.coordinates.get(i).x * distance,
-						translateY + VRG.coordinates.get(i).y * distance,
+				vertex.objectVertex = graph.insertVertex(parent, null, VRGUtils.LABEL_VERTEX + i,
+						translateX + VRG.coordinates.get(i).x * distance, translateY + VRG.coordinates.get(i).y * distance,
 						length, length);// x,y,width,height//StrUtils.GRAPH_PARAM_3
 
 				vertex.demand = VRG.demand.get(i);
 				vertex.price = VRG.price.get(i);
-				vertex.vertexCoords = new VRGvertexes.VertexCoords(
-						VRG.coordinates.get(i));
+				vertex.vertexCoords = new VRGvertexes.VertexCoords(VRG.coordinates.get(i));
 
 				vrgVertexes.add(vertex);
 			}
@@ -172,17 +161,15 @@ public class graphSmall extends JFrame {
 			VRGvertexes vertex = new VRGvertexes();
 			vertex.demand = VRG.demand.get(i);
 			vertex.price = VRG.price.get(i);
-			vertex.vertexCoords = new VRGvertexes.VertexCoords(
-					VRG.coordinates.get(i));
+			vertex.vertexCoords = new VRGvertexes.VertexCoords(VRG.coordinates.get(i));
 			vrgVertexes.add(vertex);
 		}
 	}
 
 	private void addCars(mxGraph graph) {
 		for (int i = 1; i < VRG.carsCoordinates.size(); i++) {
-			graph.insertVertex(graph.getDefaultParent(), null,
-					VRGUtils.LABEL_CARS + i, 50,
-					VRG.carsCoordinates.get(i).y / 2, 2 * length, length);
+			graph.insertVertex(graph.getDefaultParent(), null, VRGUtils.LABEL_CARS + i, 50, VRG.carsCoordinates.get(i).y / 2,
+					2 * length, length);
 		}
 	}
 
@@ -201,8 +188,7 @@ public class graphSmall extends JFrame {
 
 		if ((numberOfSpace + 1) > VRG.routes.size()) {
 			VRGframe.isNeedToUpdate = false;
-			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION,
-					VRGUtils.MSG_ERR_ROUTES)) {
+			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
 				VRG.generateEdges();
 			}
 			VRGframe.isNeedToUpdate = true;
@@ -213,12 +199,9 @@ public class graphSmall extends JFrame {
 
 		int in = 0;
 		for (int index : tmp) {
-			distance = VRGvertexes.getDistance(
-					vrgVertexes.get(in).vertexCoords,
-					vrgVertexes.get(index).vertexCoords);
+			distance = VRGvertexes.getDistance(vrgVertexes.get(in).vertexCoords, vrgVertexes.get(index).vertexCoords);
 
-			graph.insertEdge(parent, null, distance.toString().substring(0, 3),
-					vrgVertexes.get(in).objectVertex,
+			graph.insertEdge(parent, null, distance.toString().substring(0, 3), vrgVertexes.get(in).objectVertex,
 					vrgVertexes.get(index).objectVertex, VRGUtils.GRAPH_PARAM_2);
 			in = index;
 		}
@@ -245,8 +228,7 @@ public class graphSmall extends JFrame {
 	public KeyListener keyListener = new KeyListener() {
 		@Override
 		public void keyReleased(KeyEvent paramKeyEvent) {
-			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE)
-					&& VRG.routes != null && VRG.routes.size() > 0) {
+			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE) && VRG.routes != null && VRG.routes.size() > 0) {
 				numberOfSpace++;
 				updateEdges(graphComponent.getGraph());
 			}
