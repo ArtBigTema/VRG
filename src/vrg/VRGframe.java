@@ -1063,7 +1063,7 @@ public class VRGframe extends JFrame {
 		} else {
 			if (graphIsFirstOpened) {
 				tabbedPane.setSelectedIndex(3);
-				GraphFrame frame = new GraphFrame();
+				VRGgraphOld frame = new VRGgraphOld();
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			}
 		}

@@ -18,7 +18,7 @@ import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxGraph;
 
 @SuppressWarnings("serial")
-public class GraphFrame extends JFrame {
+public class graphSmall extends JFrame {
 	public mxGraphComponent graphComponent;
 	public static final int length = 20;
 	public static final int baseLength = 15;
@@ -38,7 +38,7 @@ public class GraphFrame extends JFrame {
 		VRGUtils.showInitMessage(this, VRGUtils.MSG_INIT);
 	}
 
-	public GraphFrame() {
+	public graphSmall() {
 		vrgVertexes = new ArrayList<VRGvertexes>();
 
 		mxGraph graph = new mxGraph() {
@@ -182,7 +182,7 @@ public class GraphFrame extends JFrame {
 		for (int i = 1; i < VRG.carsCoordinates.size(); i++) {
 			graph.insertVertex(graph.getDefaultParent(), null,
 					VRGUtils.LABEL_CARS + i, 50,
-					VRG.carsCoordinates.get(i).y / 2, 3 * length, length);
+					VRG.carsCoordinates.get(i).y / 2, 2 * length, length);
 		}
 	}
 
@@ -252,10 +252,10 @@ public class GraphFrame extends JFrame {
 			}
 
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ALT) {
-				VRGUtils.takeScreenShotOfWindow(GraphFrame.this);
+				VRGUtils.takeScreenShotOfWindow(VRGgraphOld.this);
 			}
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_CONTROL) {
-				VRGUtils.takeScreenCapture(GraphFrame.this);
+				VRGUtils.takeScreenCapture(VRGgraphOld.this);
 			}
 		};
 
@@ -274,7 +274,7 @@ public class GraphFrame extends JFrame {
 		@Override
 		public void focusLost(FocusEvent arg0) {
 			if (VRGframe.isNeedToUpdate) {
-				GraphFrame.this.dispose();
+				VRGgraphOld.this.dispose();
 			}
 		}
 

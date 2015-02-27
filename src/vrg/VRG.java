@@ -8,14 +8,18 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Random;
 import java.util.Set;
 
 import javax.swing.JFrame;
 
 public class VRG {
-	public static final int[][] COORDINATES = { { 19, 45 }, { 18, 46 },
+	/*public static final int[][] COORDINATES = { { 19, 45 }, { 18, 46 },
 			{ 20, 47 }, { 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 },
-			{ 13, 45 } };
+			{ 13, 45 } };*/
+	public static final int[][] COORDINATES = { {4,3}, { 5,2 }, { 3,1 },
+		{ 1,6 }, { 3,7 }, { 9,8 }, { 11,4 }, { 10,3 },
+	};
 	public static final int[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
 	public static final int[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
 	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
@@ -358,10 +362,6 @@ public class VRG {
 		for (ArrayList<Integer> arrr : arrayList) {
 			ArrayList<Integer> arr = new ArrayList<Integer>(arrr);
 			Double result = 0D;
-			if (arr.size() < 1) {
-				System.out.println("Error " + arr.toString());
-				System.out.println("Error " + arrayList.toString());
-			}
 			arr.add(0, 0);
 			arr.add(0);
 
@@ -441,7 +441,7 @@ public class VRG {
 	}
 
 	private static void getNotContainsValue(
-			ArrayList<ArrayList<ArrayList<Integer>>> paths) {// XXX
+			ArrayList<ArrayList<ArrayList<Integer>>> paths) {// FIXME
 		for (int i = paths.size() - 1; i >= 0; i--) {
 			ArrayList<ArrayList<Integer>> tmp = paths.get(i);
 			ArrayList<Integer> all = new ArrayList<Integer>();
@@ -652,7 +652,9 @@ public class VRG {
 	}
 
 	public static int random(int start, int end) {
-		return (int) (start + Math.round((end - start) * Math.random()));
+		Random rand = new Random();
+		// return (int) (start + Math.round((end - start) * Math.random()));
+		return (int) (start + rand.nextInt(end - start));
 	}
 
 	public static int random(int start, int end, int oldValue) {

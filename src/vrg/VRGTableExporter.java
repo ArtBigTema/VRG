@@ -87,6 +87,7 @@ public class VRGTableExporter {
 						out.write("<td>" + table.getValueAt(i, j).toString()
 								+ " </td>");
 					else
+
 						out.write("<td> </td>");
 				}
 

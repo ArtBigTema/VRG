@@ -213,7 +213,7 @@ public class VRGUtils {
 		windowWidth = w;
 		windowHeight = h;
 		VRGgraph.reSize(w, h);
-		GraphFrame.reSize(w, h);
+		VRGgraphOld.reSize(w, h);
 	}
 
 	public static void paintCarcass(Graphics graphics) {// FIXME
@@ -228,11 +228,11 @@ public class VRGUtils {
 			dx += numX;
 			dy += numY;
 			graphics.drawLine(0, dy, offset, dy);
-			graphics.drawString(String.valueOf(dy / DISTANCE), offset + 1, dy);
+		//	graphics.drawString(String.valueOf(dy / DISTANCE), offset + 1, dy);
 
 			graphics.drawLine(dx, 0, dx, offset);
-			graphics.drawString(String.valueOf(dx / DISTANCE), dx - numX / 5,
-					offset * 4);
+		//	graphics.drawString(String.valueOf(dx / DISTANCE), dx - numX / 5,
+			//		offset * 4);
 		}
 		// paramGraphics.drawLine(0, 1, MAX_SIZE, 1);
 		// paramGraphics.drawLine(1, 0, 1, MAX_SIZE);
@@ -289,11 +289,11 @@ public class VRGUtils {
 		File filename = null;
 
 		if (directory.exists() && directory.isDirectory()) {
-			filename = new File(directory.getName() + "/ScreenShots"
+			filename = new File(directory.getName() + "/ScreenShots "
 					+ (directory.list().length + 1) + extension);
 		} else {
 			directory.mkdir();
-			filename = new File(directory.getName() + "/ScreenShots"
+			filename = new File(directory.getName() + "/ScreenShots "
 					+ (directory.list().length + 1) + extension);
 		}
 		return filename;
