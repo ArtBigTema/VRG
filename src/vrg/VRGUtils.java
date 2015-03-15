@@ -18,7 +18,6 @@ import javax.swing.JOptionPane;
 import ru.amse.smyshlyaev.grapheditor.graph.Graph;
 import ru.amse.smyshlyaev.grapheditor.io.GraphXMLFileReader;
 import ru.amse.smyshlyaev.grapheditor.io.GraphXMLFileWriter;
-import ru.amse.smyshlyaev.grapheditor.ui.JGraphComponent;
 import ru.amse.smyshlyaev.grapheditor.ui.filechooser.FileChooser;
 
 public class VRGUtils {
@@ -73,25 +72,24 @@ public class VRGUtils {
 			+ "entryX=0;entryY=1;entryPerimeter=0;";
 	public static final String GRAPH_PARAM_3 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
 
-	public static final String MSG_INIT = "Здесь будет отображаться Ваш граф"
-			+ "\n"
-			+ "Чтобы сгенерировать другой маршрут нажмите пробел (spase)"
-			+ "\n" + "Чтобы сохранить текущее окно как картинку, нажмите CTRL"
-			+ "\n" + "Чтобы сохранить весь экран как картинку, нажмите ALT";
+	public static final String MSG_INIT = "Здесь будет отображаться Ваш граф" + "\n"
+			+ "Чтобы сгенерировать другой маршрут нажмите пробел (spase)" + "\n"
+			+ "Чтобы сохранить текущее окно как картинку, нажмите CTRL" + "\n"
+			+ "Чтобы сохранить весь экран как картинку, нажмите ALT";
 	public static final String MSG_ERR_FILE_ISNT_CREATED = "Не возможно создать файл!";// "File is not created!";
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
 	public static final String MSG_ATTENTION = "Attention";
 	public static final String MSG_ERR_FNF = "Файл не найден";// "File not found";
-	public static final String MSG_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n "
-			+ "чтобы посмотреть визуализацию";// "Click graph tab";
+	public static final String MSG_BODY_ATTENTION = "Можете перейдите по вкладке граф,\n " + "чтобы посмотреть визуализацию";// "Click graph tab";
 	public static final String MSG_ERR_BODY_NULL = "Заполните начальные данные";// "Enter main values";
 	public static final String LABEL_WEIGHT = "Масса: ";// "WEIGHT: ";
 	public static final String TXT_ANALYS = "Анализ на чувствительность";// "Analys";
 	public static final String MSG_ERR_ADD_VERTEX = "Добавьте несколько вершин";// "Add more vertexes";
 	public static final String TXT_IS_ALL = "Всего";// "All: ";
-	public static final String MSG_ERR_ROUTES = "Возможные пути исчерпаны \n "
-			+ "Сгенерировать другие?";// "Generate routes?";//yes, no, cancel
+	public static final String MSG_ERR_ROUTES = "Возможные пути исчерпаны \n " + "Сгенерировать другие?";// "Generate routes?";//yes,
+																											// no,
+																											// cancel
 	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";// "Standard data";
 
 	public static final String SYMBOLS_ON = "☑";
@@ -104,7 +102,8 @@ public class VRGUtils {
 	public static final int DELAY = 100;
 	public static final int START = 10;
 	public static int DISTANCE = 1;
-	public static final int MAX_SIZE = 1000;
+	public static int radius = 10;
+	public static final int MAX_SIZE = 1000;// FIXME
 	public static int windowWidth = 100;
 	public static int windowHeight = 100;
 
@@ -141,13 +140,11 @@ public class VRGUtils {
 		return k;
 	}
 
-	public static int getIntFromDialog(javax.swing.JFrame frame, String title,
-			int text) {
+	public static int getIntFromDialog(javax.swing.JFrame frame, String title, int text) {
 		int k = 0;
 		try {
-			k = Integer.parseInt(String.valueOf(JOptionPane.showInputDialog(
-					frame, title, null, JOptionPane.QUESTION_MESSAGE, null,
-					null, text)));
+			k = Integer.parseInt(String.valueOf(JOptionPane.showInputDialog(frame, title, null, JOptionPane.QUESTION_MESSAGE,
+					null, null, text)));
 		} catch (NumberFormatException e) {
 			return 0;
 		}
@@ -184,25 +181,20 @@ public class VRGUtils {
 		return Double.valueOf(s.replace(",", "."));
 	}
 
-	public static void showMessage(java.awt.Component frame, String title,
-			String body, int type) {
+	public static void showMessage(java.awt.Component frame, String title, String body, int type) {
 		JOptionPane.showMessageDialog(frame, body, title, type);
 	}
 
-	public static void showErrorMess(java.awt.Component frame, String title,
-			String body) {
+	public static void showErrorMess(java.awt.Component frame, String title, String body) {
 		showMessage(frame, title, body, JOptionPane.ERROR_MESSAGE);
 	}
 
-	public static void showInfoMess(java.awt.Component frame, String title,
-			String body) {
+	public static void showInfoMess(java.awt.Component frame, String title, String body) {
 		showMessage(frame, title, body, JOptionPane.QUESTION_MESSAGE);
 	}
 
-	public static boolean showInputDialog(java.awt.Component frame,
-			String title, String body) {
-		return (JOptionPane.showConfirmDialog(frame, body, title,
-				JOptionPane.YES_OPTION) == JOptionPane.YES_OPTION);
+	public static boolean showInputDialog(java.awt.Component frame, String title, String body) {
+		return (JOptionPane.showConfirmDialog(frame, body, title, JOptionPane.YES_OPTION) == JOptionPane.YES_OPTION);
 	}
 
 	public static void showInitMessage(javax.swing.JFrame frame, String text) {
@@ -212,7 +204,7 @@ public class VRGUtils {
 	public static void saveWindowSize(int w, int h) {
 		windowWidth = w;
 		windowHeight = h;
-		VRGgraph.reSize(w, h);
+		VRGgraphComponent.reSize(w, h);
 		VRGgraphOld.reSize(w, h);
 	}
 
@@ -228,11 +220,12 @@ public class VRGUtils {
 			dx += numX;
 			dy += numY;
 			graphics.drawLine(0, dy, offset, dy);
-		//	graphics.drawString(String.valueOf(dy / DISTANCE), offset + 1, dy);
+			// graphics.drawString(String.valueOf(dy / DISTANCE), offset + 1,
+			// dy);
 
 			graphics.drawLine(dx, 0, dx, offset);
-		//	graphics.drawString(String.valueOf(dx / DISTANCE), dx - numX / 5,
-			//		offset * 4);
+			// graphics.drawString(String.valueOf(dx / DISTANCE), dx - numX / 5,
+			// offset * 4);
 		}
 		// paramGraphics.drawLine(0, 1, MAX_SIZE, 1);
 		// paramGraphics.drawLine(1, 0, 1, MAX_SIZE);
@@ -254,21 +247,18 @@ public class VRGUtils {
 	public static void takeScreenCapture() {
 		BufferedImage image;
 		try {
-			image = new Robot().createScreenCapture(new Rectangle(Toolkit
-					.getDefaultToolkit().getScreenSize()));
+			image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 
 			ImageIO.write(image, "png", getFile(new File(VRGUtils.LABEL_VRG)));
 
 		} catch (Exception e) {
-			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE,
-					VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
 		}
 	}
 
 	public static void takeScreenShotOfWindow(Component component) {
 		try {
-			BufferedImage image = new BufferedImage(component.getWidth(),
-					component.getHeight(), BufferedImage.TYPE_INT_RGB);
+			BufferedImage image = new BufferedImage(component.getWidth(), component.getHeight(), BufferedImage.TYPE_INT_RGB);
 			Graphics2D graphics2D = image.createGraphics();
 			component.paint(graphics2D);
 
@@ -276,8 +266,7 @@ public class VRGUtils {
 
 			ImageIO.write(image, "jpeg", getFile(directory));
 		} catch (Exception e) {
-			VRGUtils.showErrorMess(component, VRGUtils.MSG_ERR_TITLE,
-					VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
+			VRGUtils.showErrorMess(component, VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_FILE_ISNT_CREATED);
 		}
 	}
 
@@ -289,17 +278,15 @@ public class VRGUtils {
 		File filename = null;
 
 		if (directory.exists() && directory.isDirectory()) {
-			filename = new File(directory.getName() + "/ScreenShots "
-					+ (directory.list().length + 1) + extension);
+			filename = new File(directory.getName() + "/ScreenShots " + (directory.list().length + 1) + extension);
 		} else {
 			directory.mkdir();
-			filename = new File(directory.getName() + "/ScreenShots "
-					+ (directory.list().length + 1) + extension);
+			filename = new File(directory.getName() + "/ScreenShots " + (directory.list().length + 1) + extension);
 		}
 		return filename;
 	}
 
-	private static boolean openGraph(Component component) {
+	private static boolean openGraph(VRGgraphComponent component) {
 		boolean result = false;
 		File file = FileChooser.choose(component, BTN_TXT_OPEN);
 
@@ -311,20 +298,19 @@ public class VRGUtils {
 		if (graph == null) {
 			return result;
 		}
-		((JGraphComponent) component).setGraph(graph);
+		component.setGraph(graph);
 		component.repaint();
 		return result;
 	}
 
-	private static boolean saveGraph(Component component) {
+	private static boolean saveGraph(VRGgraphComponent component) {
 		boolean result = false;
 		File file = FileChooser.choose(component, BTN_TXT_SAVE);
 		if (file == null) {
 			return result;
 		}
 		try {
-			GraphXMLFileWriter.writeGraph(file,
-					((JGraphComponent) component).getGraph());
+			GraphXMLFileWriter.writeGraph(file, component.getGraph());
 			result = true;
 		} catch (Exception e) {
 			showErrorMess(component, MSG_ERR_TITLE, e.toString());
@@ -332,7 +318,7 @@ public class VRGUtils {
 		return result;
 	}
 
-	public static boolean IOGraph(Component component, boolean isSave) {
+	public static boolean IOGraph(VRGgraphComponent component, boolean isSave) {
 		if (isSave) {
 			return saveGraph(component);
 		} else {

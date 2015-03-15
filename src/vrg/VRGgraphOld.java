@@ -22,6 +22,7 @@ public class VRGgraphOld extends JFrame {
 	public mxGraphComponent graphComponent;
 	public static final int length = 20;
 	public static final int baseLength = 15;
+	public static boolean isCompleted = false;
 
 	public static int distance = VRGUtils.DISTANCE;
 	public static int zoom = 1;
@@ -62,8 +63,8 @@ public class VRGgraphOld extends JFrame {
 			@Override
 			public void paint(Graphics paramGraphics) {
 				super.paint(paramGraphics);
-
 				VRGUtils.paintCarcass(paramGraphics.create());
+
 			}
 
 			// Sets global image base path
@@ -82,6 +83,16 @@ public class VRGgraphOld extends JFrame {
 
 		graphComponent.addKeyListener(keyListener);
 		graphComponent.addFocusListener(focusListener);
+	}
+
+	@Override
+	public void paint(Graphics paramGraphics) {
+		super.paint(paramGraphics);
+		if (isCompleted) {
+			paramGraphics.drawOval(translateX + (VRG.coordinates.get(0).x) * distance - VRGUtils.radius, translateY
+					+ (VRG.coordinates.get(0).y) * distance - VRGUtils.radius, VRGUtils.radius, VRGUtils.radius);
+			// x-radius, y-radius, radius*2, radius*2
+		}
 	}
 
 	public static void reSize(int w, int h) {
@@ -119,7 +130,7 @@ public class VRGgraphOld extends JFrame {
 			{
 				VRGvertexes a = new VRGvertexes();
 
-				a.objectVertex = graph.insertVertex(parent, null, VRGUtils.LABEL_BASE, translateX + (VRG.coordinates.get(0).x)
+				a.objectVertex = graph.insertVertex(parent, null, VRGUtils.LABEL_BASE, translateX + VRG.coordinates.get(0).x
 						* distance, translateY + VRG.coordinates.get(0).y * distance, baseLength, baseLength,
 						"shape=ellipse;perimeter=trianglePerimeter");// x,y,width,height
 				a.demand = 0;
@@ -145,6 +156,7 @@ public class VRGgraphOld extends JFrame {
 			}
 			updateEdges(graph);
 		} finally {
+			isCompleted = true;
 			graph.getModel().endUpdate();
 		}
 	}

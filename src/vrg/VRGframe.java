@@ -24,7 +24,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import ru.amse.smyshlyaev.grapheditor.ui.JGraphComponent;
 
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class VRGframe extends JFrame {
@@ -270,8 +269,8 @@ public class VRGframe extends JFrame {
 		p8.setLayout(jPanel7Layout);
 		jPanel7Layout.setHorizontalGroup(jPanel7Layout.createParallelGroup(LEADING).addGap(0, 100, S_MAX));
 		jPanel7Layout.setVerticalGroup(jPanel7Layout.createParallelGroup(LEADING).addGap(0, 100, S_MAX));
-		graph = new VRGgraph();
-		graphComponent = new JGraphComponent(graph.getGraph(), VRGUtils.MAX_SIZE, VRGUtils.MAX_SIZE) {
+		newGraphComponent = new VRGgraphComponent(null, VRGUtils.MAX_SIZE,
+				VRGUtils.MAX_SIZE) {
 
 			@Override
 			public void paint(Graphics g) {
@@ -281,7 +280,7 @@ public class VRGframe extends JFrame {
 		};
 		internalFrame.setVisible(true);
 		javax.swing.JScrollPane jScrollPane = new javax.swing.JScrollPane();
-		jScrollPane.setViewportView(graphComponent);
+		jScrollPane.setViewportView(newGraphComponent);// newGraphComponent
 		javax.swing.GroupLayout jInternalFrame2Layout = new javax.swing.GroupLayout(internalFrame.getContentPane());
 		internalFrame.getContentPane().setLayout(jInternalFrame2Layout);
 		jInternalFrame2Layout.setHorizontalGroup(jInternalFrame2Layout.createParallelGroup(LEADING).addComponent(jScrollPane,
@@ -493,7 +492,7 @@ public class VRGframe extends JFrame {
 		for (JTable table : tables) {
 			table.addKeyListener(keyListener);
 		}
-		graphComponent.addKeyListener(keyListener);
+		newGraphComponent.addKeyListener(keyListener);
 	}
 
 	private void closeProgram() {
@@ -896,8 +895,9 @@ public class VRGframe extends JFrame {
 
 	private void openGraph(boolean isNewStyle) {
 		if (isNewStyle) {
-			graph = new VRGgraph(this);
-			graphComponent.setGraph(graph.getGraph());
+			// graph = new VRGgraph(this);
+			// newGraphComponent.setGraph(new Graph());
+			newGraphComponent.init(this);
 			repaint();
 		} else {
 			if (graphIsFirstOpened) {
@@ -1241,7 +1241,8 @@ public class VRGframe extends JFrame {
 
 		@Override
 		public void actionPerformed(ActionEvent evt) {
-			VRGUtils.IOGraph(graphComponent, ((JMenuItem) evt.getSource()).getAutoscrolls());
+			VRGUtils.IOGraph(newGraphComponent, ((JMenuItem) evt.getSource()).getAutoscrolls());
+
 		}
 	};
 
@@ -1303,6 +1304,5 @@ public class VRGframe extends JFrame {
 	private javax.swing.JTable tableResult;
 	private javax.swing.JTable tableTC;
 	private javax.swing.JTextField textCountCars;
-	private VRGgraph graph;
-	private JGraphComponent graphComponent;
+	private VRGgraphComponent newGraphComponent;
 }

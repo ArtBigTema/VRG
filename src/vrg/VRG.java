@@ -302,8 +302,8 @@ public class VRG {
 		}
 
 		ArrayList<ArrayList<ArrayList<Integer>>> paths = constructRoutes(pathAll);
-		VRGfile.write(paths.toString());
 		VRGfile.write(paths.size());
+		VRGfile.write(paths.toString());
 
 		for (ArrayList<ArrayList<Integer>> allRoutes : paths) {
 			for (ArrayList<Integer> arrr : allRoutes) {

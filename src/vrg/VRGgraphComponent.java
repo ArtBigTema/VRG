@@ -1,13 +1,22 @@
 package vrg;
 
+import java.awt.Graphics;
 import java.util.ArrayList;
 
 import ru.amse.smyshlyaev.grapheditor.graph.Edge;
 import ru.amse.smyshlyaev.grapheditor.graph.Graph;
 import ru.amse.smyshlyaev.grapheditor.graph.Vertex;
+import ru.amse.smyshlyaev.grapheditor.ui.JGraphComponent;
 
-public class VRGgraph implements VRGframe.onSpacePressed {
-	Graph graph;
+@SuppressWarnings("serial")
+public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpacePressed {
+	public Graph graph;
+	public boolean isCompleted = false;
+
+	public VRGgraphComponent(Graph graph, int width, int height) {
+		super(graph, width, height);
+		setUp();
+	}
 
 	public static int length = 20;
 	public static int baseLength = 15;
@@ -22,9 +31,9 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 
 	ArrayList<VRGvertexes> vrgVertexes;
 
-	public void setListener(Object o) {
+	public void setListener(VRGframe o) {
 		VRGframe.onSpacePressed listener = this;
-		((VRGframe) o).setListener(listener);
+		o.setListener(listener);
 	}
 
 	public void setUp() {
@@ -37,15 +46,13 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		distance = z;
 	}
 
-	public VRGgraph() {
-		setUp();
-	}
-
-	public VRGgraph(Object o) {
+	public void init(VRGframe o) {
 		setListener(o);
 		graph = new Graph();
 		vrgVertexes = new ArrayList<VRGvertexes>();
 		constuctGraph(graph);
+		this.setGraph(graph);
+		isCompleted = true;
 		// Graph.unmodifiableGraph(graph);
 	}
 
@@ -133,7 +140,6 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 		if (graph == null) {
 			return;
 		}
-		VRG.generateEdges();// FIXME
 
 		if ((numberOfSpace + 1) > VRG.routes.size()) {
 			VRGframe.isNeedToUpdate = false;
@@ -184,8 +190,20 @@ public class VRGgraph implements VRGframe.onSpacePressed {
 	}
 
 	@Override
+	public void paint(Graphics paramGraphics) {
+		super.paint(paramGraphics);
+		if (isCompleted) {
+			paramGraphics.drawOval(translateX + VRG.coordinates.get(0).x * distance - VRGUtils.radius, translateY
+					+ VRG.coordinates.get(0).y * distance - VRGUtils.radius, VRGUtils.radius, VRGUtils.radius);
+			// x-radius, y-radius, radius*2, radius*2
+		}
+	}
+
+	@Override
 	public void spacePressed() {
+		VRG.generateEdges();// FIXME
 		numberOfSpace++;
 		updateEdges(graph);
 	}
+
 }
