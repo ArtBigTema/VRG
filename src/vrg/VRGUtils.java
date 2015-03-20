@@ -91,7 +91,7 @@ public class VRGUtils {
 	public static final String FIELD_INT_TIMEWINDOW = "Введите максимальное время в пути";
 	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";// "Standard data";
 	public static final String TXT_BUTT_TIME_WINDOW = "Временные окна";// "Time window";
-	public static final String MSG_ERR_TIMEWINDOW = "Время не может быть отрицательным и равным нулю";
+	public static final String MSG_ERR_TIMEWINDOW = "Время не может быть отрицательным или равным нулю";
 
 	public static final String SYMBOLS_ON = "☑";
 	public static final String SYMBOLS_OFF = "☐";

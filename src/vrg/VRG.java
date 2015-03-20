@@ -32,6 +32,7 @@ public class VRG {
 	public static int numberProfits = 0;
 	public static boolean withTimeWindow = false;// FIXME
 	public static int timeWindow = 0;
+	public static ArrayList<Integer> indexInWindow = new ArrayList<Integer>();
 
 	public static ArrayList<Integer> cars = new ArrayList<Integer>();
 	public static ArrayList<Integer> price = new ArrayList<Integer>();
@@ -49,6 +50,11 @@ public class VRG {
 
 	public static void generateAllStandart() {
 		clearAll();
+
+		if (withTimeWindow) {
+			generateAllStandartWithTimeWindow();
+			return;
+		}
 
 		for (int i = 0; i < countCoords; i++) {
 			coordinates.add(new Point(COORDINATES[i][0], COORDINATES[i][1]));
@@ -82,6 +88,7 @@ public class VRG {
 	}
 
 	public static void clearAll() {
+		withTimeWindow = false;
 		countCars = CARS.length;
 		countCoords = COORDINATES.length;
 		coordinates.clear();
@@ -92,6 +99,58 @@ public class VRG {
 		routes.clear();
 		carsCoordinates.clear();
 		benefits.clear();
+	}
+
+	public static ArrayList<Integer> generateAllStandartWithTimeWindow() {
+		coordinates.clear();
+		indexInWindow.clear();
+		routes.clear();
+
+		ArrayList<Integer> indexes = new ArrayList<Integer>();
+
+		Point depo = new Point(COORDINATES[0][0], COORDINATES[0][1]);
+		coordinates.add(depo);
+
+		for (int i = 1; i < countCoords; i++) {
+			Point vertex = new Point(COORDINATES[i][0], COORDINATES[i][1]);
+			if (checkVertex(vertex, depo)) {
+				indexInWindow.add(i);
+				coordinates.add(vertex);
+				price.add(PRICE[i]);
+				demand.add(DEMAND[i]);
+			} else {
+				indexes.add(i);
+			}
+		}
+		countCoords -= indexes.size();
+		generateRoutesWithTimeWindow(new ArrayList<Integer>(indexInWindow));
+		return indexes;
+
+	}
+
+	private static void generateRoutesWithTimeWindow(ArrayList<Integer> in) {
+		routes.clear();
+		generateGraphRoutes();
+
+		cars.add(CARS_WEIGHT[0]);
+		for (int i = 0; i < countCars; i++) {
+			cars.add(CARS_WEIGHT[i]);
+
+			ArrayList<Integer> tmp = new ArrayList<Integer>();
+			for (int j = 0; j < random(0, in.size()); j++) {
+				int k = random(0, in.size());
+				tmp.add(in.get(k));
+				in.remove(k);
+			}
+			routes.add(tmp);
+		}
+
+		fillCarsCoords();
+		createTableOfRoutes();
+	}
+
+	private static boolean checkVertex(Point v, Point d) {
+		return Math.sqrt((v.x - d.x) * (v.x - d.x) + (v.y - d.y) * (v.y - d.y)) <= timeWindow;
 	}
 
 	public static void generateCoordinates(int n) {
@@ -631,8 +690,10 @@ public class VRG {
 
 	public static int random(int start, int end) {
 		Random rand = new Random();
-		// return (int) (start + Math.round((end - start) * Math.random()));
-		return (int) (start + rand.nextInt(end - start));
+		if (start > end)
+			return (int) (start + rand.nextInt(start - end));
+		else
+			return (int) (start + rand.nextInt(end - start));
 	}
 
 	public static int random(int start, int end, int oldValue) {

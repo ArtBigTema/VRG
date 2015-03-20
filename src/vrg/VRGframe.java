@@ -11,6 +11,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -1258,13 +1259,26 @@ public class VRGframe extends JFrame {
 
 	private void buttonTimeWindowActionPerformed(ActionEvent evt) {
 		// VRG.withTimeWindow = buttonTimeWindow.isSelected();
-		int k = VRGUtils.getIntFromDialog(this, VRGUtils.FIELD_INT_TIMEWINDOW, 10);
+		int k = VRGUtils.getIntFromDialog(this, VRGUtils.FIELD_INT_TIMEWINDOW, 5);
 		buttonTimeWindow.setSelected(k > 0);
 		if (k > 0) {
 			VRG.timeWindow = k;
 			VRG.withTimeWindow = true;
 		} else {
 			VRGUtils.showErrorMess(this, VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_TIMEWINDOW);
+		}
+		ArrayList<Integer> indexes = VRG.generateAllStandartWithTimeWindow();// FIXME
+		deleteNotUsingRows(indexes);
+	}
+
+	private void deleteNotUsingRows(ArrayList<Integer> in) {
+		DefaultTableModel dtm = (DefaultTableModel) tableCoordsDP.getModel();
+
+		for (int i : in) {
+			dtm.setValueAt("-", i, 0);
+			dtm.setValueAt("-", i, 1);
+			dtm.setValueAt("-", i, 2);
+			dtm.setValueAt("-", i, 3);
 		}
 	}
 
