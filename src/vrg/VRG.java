@@ -30,6 +30,8 @@ public class VRG {
 	public static int countCars = 3;
 	public static final int ZOOM = 5;
 	public static int numberProfits = 0;
+	public static boolean withTimeWindow = false;// FIXME
+	public static int timeWindow = 0;
 
 	public static ArrayList<Integer> cars = new ArrayList<Integer>();
 	public static ArrayList<Integer> price = new ArrayList<Integer>();

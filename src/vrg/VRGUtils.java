@@ -48,14 +48,14 @@ public class VRGUtils {
 	public static final String TXT_LENGTH_OF_ROUTE = "Длина маршрута, r[i]";// "Length of the route, r[i]";
 	public static final String TXT_LOAD_VEHICLE = "Загрузка ТС, Sum(d(x[j]))";// "Load the vehicle, Sum(d(x[j]))";
 	public static final String TXT_PROFIT_LABEL = "Прибыль, k[i](h[i])";// "Profit, k[i](h[i])";
-	public static final String BTN_TXT_GENERATE = "Генерировать";// "Generate";
+	public static final String BTN_TXT_GENERATE = "Генерировать игроков";// "Generate";
 	public static final String TXT_ROUTE = "r[i]";
 	public static final String TXT_PROFIT = "k[i](r[i])";
 	public static final String TXT_VERTEX = "x[j]/x[j]";
 	public static final String TAB_TXT_GRAPH = "Граф";// "Graph";
 	public static final String TAB_TXT_RESULT = "Результат";// "Result";
 	public static final String TAB_TXT_ENTER_COORDS = "Ввод координат/авто";// "Coordinate input";
-	public static final String FIELD_TXT_NUMBERS_OF_PLAYERS = "Введите количество игроков";// "Enter the number of players";
+	public static final String FIELD_TXT_NUMBERS_OF_PLAYERS = "Введите кол-во игроков";// "Enter the number of players";
 	public static final String TXT_VERTEX_LABEL = "Вершина, x[j]";// "Vertex, x[j]";
 	public static final String TXT_COORDS = "Координаты";// "Coordinates";
 	public static final String TXT_DEMAND = "d(x[j])";
@@ -88,9 +88,10 @@ public class VRGUtils {
 	public static final String MSG_ERR_ADD_VERTEX = "Добавьте несколько вершин";// "Add more vertexes";
 	public static final String TXT_IS_ALL = "Всего";// "All: ";
 	public static final String MSG_ERR_ROUTES = "Возможные пути исчерпаны \n " + "Сгенерировать другие?";// "Generate routes?";//yes,
-																											// no,
-																											// cancel
+	public static final String FIELD_INT_TIMEWINDOW = "Введите максимальное время в пути";
 	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";// "Standard data";
+	public static final String TXT_BUTT_TIME_WINDOW = "Временные окна";// "Time window";
+	public static final String MSG_ERR_TIMEWINDOW = "Время не может быть отрицательным и равным нулю";
 
 	public static final String SYMBOLS_ON = "☑";
 	public static final String SYMBOLS_OFF = "☐";

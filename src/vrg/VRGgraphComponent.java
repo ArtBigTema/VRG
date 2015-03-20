@@ -143,7 +143,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 
 		if ((numberOfSpace + 1) > VRG.routes.size()) {
 			VRGframe.isNeedToUpdate = false;
-			if (VRGUtils.showInputDialog(null, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
+			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
 				VRG.constructSolution();
 			}
 			VRGframe.isNeedToUpdate = true;

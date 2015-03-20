@@ -24,7 +24,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-
 @SuppressWarnings({ "unchecked", "rawtypes", "serial" })
 public class VRGframe extends JFrame {
 	public static boolean isEnabled = false;
@@ -62,6 +61,7 @@ public class VRGframe extends JFrame {
 		buttonSolve = new javax.swing.JButton();
 		buttonBestSolve = new javax.swing.JButton();
 		buttonStandartData = new javax.swing.JButton();
+		buttonTimeWindow = new javax.swing.JCheckBox();
 		menuBar = new javax.swing.JMenuBar();
 		javax.swing.JPanel p1 = new javax.swing.JPanel();
 		javax.swing.JPanel p2 = new javax.swing.JPanel();
@@ -142,7 +142,15 @@ public class VRGframe extends JFrame {
 				buttonStandartDataActionPerformed(evt);
 			}
 		});
-
+		buttonTimeWindow.setFont(font);
+		buttonTimeWindow.setHorizontalAlignment(0);
+		buttonTimeWindow.setText(VRGUtils.TXT_BUTT_TIME_WINDOW);
+		buttonTimeWindow.setBorder(javax.swing.BorderFactory.createEtchedBorder(null, new java.awt.Color(0, 0, 0)));
+		buttonTimeWindow.addActionListener(new ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				buttonTimeWindowActionPerformed(evt);
+			}
+		});
 		textCountCars.setText(VRGUtils.FIELD_TXT_NUMBERS_OF_PLAYERS);
 		textCountCars.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 		textCountCars.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -179,6 +187,7 @@ public class VRGframe extends JFrame {
 						javax.swing.GroupLayout.Alignment.TRAILING,
 						jPanel8Layout.createSequentialGroup().addContainerGap()
 								.addComponent(buttonStandartData, P_SIZE, 212, P_SIZE)
+								.addComponent(buttonTimeWindow, P_SIZE, 155, P_SIZE)
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
 								.addComponent(textCountCars, D_SIZE, 197, S_MAX)
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -194,6 +203,7 @@ public class VRGframe extends JFrame {
 						.addGroup(
 								jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
 										.addComponent(buttonStandartData, 28, D_SIZE, P_SIZE)
+										.addComponent(buttonTimeWindow, P_SIZE, 22, P_SIZE)
 										.addComponent(textCountCars, P_SIZE, D_SIZE, P_SIZE).addComponent(buttonSaveCountCars))
 						.addGap(0, 11, S_MAX)));
 
@@ -209,7 +219,6 @@ public class VRGframe extends JFrame {
 		jPanel5Layout.setVerticalGroup(jPanel5Layout.createParallelGroup(LEADING).addGroup(
 				javax.swing.GroupLayout.Alignment.TRAILING,
 				jPanel5Layout.createSequentialGroup().addGap(0, 0, S_MAX).addComponent(jScrollPane2, P_SIZE, 58, P_SIZE)));
-
 		javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(p2);
 		p2.setLayout(jPanel6Layout);
 		jPanel6Layout.setHorizontalGroup(jPanel6Layout.createParallelGroup(LEADING).addComponent(p11, D_SIZE, D_SIZE, S_MAX)
@@ -269,8 +278,7 @@ public class VRGframe extends JFrame {
 		p8.setLayout(jPanel7Layout);
 		jPanel7Layout.setHorizontalGroup(jPanel7Layout.createParallelGroup(LEADING).addGap(0, 100, S_MAX));
 		jPanel7Layout.setVerticalGroup(jPanel7Layout.createParallelGroup(LEADING).addGap(0, 100, S_MAX));
-		newGraphComponent = new VRGgraphComponent(null, VRGUtils.MAX_SIZE,
-				VRGUtils.MAX_SIZE) {
+		newGraphComponent = new VRGgraphComponent(null, VRGUtils.MAX_SIZE, VRGUtils.MAX_SIZE) {
 
 			@Override
 			public void paint(Graphics g) {
@@ -648,6 +656,7 @@ public class VRGframe extends JFrame {
 	protected void generateAllStandart() {
 		clearAll();
 		isNeedToUpdate = true;
+		buttonTimeWindow.setSelected(false);
 
 		VRG.generateAllStandart();
 		fillAllStandart();
@@ -707,6 +716,7 @@ public class VRGframe extends JFrame {
 
 	private void clearAll() {
 		VRG.clearAll();
+		buttonTimeWindow.setSelected(false);
 		setAllModel(tableCoordsDP, new String[] { VRGUtils.TXT_VERTEX_LABEL, VRGUtils.TXT_COORDS, VRGUtils.TXT_DEMAND,
 				VRGUtils.TXT_PRICE });
 		setAllModel(tableCars, new String[] { VRGUtils.TXT_GAMERS_AUTO, "1", "2", "3" });
@@ -1246,6 +1256,18 @@ public class VRGframe extends JFrame {
 		}
 	};
 
+	private void buttonTimeWindowActionPerformed(ActionEvent evt) {
+		// VRG.withTimeWindow = buttonTimeWindow.isSelected();
+		int k = VRGUtils.getIntFromDialog(this, VRGUtils.FIELD_INT_TIMEWINDOW, 10);
+		buttonTimeWindow.setSelected(k > 0);
+		if (k > 0) {
+			VRG.timeWindow = k;
+			VRG.withTimeWindow = true;
+		} else {
+			VRGUtils.showErrorMess(this, VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_TIMEWINDOW);
+		}
+	}
+
 	public void reSize() {
 		repaint();
 		VRGUtils.saveWindowSize(getWidth(), getHeight());
@@ -1294,6 +1316,7 @@ public class VRGframe extends JFrame {
 	private javax.swing.JButton buttonDeleteVertex;
 	private javax.swing.JButton buttonGenerGraph;
 	private javax.swing.JButton buttonGenerPath;
+	private javax.swing.JCheckBox buttonTimeWindow;
 	private javax.swing.JButton buttonSaveCountCars;
 	private javax.swing.JButton buttonStandartData;
 	private javax.swing.JMenuBar menuBar;
