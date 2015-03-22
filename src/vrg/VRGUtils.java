@@ -105,8 +105,8 @@ public class VRGUtils {
 	public static int DISTANCE = 1;
 	public static int radius = 10;
 	public static final int MAX_SIZE = 1000;// FIXME
-	public static int windowWidth = 100;
-	public static int windowHeight = 100;
+	public static int windowWidth = 20;
+	public static int windowHeight = 20;
 
 	public static final String MENU_FILE = "Файл";// "File";
 	public static final String MENU_EDIT = "Изменить";// "Edit";

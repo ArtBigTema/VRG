@@ -59,8 +59,8 @@ public class VRGframe extends JFrame {
 		tableTC = new javax.swing.JTable();
 		tableResult = new javax.swing.JTable();
 		buttonAnSolve = new javax.swing.JButton();
-		buttonSolve = new javax.swing.JButton();
 		buttonBestSolve = new javax.swing.JButton();
+		buttonSearchBestSolve = new javax.swing.JButton();
 		buttonStandartData = new javax.swing.JButton();
 		buttonTimeWindow = new javax.swing.JCheckBox();
 		menuBar = new javax.swing.JMenuBar();
@@ -86,7 +86,7 @@ public class VRGframe extends JFrame {
 		javax.swing.JScrollPane jScrollPane3 = new javax.swing.JScrollPane();
 		javax.swing.JScrollPane jScrollPane2 = new javax.swing.JScrollPane();
 		javax.swing.JScrollPane jScrollPane1 = new javax.swing.JScrollPane();
-		javax.swing.JInternalFrame internalFrame = new javax.swing.JInternalFrame();
+		javax.swing.JInternalFrame innerFrame = new javax.swing.JInternalFrame();
 
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
@@ -287,17 +287,17 @@ public class VRGframe extends JFrame {
 				VRGUtils.paintCarcass(g.create());
 			}
 		};
-		internalFrame.setVisible(true);
+		innerFrame.setVisible(true);
 		javax.swing.JScrollPane jScrollPane = new javax.swing.JScrollPane();
-		jScrollPane.setViewportView(newGraphComponent);// newGraphComponent
-		javax.swing.GroupLayout jInternalFrame2Layout = new javax.swing.GroupLayout(internalFrame.getContentPane());
-		internalFrame.getContentPane().setLayout(jInternalFrame2Layout);
+		jScrollPane.setViewportView(newGraphComponent);
+		javax.swing.GroupLayout jInternalFrame2Layout = new javax.swing.GroupLayout(innerFrame.getContentPane());
+		innerFrame.getContentPane().setLayout(jInternalFrame2Layout);
 		jInternalFrame2Layout.setHorizontalGroup(jInternalFrame2Layout.createParallelGroup(LEADING).addComponent(jScrollPane,
 				D_SIZE, 0, S_MAX));
 		jInternalFrame2Layout.setVerticalGroup(jInternalFrame2Layout.createParallelGroup(LEADING).addComponent(jScrollPane,
 				D_SIZE, 0, S_MAX));
 		jScrollPane.getViewport().setViewPosition(new java.awt.Point(0, 0));
-		tabbedPane.addTab(VRGUtils.TAB_TXT_GRAPH, internalFrame);
+		tabbedPane.addTab(VRGUtils.TAB_TXT_GRAPH, innerFrame);
 
 		jLabel1.setFont(font);
 		jLabel1.setHorizontalAlignment(0);
@@ -426,15 +426,15 @@ public class VRGframe extends JFrame {
 			}
 		});
 
-		buttonSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION);
-		buttonSolve.addActionListener(new ActionListener() {
+		buttonBestSolve.setText(VRGUtils.BTN_TXT_BEST_SOLUTION);
+		buttonBestSolve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				buttonSolveActionPerformed(evt);
 			}
 		});
 
-		buttonBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION + VRGUtils.SPACE + VRGUtils.SYMBOLS_OFF);
-		buttonBestSolve.addActionListener(new ActionListener() {
+		buttonSearchBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION + VRGUtils.SPACE + VRGUtils.SYMBOLS_OFF);
+		buttonSearchBestSolve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				buttonSearchSolveActionPerformed(evt);
 			}
@@ -458,10 +458,10 @@ public class VRGframe extends JFrame {
 																.createSequentialGroup()
 																.addComponent(buttonAnSolve)
 																.addGap(18, 18, 18)
-																.addComponent(buttonSolve,
+																.addComponent(buttonBestSolve,
 																		javax.swing.GroupLayout.DEFAULT_SIZE,
 																		javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																.addGap(18, 18, 18).addComponent(buttonBestSolve)))
+																.addGap(18, 18, 18).addComponent(buttonSearchBestSolve)))
 								.addContainerGap()));
 		jPanel9Layout.setVerticalGroup(jPanel9Layout.createParallelGroup(LEADING).addGroup(
 				javax.swing.GroupLayout.Alignment.TRAILING,
@@ -472,7 +472,8 @@ public class VRGframe extends JFrame {
 						.addGap(18, 18, 18)
 						.addGroup(
 								jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-										.addComponent(buttonAnSolve).addComponent(buttonSolve).addComponent(buttonBestSolve))
+										.addComponent(buttonAnSolve).addComponent(buttonBestSolve)
+										.addComponent(buttonSearchBestSolve))
 						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 						.addComponent(jScrollPane5, D_SIZE, 353, S_MAX)));
 
@@ -831,7 +832,8 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonAnSolveActionPerformed(ActionEvent evt) {
-		generateSolution();
+		VRG.nGener(1);
+		fillValueToResultTable();// generateSolution();//FIXME
 	}
 
 	private void generateSolution() {
@@ -847,7 +849,10 @@ public class VRGframe extends JFrame {
 
 	private void buttonSolveActionPerformed(ActionEvent evt) {
 		VRG.constructSolution();
-		fillValueToResultTable();
+		if (VRG.isValid()) {
+			fillValueToResultTable();
+		}
+		System.gc();
 	}
 
 	private void turnOnTimer(final ActionEvent evt) {
@@ -876,6 +881,7 @@ public class VRGframe extends JFrame {
 				}
 			}
 		}, VRGUtils.START, VRGUtils.DELAY);
+		System.gc();
 	}
 
 	private Double getOldProfits() {
@@ -894,9 +900,9 @@ public class VRGframe extends JFrame {
 
 	private void setButtonText(boolean b) {
 		if (b) {
-			buttonBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION + VRGUtils.SPACE + VRGUtils.SYMBOLS_ON);
+			buttonSearchBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION + VRGUtils.SPACE + VRGUtils.SYMBOLS_ON);
 		} else {
-			buttonBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION + VRGUtils.SPACE + VRGUtils.SYMBOLS_OFF);
+			buttonSearchBestSolve.setText(VRGUtils.BTN_TXT_SEARCH_SOLUTION + VRGUtils.SPACE + VRGUtils.SYMBOLS_OFF);
 		}
 	}
 
@@ -906,8 +912,6 @@ public class VRGframe extends JFrame {
 
 	private void openGraph(boolean isNewStyle) {
 		if (isNewStyle) {
-			// graph = new VRGgraph(this);
-			// newGraphComponent.setGraph(new Graph());
 			newGraphComponent.init(this);
 			repaint();
 		} else {
@@ -984,7 +988,13 @@ public class VRGframe extends JFrame {
 		if (VRG.isValid()) {
 			fillColumnValueToResultTable();
 			fillValueToResultTable(VRGUtils.TXT_IS_ALL);
+		} else {
+			showErrMsg();
 		}
+	}
+
+	private void showErrMsg() {
+		VRGUtils.showErrorMess(this, VRGUtils.MSG_ERR_TITLE, "Решения не существует");// FIXME
 	}
 
 	private void fillValueToResultTable() {
@@ -1284,7 +1294,7 @@ public class VRGframe extends JFrame {
 
 	public void reSize() {
 		repaint();
-		VRGUtils.saveWindowSize(getWidth(), getHeight());
+		// VRGUtils.saveWindowSize(getWidth(), getHeight());
 	}
 
 	public KeyListener keyListener = new KeyListener() {
@@ -1325,8 +1335,8 @@ public class VRGframe extends JFrame {
 	public onSpacePressed spaceListener;
 	private javax.swing.JButton buttonAddVertex;
 	private javax.swing.JButton buttonAnSolve;
-	private javax.swing.JButton buttonSolve;
 	private javax.swing.JButton buttonBestSolve;
+	private javax.swing.JButton buttonSearchBestSolve;
 	private javax.swing.JButton buttonDeleteVertex;
 	private javax.swing.JButton buttonGenerGraph;
 	private javax.swing.JButton buttonGenerPath;

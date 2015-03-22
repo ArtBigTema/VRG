@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 import java.util.Set;
+import java.util.Stack;
 
 import javax.swing.JFrame;
 
@@ -18,8 +19,8 @@ public class VRG {
 	 * public static final int[][] COORDINATES = { { 19, 45 }, { 18, 46 }, { 20,
 	 * 47 }, { 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 }, { 13, 45 } };
 	 */
-	public static final int[][] COORDINATES = { { 4, 3 }, { 5, 2 }, { 3, 1 }, { 1, 6 }, { 3, 7 }, { 9, 8 }, { 11, 4 },
-			{ 10, 3 }, };
+	public static final int[][] COORDS = { { 4, 3 }, { 5, 2 }, { 3, 1 }, { 1, 6 }, { 3, 7 }, { 9, 8 }, { 11, 4 }, { 10, 3 } };
+	public static final int[][] TIMES = { { 1, 3 }, { 2, 5 }, { 1, 5 }, { 1, 6 }, { 3, 7 }, { 4, 8 }, { 5, 11 }, { 10, 12 } };
 	public static final int[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
 	public static final int[] PRICE = { 0, 4, 4, 4, 4, 4, 4, 4 };
 	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
@@ -57,7 +58,7 @@ public class VRG {
 		}
 
 		for (int i = 0; i < countCoords; i++) {
-			coordinates.add(new Point(COORDINATES[i][0], COORDINATES[i][1]));
+			coordinates.add(new Point(COORDS[i][0], COORDS[i][1]));
 			price.add(PRICE[i]);
 			demand.add(DEMAND[i]);
 		}
@@ -79,6 +80,7 @@ public class VRG {
 
 	public static void generateAll(int n) {
 		clearAll();
+		// countCoords = n;
 		generateCoordinates(n);
 		generateCars(n);
 		generateDemand(n);
@@ -90,7 +92,7 @@ public class VRG {
 	public static void clearAll() {
 		withTimeWindow = false;
 		countCars = CARS.length;
-		countCoords = COORDINATES.length;
+		countCoords = COORDS.length;
 		coordinates.clear();
 		price.clear();
 		demand.clear();
@@ -108,11 +110,11 @@ public class VRG {
 
 		ArrayList<Integer> indexes = new ArrayList<Integer>();
 
-		Point depo = new Point(COORDINATES[0][0], COORDINATES[0][1]);
+		Point depo = new Point(COORDS[0][0], COORDS[0][1]);
 		coordinates.add(depo);
 
 		for (int i = 1; i < countCoords; i++) {
-			Point vertex = new Point(COORDINATES[i][0], COORDINATES[i][1]);
+			Point vertex = new Point(COORDS[i][0], COORDS[i][1]);
 			if (checkVertex(vertex, depo)) {
 				indexInWindow.add(i);
 				coordinates.add(vertex);
@@ -161,6 +163,8 @@ public class VRG {
 		for (int i = 1; i < n; i++) {
 			coordinates.add(new Point(random(y / 20, y), random(y / 20, y)));
 		}
+		// generatePrice(random(x / 20, x));
+		// generateDemand(random(y / 5, y));
 	}
 
 	public static void generatePrice(int n) {
@@ -235,7 +239,7 @@ public class VRG {
 			indexes.add(i + 1);
 		}
 
-		Collections.shuffle(indexes);
+		Collections.shuffle(indexes);// FIXME XXX
 		return indexes;
 	}
 
@@ -854,6 +858,86 @@ public class VRG {
 
 		fillCarsCoords();
 		createTableOfRoutes();
+	}
+
+	public static void nonKoopGener(int accuracy) {
+		routes.clear();
+		benefits.clear();
+		if (lengthOfRoutes.size() < 1) {
+			generateGraphRoutes();
+		}
+
+		ArrayList<Double> localBenefits = new ArrayList<Double>();
+
+		ArrayList<ArrayList<Integer>> pathMaxDel = new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> pathMax = new ArrayList<ArrayList<Integer>>();
+
+		for (int i = 1; i < cars.size(); i++) {
+
+			ArrayList<ArrayList<Integer>> allRoutes = getRoutes(cars.get(i), demand, accuracy);
+			ArrayList<ArrayList<Integer>> copy = new ArrayList<ArrayList<Integer>>(allRoutes);
+			for (ArrayList<Integer> tmp : pathMax) {
+				deleteArray(copy, tmp);
+			}
+
+			ArrayList<Integer> paths = new ArrayList<Integer>();
+
+			for (ArrayList<Integer> arr : copy) {
+				Double result = 0D;
+				if (arr.size() < 1) {
+					continue;
+				}
+
+				int index = 0;
+				for (int j = 1; j < arr.size() - 1; j++) {
+					Double sum = 0D;
+					index = arr.get(j);
+					sum += price.get(index) * demand.get(index);
+					sum -= lengthOfRoutes.get(index).get(arr.get(j - 1));
+					result += sum;
+					paths.add(index);
+				}
+				result -= lengthOfRoutes.get(0).get(index);
+
+				if (result > 0) {
+					benefits.add(result);
+					pathMaxDel.add(new ArrayList<Integer>(paths));
+				}
+				paths.clear();
+			}
+
+			if (benefits.size() < 1) {
+				localBenefits.add(0D);
+				pathMax.add(new ArrayList<Integer>());
+				continue;
+			}
+			Double max = Collections.max(benefits);
+			int in = benefits.indexOf(max);
+
+			localBenefits.add(max);
+			pathMax.add(pathMaxDel.get(in));
+			deleteArray(routes, pathMaxDel.get(in));
+
+			pathMaxDel.clear();
+			benefits.clear();
+		}
+		createOptimumRoutesAndBenefits(pathMax, localBenefits);
+	}
+
+	public static void nGener(int accuracy) {
+		if (accuracy == 1) {
+			nonKoopGener(1);
+			return;
+		}
+
+		/*
+		 * int n = readInt(); int k = readInt();
+		 * 
+		 * PriorityQueue<Long> servers = new PriorityQueue<Long>(); for (int i =
+		 * 0; i < k; i++) {servers.add(0L);} for (int i = 0; i < n; i++) { int s
+		 * = readInt(); int m = readInt(); long end = Math.max(servers.poll(),
+		 * s) + m; servers.add(end); out.println(end); }
+		 */
 	}
 
 	public static void main(String[] args) {
