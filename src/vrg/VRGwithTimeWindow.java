@@ -23,8 +23,10 @@ public class VRGwithTimeWindow {
 	public static ArrayList<Integer> cars = new ArrayList<Integer>();
 	public static ArrayList<Point> coordinates = new ArrayList<Point>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
-	public static Queue<Queue<Double>> tr = new LinkedList<Queue<Double>>();
+	public static LinkedList<Queue<Double>> tr = new LinkedList<Queue<Double>>();
 	public static ArrayList<Integer> oldPath = new ArrayList<Integer>();
+	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
+
 	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<Double> NAN = new ArrayList<Double>();
 
@@ -47,6 +49,7 @@ public class VRGwithTimeWindow {
 
 		for (int i = 0; i < coordinates.size(); i++) {
 			NAN.add(Double.NaN);
+			allIndexes.add(i);
 			ArrayList<Double> tmp = new ArrayList<Double>();
 			Queue<Double> q = new LinkedList<Double>();
 
@@ -64,11 +67,12 @@ public class VRGwithTimeWindow {
 			tr.add(q);
 			lengthOfRoutes.add(new ArrayList<Double>(tmp));
 
-			for (int j = 0; j < i; j++) {
+			for (int j = i; j < coordinates.size(); j++) {
 				tmp.set(j, Double.NaN);
 			}
 			table.add(tmp);
 		}
+		// sort(coordinates, lengthOfRoutes.get(0));
 		print();
 
 		try {
@@ -80,14 +84,19 @@ public class VRGwithTimeWindow {
 	}
 
 	private static void print() {
+		p("Отсортированные координаты по Х");
 		for (int i = 0; i < coordinates.size(); i++) {
 			p(coordinates.get(i));
 		}
 		p("");
+		p("");
+		p("tr");
 		p(tr);
 		p("");
+		p("таблица всех путей");
 		p(lengthOfRoutes);
 		p("");
+		p("таблица оставшихся путей");
 		p(table);
 		p("");
 		// p(NAN);
@@ -96,6 +105,12 @@ public class VRGwithTimeWindow {
 	public static void p(Object o) {
 		out.println(o.toString());
 		out.flush();
+	}
+
+	public static void p(LinkedList<Queue<Double>> oo) {
+		for (Queue<Double> o : oo) {
+			p(o.toString());
+		}
 	}
 
 	public static void p(ArrayList<ArrayList<Double>> oo) {
@@ -137,27 +152,23 @@ public class VRGwithTimeWindow {
 		// int n = coordinates.size();// getMin(arr).intValue();// readInt();
 		int k = cars.size();// readInt();
 
-		PriorityQueue<Pair> servers = new PriorityQueue<Pair>(10, new Comparator<Pair>() {
-			public int compare(Pair p1, Pair p2) {
-				return Double.compare(p1.delay, p2.delay);
-			}
-		});
+		ArrayList<Pair> cities = new ArrayList<Pair>();
 
 		for (int i = 0; i < k; i++) {
-			servers.add(new Pair(0, 0, i + 1));
+			cities.add(new Pair(0, 0, i + 1));
 		}
 
 		Queue<Double> qq = tr.peek();// tr.poll();
 		ArrayList<Double> q = new ArrayList<Double>(qq);
 		oldPath.add(0);
 		for (int i = 0; i < k; i++) {
-			double s = 0; // readInt();
+			double s = 1; // readInt();
 
 			double m = getMin(qq); // getMin(arr); // 0; // readInt();
 
-			double end = Math.max(servers.peek().delay, s) + m;
-			Pair p = new Pair(end, q.indexOf(m), servers.poll().num);
-			servers.add(p);
+			double end = Math.max(cities.get(i).delay, s) + m;
+			Pair p = new Pair(end, q.indexOf(m), cities.get(i).num);
+			cities.get(i).setNewValue(p);
 
 			p(p);
 			oldPath.add(p.index);
@@ -171,31 +182,109 @@ public class VRGwithTimeWindow {
 		// нужно удалить 0 вую строку и столбец!
 
 		for (int j : oldPath) {
-			table.set(j, NAN);// можно lengthOfRoutes
+			for (int i = 0; i < table.get(j).size(); i++) {
+				table.get(j).set(i, Double.NaN);// можно lengthOfRoutes
+				// lengthOfRoutes.get(i).set(j, Double.NaN);
+			}
 		}
+		p("таблица оставшихся путей");
 		p(table);
+		p("");
 
+		Queue<Integer> pathNew = getDifferenceBetweenSets(allIndexes, oldPath);
+		tr.clear();
+		for (int i = 0; i < lengthOfRoutes.size(); i++) {
+			tr.add(new LinkedList<Double>(table.get(i)));// lengthOfRoutes
+		}
+		p(pathNew + " осталось");
+		p("");
+
+		while (pathNew.size() != 0) {
+			qq = tr.get(pathNew.poll());
+			q = new ArrayList<Double>(qq);
+			p(qq + " смотрим");
+
+			double m = getMin(q);
+			double s = 1; // readInt();//FIXME
+			int num = getIndexFromPair(cities, q.indexOf(m)) - 1;
+
+			double end = Math.max(cities.get(num).delay, s) + m;
+			Pair p = new Pair(end + s, q.indexOf(m) + 1, cities.get(num).num);
+			cities.get(num).setNewValue(p);
+
+			p(p + " оптимальное место");
+			oldPath.add(p.index);
+			p("");
+		}
+
+		p(oldPath + " всё пройдено ");
+		p("");
+		for (Pair p : cities) {
+			p(p.toStr());
+		}
+	}
+
+	public static int getIndexFromPair(ArrayList<Pair> s, int index) {
+		for (Pair p : s) {
+			if (p.equalsIndex(index)) {
+				return p.num;
+			}
+		}
+		return 0;
+	}
+
+	public static Queue<Integer> getDifferenceBetweenSets(ArrayList<Integer> path, ArrayList<Integer> removed) {
+		ArrayList<Integer> diff = new ArrayList<Integer>(path);
+
+		diff.removeAll(removed);
+		Collections.sort(diff);
+
+		return new LinkedList<Integer>(diff);
 	}
 
 	public static class Pair {
 		double delay;
 		int num;
 		int index;
+		ArrayList<Integer> path;
 
 		public Pair(double d, int n) {
+			path = new ArrayList<Integer>();
 			delay = d;
 			num = n;
+			index = 0;
 		}
 
 		public Pair(double d, int i, int n) {
-			delay = d;
+			path = new ArrayList<Integer>();
+			if (i != 0) {
+				delay = d;
+			} else {
+				delay = 0;
+			}
 			num = n;
 			index = i;
+			path.add(i);
+		}
+
+		public void setNewValue(Pair p) {
+			path.add(p.index);
+			delay = p.delay;
+			num = p.num;
+			index = p.index;
+		}
+
+		public boolean equalsIndex(int in) {
+			return index == in;
+		}
+
+		public String toStr() {
+			return "Num: " + num + ", Общее время в пути: " + delay + ",  Весь путь: " + path.toString();
 		}
 
 		@Override
 		public String toString() {
-			return "Num: " + num + ", delay: " + delay + ",  index: " + index;
+			return "Num: " + num + ", delay: " + delay + ",  lastPlace: " + index;
 		}
 	}
 }

@@ -832,8 +832,8 @@ public class VRGframe extends JFrame {
 	}
 
 	private void buttonAnSolveActionPerformed(ActionEvent evt) {
-		VRG.nGener(1);
-		fillValueToResultTable();// generateSolution();//FIXME
+		generateSolution();// VRG.nGener(1);
+		// fillValueToResultTable();// generateSolution();//FIXME
 	}
 
 	private void generateSolution() {
