@@ -1,11 +1,7 @@
 package vrg;
 
 import java.awt.Point;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.StreamTokenizer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -16,7 +12,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 public class VRGwithTimeWindow {
-	private static StreamTokenizer in = new StreamTokenizer(new BufferedReader(new InputStreamReader(System.in)));
 	private static NumberFormat f = new DecimalFormat("#0.0");
 	private static final PrintWriter out = new PrintWriter(System.out);
 
@@ -29,10 +24,13 @@ public class VRGwithTimeWindow {
 	public static ArrayList<Point> coordinates = new ArrayList<Point>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 	public static Queue<Queue<Double>> tr = new LinkedList<Queue<Double>>();
+	public static ArrayList<Integer> oldPath = new ArrayList<Integer>();
+	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
+	public static ArrayList<Double> NAN = new ArrayList<Double>();
 
 	public static void main(String[] args) {
 		// Locale.setDefault(Locale.ENGLISH);
-		Point depo = new Point(COORDS[0][0], COORDS[0][1]);
+		// Point depo = new Point(COORDS[0][0], COORDS[0][1]);
 		for (int i = 0; i < COORDS.length; i++) {
 			coordinates.add(new Point(COORDS[i][0], COORDS[i][1]));
 		}
@@ -47,12 +45,8 @@ public class VRGwithTimeWindow {
 			}
 		});
 
-		p("depo: " + depo);
 		for (int i = 0; i < coordinates.size(); i++) {
-			p(coordinates.get(i));
-		}
-
-		for (int i = 0; i < coordinates.size(); i++) {
+			NAN.add(Double.NaN);
 			ArrayList<Double> tmp = new ArrayList<Double>();
 			Queue<Double> q = new LinkedList<Double>();
 
@@ -65,21 +59,17 @@ public class VRGwithTimeWindow {
 					tmp.add(Double.parseDouble(f.format(d).replace(",", ".")));
 			}
 			for (int j = i; j < coordinates.size(); j++) {
-				// tmp.set(j, Double.NaN);
 				q.add(tmp.get(j));
 			}
 			tr.add(q);
-			lengthOfRoutes.add(tmp);
-		}
+			lengthOfRoutes.add(new ArrayList<Double>(tmp));
 
-		p("");
-		p(tr);
-		p("");
-		for (ArrayList<Double> arr : lengthOfRoutes) {
-			p(arr.toString());
-
+			for (int j = 0; j < i; j++) {
+				tmp.set(j, Double.NaN);
+			}
+			table.add(tmp);
 		}
-		p("");
+		print();
 
 		try {
 			solve(lengthOfRoutes);
@@ -87,6 +77,35 @@ public class VRGwithTimeWindow {
 		} catch (Exception e) {
 			p(e);
 		}
+	}
+
+	private static void print() {
+		for (int i = 0; i < coordinates.size(); i++) {
+			p(coordinates.get(i));
+		}
+		p("");
+		p(tr);
+		p("");
+		p(lengthOfRoutes);
+		p("");
+		p(table);
+		p("");
+		// p(NAN);
+	}
+
+	public static void p(Object o) {
+		out.println(o.toString());
+		out.flush();
+	}
+
+	public static void p(ArrayList<ArrayList<Double>> oo) {
+		for (ArrayList<Double> o : oo) {
+			p(o.toString());
+		}
+	}
+
+	public static void p(Point o) {
+		out.print("(" + o.x + ", " + o.y + "), ");
 	}
 
 	public static double getDistance(Point p1, Point p2) {
@@ -113,18 +132,9 @@ public class VRGwithTimeWindow {
 		return x;
 	}
 
-	public static void p(Object o) {
-		out.println(o.toString());
-		out.flush();
-	}
-
-	public static void p(Point o) {
-		out.println("(" + o.x + ", " + o.y + "), ");
-	}
-
 	private static void solve(ArrayList<ArrayList<Double>> l) throws Exception {
 
-		int n = coordinates.size();// getMin(arr).intValue();// readInt();
+		// int n = coordinates.size();// getMin(arr).intValue();// readInt();
 		int k = cars.size();// readInt();
 
 		PriorityQueue<Pair> servers = new PriorityQueue<Pair>(10, new Comparator<Pair>() {
@@ -133,16 +143,13 @@ public class VRGwithTimeWindow {
 			}
 		});
 
-		// ArrayList<ArrayList<Double>> serv = new
-		// ArrayList<ArrayList<Double>>(k);
-
 		for (int i = 0; i < k; i++) {
 			servers.add(new Pair(0, 0, i + 1));
 		}
 
 		Queue<Double> qq = tr.peek();// tr.poll();
 		ArrayList<Double> q = new ArrayList<Double>(qq);
-
+		oldPath.add(0);
 		for (int i = 0; i < k; i++) {
 			double s = 0; // readInt();
 
@@ -153,12 +160,20 @@ public class VRGwithTimeWindow {
 			servers.add(p);
 
 			p(p);
+			oldPath.add(p.index);
 
 			qq.remove(m);
 			tr.poll();
 		}
+		p(oldPath + " пройдено");
+		p("");
 		// First iteration
 		// нужно удалить 0 вую строку и столбец!
+
+		for (int j : oldPath) {
+			table.set(j, NAN);// можно lengthOfRoutes
+		}
+		p(table);
 
 	}
 
