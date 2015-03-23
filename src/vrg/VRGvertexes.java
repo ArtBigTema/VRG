@@ -1,6 +1,6 @@
 package vrg;
 
-import java.awt.Point;
+import vrg.VRGwithTimeWindow.Point;
 
 public class VRGvertexes {
 

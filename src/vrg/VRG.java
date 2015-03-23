@@ -1,25 +1,14 @@
 package vrg;
 
-import java.awt.Point;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Random;
-import java.util.Set;
-import java.util.Stack;
-
-import javax.swing.JFrame;
+import vrg.VRGwithTimeWindow.Point;
+import java.util.*;
 
 public class VRG {
 	/*
 	 * public static final int[][] COORDINATES = { { 19, 45 }, { 18, 46 }, { 20,
 	 * 47 }, { 22, 42 }, { 20, 41 }, { 14, 40 }, { 12, 44 }, { 13, 45 } };
 	 */
-	
+
 	public static final int[][] COORDS = { { 4, 3 }, { 5, 2 }, { 3, 1 }, { 1, 6 }, { 3, 7 }, { 9, 8 }, { 11, 4 }, { 10, 3 } };
 	public static final int[][] TIMES = { { 1, 3 }, { 2, 5 }, { 1, 5 }, { 1, 6 }, { 3, 7 }, { 4, 8 }, { 5, 11 }, { 10, 12 } };
 	public static final int[] DEMAND = { 0, 1, 1, 1, 2, 2, 2, 1 };
@@ -44,7 +33,6 @@ public class VRG {
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<Double> benefits = new ArrayList<Double>();
-	public static DecimalFormat df = VRGUtils.df;
 
 	public static boolean isValid() {
 		return (coordinates != null) && (coordinates.size() > 0) && (cars != null) && (cars.size() > 0);
@@ -943,7 +931,6 @@ public class VRG {
 
 	public static void main(String[] args) {
 		VRGframe frame = new VRGframe();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
 }
