@@ -1,6 +1,6 @@
 package vrg;
 
-import vrg.VRGwithTimeWindow.Point;
+import vrg.VRGUtils.Point;
 import java.util.*;
 
 public class VRG {

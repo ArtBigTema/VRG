@@ -326,4 +326,14 @@ public class VRGUtils {
 			return openGraph(component);
 		}
 	}
+
+	public static class Point {
+		int x;
+		int y;
+
+		public Point(int xx, int yy) {
+			x = xx;
+			y = yy;
+		}
+	}
 }
