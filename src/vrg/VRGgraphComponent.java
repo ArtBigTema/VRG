@@ -192,6 +192,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 	@Override
 	public void paint(Graphics paramGraphics) {
 		super.paint(paramGraphics);
+		VRGUtils.paintCarcass(paramGraphics.create());
 		if (isCompleted) {
 			paramGraphics.drawOval(translateX + VRG.coordinates.get(0).x * distance - VRGUtils.radius, translateY
 					+ VRG.coordinates.get(0).y * distance - VRGUtils.radius, VRGUtils.radius, VRGUtils.radius);
