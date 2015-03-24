@@ -5,9 +5,11 @@ import java.text.DecimalFormat;
 import java.util.*;
 import vrg.VRGUtils.Point;
 
+
 public class VRGwithTimeWindow {
 	private static DecimalFormat f = new DecimalFormat("#.#");
 	private static final PrintWriter out = new PrintWriter(System.out);
+	private static final boolean showGraph = true;// FIXME
 
 	// public static final int[][] COORDS = { { 5, 3 }, { 8, 1 }, { 8, 5 }, {
 	// 11, 1 }, { 8, 6 }, { 2, 1 }, { 2, 3 }, { 1, 3 } };
@@ -16,20 +18,19 @@ public class VRGwithTimeWindow {
 	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
 
 	public static ArrayList<Integer> cars = new ArrayList<Integer>();
-	public static ArrayList<Point> coordinates = new ArrayList<Point>();
+	public static ArrayList<PointT> coordinates = new ArrayList<PointT>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<Integer> oldPath = new ArrayList<Integer>();
 	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
+	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 
 	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
 
 	// public static ArrayList<Double> NAN = new ArrayList<Double>();
 
 	public static void main(String[] args) {
-		// Locale.setDefault(Locale.ENGLISH);
-		// Point depo = new Point(COORDS[0][0], COORDS[0][1]);
 		for (int i = 0; i < COORDS.length; i++) {
-			coordinates.add(new Point(COORDS[i][0], COORDS[i][1]));
+			coordinates.add(new PointT(COORDS[i][0], COORDS[i][1]));
 		}
 		for (int i = 0; i < CARS_WEIGHT.length; i++) {
 			cars.add(CARS_WEIGHT[i]);
@@ -79,6 +80,19 @@ public class VRGwithTimeWindow {
 			out.flush();
 		} catch (Exception e) {
 			p(e);
+		}
+
+		showGraphIfNeed();
+	}
+
+	private static void showGraphIfNeed() {
+		if (showGraph) {
+			ArrayList<Point> coord = new ArrayList<Point>();
+			for (Point p : coordinates) {
+				coord.add(p);
+			}
+			VRGgraphOld frame = new VRGgraphOld(coord, routes);
+			frame.isTimeWindow = true;
 		}
 	}
 
@@ -206,6 +220,7 @@ public class VRGwithTimeWindow {
 		p("");
 		for (Pair p : cities) {
 			p(p.toStr());
+			routes.add(p.path);
 		}
 	}
 
@@ -272,4 +287,23 @@ public class VRGwithTimeWindow {
 			return "Num: " + num + ", delay: " + delay + ",  lastPlace: " + place;
 		}
 	}
+
+	public static class PointT extends Point {
+		int x;
+		int y;
+		int start;
+		int end;
+
+		public PointT(int xx, int yy) {
+			super(xx, yy);
+			x = xx;
+			y = yy;
+		}
+
+		@Override
+		public String toString() {
+			return "(" + x + ", " + y + "), ";
+		}
+	}
+
 }

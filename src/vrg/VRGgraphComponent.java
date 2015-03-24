@@ -93,7 +93,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 	}
 
 	private void setZoomIfNeed() {
-		java.awt.Point point = VRG.getMaxCoords();
+		VRGUtils.Point point = VRG.getMaxCoords();
 		if ((point.x < width / 3) || (point.y < height / 4)) {
 			distance = (width + height) / 50;
 		} else {
