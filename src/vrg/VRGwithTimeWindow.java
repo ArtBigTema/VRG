@@ -5,11 +5,10 @@ import java.text.DecimalFormat;
 import java.util.*;
 import vrg.VRGUtils.Point;
 
-
 public class VRGwithTimeWindow {
-	private static DecimalFormat f = new DecimalFormat("#.#");
+	private static DecimalFormat df = new DecimalFormat("#.#");
 	private static final PrintWriter out = new PrintWriter(System.out);
-	private static final boolean showGraph = true;// FIXME
+	private static final boolean showGraph = false;// FIXME
 
 	// public static final int[][] COORDS = { { 5, 3 }, { 8, 1 }, { 8, 5 }, {
 	// 11, 1 }, { 8, 6 }, { 2, 1 }, { 2, 3 }, { 1, 3 } };
@@ -36,20 +35,9 @@ public class VRGwithTimeWindow {
 			cars.add(CARS_WEIGHT[i]);
 		}
 
-		Collections.sort(coordinates, new Comparator<Point>() {
-			@Override
-			public int compare(Point p, Point pp) {
-				if (p.x > pp.x)
-					return 1;
-				if (p.x == pp.x)
-					if (p.y >= pp.y)
-						return 1;
-				return -1;
-			}
-		});
+		Collections.sort(coordinates, new PointT.C.Cx());
 
 		for (int i = 0; i < coordinates.size(); i++) {
-			// NAN.add(Double.NaN);
 			allIndexes.add(i);
 			ArrayList<Double> tmp = new ArrayList<Double>();
 			Queue<Double> q = new LinkedList<Double>();
@@ -60,7 +48,7 @@ public class VRGwithTimeWindow {
 				if (d == 0.0D)
 					tmp.add(Double.NaN);
 				else
-					tmp.add(Double.parseDouble(f.format(d).replace(",", ".")));
+					tmp.add(Double.parseDouble(df.format(d).replace(",", ".")));
 			}
 			for (int j = i; j < coordinates.size(); j++) {
 				q.add(tmp.get(j));
@@ -85,7 +73,7 @@ public class VRGwithTimeWindow {
 		showGraphIfNeed();
 	}
 
-	private static void showGraphIfNeed() {
+	private static void showGraphIfNeed() {// FIXME
 		if (showGraph) {
 			ArrayList<Point> coord = new ArrayList<Point>();
 			for (Point p : coordinates) {
@@ -99,7 +87,7 @@ public class VRGwithTimeWindow {
 	private static void print() {
 		p("Отсортированные координаты по Х");
 		for (int i = 0; i < coordinates.size(); i++) {
-			p(coordinates.get(i));
+			p(coordinates.get(i).toString());
 		}
 		p("");
 		p("таблица всех путей");
@@ -291,6 +279,8 @@ public class VRGwithTimeWindow {
 	public static class PointT extends Point {
 		int x;
 		int y;
+		double r;
+		double f;
 		int start;
 		int end;
 
@@ -298,11 +288,80 @@ public class VRGwithTimeWindow {
 			super(xx, yy);
 			x = xx;
 			y = yy;
+			r = Math.sqrt(x * x + y * y);
+			f = Math.toDegrees(Math.atan2(yy, xx));
+			start = 0;
+			end = Short.MAX_VALUE;
 		}
 
 		@Override
 		public String toString() {
-			return "(" + x + ", " + y + "), ";
+			return "(" + x + ", " + y + "), " + "(" + df.format(r) + ", " + df.format(f) + "), ";
+		}
+
+		public static class C {
+			public static class Cx implements Comparator<PointT> {
+
+				@Override
+				public int compare(PointT p, PointT pp) {
+					if (p.x > pp.x)
+						return 1;
+					if (p.x == pp.x)
+						if (p.y >= pp.y)
+							return 1;
+					return -1;
+				}
+			}
+
+			public static class Cy implements Comparator<PointT> {
+
+				@Override
+				public int compare(PointT p, PointT pp) {
+					if (p.y > pp.y)
+						return 1;
+					if (p.y == pp.y)
+						if (p.x >= pp.x)
+							return 1;
+					return -1;
+				}
+			}
+
+			public static class Cstart implements Comparator<PointT> {
+
+				@Override
+				public int compare(PointT p, PointT pp) {
+					if (p.start > pp.start)
+						return 1;
+					if (p.start == pp.start)
+						if (p.end <= pp.end)
+							return 1;
+					return -1;
+				}
+			}
+
+			public static class Cr implements Comparator<PointT> {
+
+				@Override
+				public int compare(PointT p, PointT pp) {
+					if (p.r > pp.r)
+						return 1;
+					else
+						return -1;
+				}
+			}
+
+			public static class Cf implements Comparator<PointT> {
+
+				@Override
+				public int compare(PointT p, PointT pp) {
+					if (p.f > pp.f)
+						return 1;
+					if (p.f == pp.f)
+						if (p.x > pp.x)
+							return 1;
+					return -1;
+				}
+			}
 		}
 	}
 
