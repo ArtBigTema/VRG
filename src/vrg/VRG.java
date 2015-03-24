@@ -683,8 +683,8 @@ public class VRG {
 
 	public static int random(int start, int end) {
 		Random rand = new Random();
-		if (start > end)
-			return (int) (start + rand.nextInt(start - end));
+		if (start >= end)
+			return (int) (start + rand.nextInt(start - end + 1));// FIXME
 		else
 			return (int) (start + rand.nextInt(end - start));
 	}
