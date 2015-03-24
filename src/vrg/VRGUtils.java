@@ -44,11 +44,14 @@ public class VRGUtils {
 	public static final String BTN_TXT_SEARCH_SOLUTION = "Поиск решения";// "Search solution";
 	public static final String BTN_TXT_ANOTHER_SOLUTION = "Другое решение";// "Another solution";
 	public static final String TXT_PLAYER_NUMBER = "Игрок, i";// "Player, i";
+	public static final String TXT_CARS_NUMBER = "Машина, i";// "Player, i";
 	public static final String TXT_ROUTE_NUMBER = "Маршрут, r[i]";// "Route, r[i]";
 	public static final String TXT_LENGTH_OF_ROUTE = "Длина маршрута, r[i]";// "Length of the route, r[i]";
 	public static final String TXT_LOAD_VEHICLE = "Загрузка ТС, Sum(d(x[j]))";// "Load the vehicle, Sum(d(x[j]))";
+	public static final String TXT_DELAY_VEHICLE = "Задержка на маршруте";// "Load the vehicle, Sum(d(x[j]))";
 	public static final String TXT_PROFIT_LABEL = "Прибыль, k[i](h[i])";// "Profit, k[i](h[i])";
 	public static final String BTN_TXT_GENERATE = "Генерировать игроков";// "Generate";
+	public static final String BTN_TXT_GENERATE_PATH = "Генерировать маршруты";// "Generate";
 	public static final String TXT_ROUTE = "r[i]";
 	public static final String TXT_PROFIT = "k[i](r[i])";
 	public static final String TXT_VERTEX = "x[j]/x[j]";
@@ -58,8 +61,11 @@ public class VRGUtils {
 	public static final String FIELD_TXT_NUMBERS_OF_PLAYERS = "Введите кол-во игроков";// "Enter the number of players";
 	public static final String TXT_VERTEX_LABEL = "Вершина, x[j]";// "Vertex, x[j]";
 	public static final String TXT_COORDS = "Координаты";// "Coordinates";
+	public static final String TXT_COORDS_CARTESIAN_POLAR = "Координаты Декартовы и Полярные";// "Coordinates";
 	public static final String TXT_DEMAND = "d(x[j])";
+	public static final String TXT_DELAY = "Задержка";
 	public static final String TXT_PRICE = "p(x[j])";
+	public static final String TXT_START_END = "Старт → Конец";// →
 	public static final String BTN_TXT_DELETE_VERTEX = "Очистить всё";// "Clear ALL";"Delete vertex";
 	public static final String BTN_TXT_GENERATE_DATA = "Генерировать данные";// "Generate data";
 	public static final String BTN_TXT_ADD_VERTEX = "Добавить вершины";// "Add vertex";
