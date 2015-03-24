@@ -8,12 +8,12 @@ import vrg.VRGUtils.Point;
 public class VRGwithTimeWindow {
 	private static DecimalFormat df = new DecimalFormat("#.#");
 	private static final PrintWriter out = new PrintWriter(System.out);
-	private static final boolean showGraph = false;// FIXME
+	private static final boolean showGraph = false;// XXX
 
 	// public static final int[][] COORDS = { { 5, 3 }, { 8, 1 }, { 8, 5 }, {
 	// 11, 1 }, { 8, 6 }, { 2, 1 }, { 2, 3 }, { 1, 3 } };
 	public static final int[][] COORDS = { { 0, 0 }, { 0, 3 }, { 4, 0 }, { 4, 3 }, { 8, 3 }, { 0, 6 }, { 8, 6 }, { 2, 6 },
-			{ 8, 0 }, { 4, 5 } };
+			{ 8, 0 }, { 4, 5 }, { 3, 6 } };
 	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
 
 	public static ArrayList<Integer> cars = new ArrayList<Integer>();
@@ -22,10 +22,11 @@ public class VRGwithTimeWindow {
 	public static ArrayList<Integer> oldPath = new ArrayList<Integer>();
 	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
-
 	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
 
-	// public static ArrayList<Double> NAN = new ArrayList<Double>();
+	public VRGwithTimeWindow() {
+		main(null);
+	}
 
 	public static void main(String[] args) {
 		for (int i = 0; i < COORDS.length; i++) {
@@ -35,7 +36,7 @@ public class VRGwithTimeWindow {
 			cars.add(CARS_WEIGHT[i]);
 		}
 
-		Collections.sort(coordinates, new PointT.C.Cx());
+		sort();
 
 		for (int i = 0; i < coordinates.size(); i++) {
 			allIndexes.add(i);
@@ -60,17 +61,32 @@ public class VRGwithTimeWindow {
 			}
 			table.add(tmp);
 		}
-		// sort(coordinates, lengthOfRoutes.get(0));
 		print();
 
 		try {
-			solve(lengthOfRoutes);
+			solve(lengthOfRoutes);// XXX
 			out.flush();
 		} catch (Exception e) {
 			p(e);
 		}
 
 		showGraphIfNeed();
+	}
+
+	private static void sort() {
+		Collections.sort(coordinates, new PointT.C.Cx());
+		p("Отсортированные координаты по Х");
+		pp(coordinates);
+		Collections.sort(coordinates, new PointT.C.Cy());
+		p("Отсортированные координаты по Y");
+		pp(coordinates);
+		Collections.sort(coordinates, new PointT.C.Cf());
+		p("Отсортированные координаты по fi");
+		pp(coordinates);
+		Collections.sort(coordinates, new PointT.C.Cr());
+		p("Отсортированные координаты по r");
+		pp(coordinates);
+		Collections.sort(coordinates, new PointT.C.Cr());// FIXME
 	}
 
 	private static void showGraphIfNeed() {// FIXME
@@ -85,10 +101,6 @@ public class VRGwithTimeWindow {
 	}
 
 	private static void print() {
-		p("Отсортированные координаты по Х");
-		for (int i = 0; i < coordinates.size(); i++) {
-			p(coordinates.get(i).toString());
-		}
 		p("");
 		p("таблица всех путей");
 		p(lengthOfRoutes);
@@ -96,12 +108,17 @@ public class VRGwithTimeWindow {
 		p("таблица оставшихся путей");
 		p(table);
 		p("");
-		// p(NAN);
 	}
 
 	public static void p(Object o) {
 		out.println(o.toString());
 		out.flush();
+	}
+
+	public static void pp(ArrayList<PointT> pp) {
+		for (PointT p : pp) {
+			p(p.toString());
+		}
 	}
 
 	public static void p(LinkedList<Queue<Double>> oo) {
@@ -157,7 +174,7 @@ public class VRGwithTimeWindow {
 		ArrayList<Double> q = new ArrayList<Double>(qq);
 		oldPath.add(0);
 		for (int i = 0; i < k; i++) {
-			double s = 1; // readInt();
+			double s = 1; // FIXME
 
 			double m = getMin(qq); // getMin(arr); // 0; // readInt();
 
@@ -223,10 +240,7 @@ public class VRGwithTimeWindow {
 
 	public static ArrayList<Integer> getDifferenceBetweenSets(ArrayList<Integer> path, ArrayList<Integer> removed) {
 		ArrayList<Integer> diff = new ArrayList<Integer>(path);
-
 		diff.removeAll(removed);
-		// Collections.sort(diff);
-
 		return diff;
 	}
 
@@ -291,12 +305,18 @@ public class VRGwithTimeWindow {
 			r = Math.sqrt(x * x + y * y);
 			f = Math.toDegrees(Math.atan2(yy, xx));
 			start = 0;
-			end = Short.MAX_VALUE;
+			end = Byte.MAX_VALUE;
+		}
+
+		public void setTimeWindow(int s, int e) {
+			start = s;
+			end = e;
 		}
 
 		@Override
 		public String toString() {
-			return "(" + x + ", " + y + "), " + "(" + df.format(r) + ", " + df.format(f) + "), ";
+			return "Декартовы: (" + x + ", " + y + ")," + "\t" + "Полярные: (" + df.format(r) + ", " + df.format(f) + "),"
+					+ "\t" + "Окна: (" + start + ", " + end + "), ";
 		}
 
 		public static class C {
@@ -357,12 +377,11 @@ public class VRGwithTimeWindow {
 					if (p.f > pp.f)
 						return 1;
 					if (p.f == pp.f)
-						if (p.x > pp.x)
+						if (p.r > pp.r)
 							return 1;
 					return -1;
 				}
 			}
 		}
 	}
-
 }
