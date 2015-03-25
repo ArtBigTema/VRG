@@ -29,6 +29,8 @@ public class VRGUtils {
 	public static final String EQ = "=";
 	public static final String SPACE = " ";
 	public static final String SLASH = "/";
+	public static final String ARROW = " → ";
+	public static final String DEEGRES = "°";
 	public static final String FONT_TAHOMA = "Tahoma";
 	public static final String TXT_DISTANCES = "Расстояния между вершинами (транспортные затраты)";// "Distances between vertices";
 	public static final String TXT_TYPE_OF_GAME = "Можете выбрать путь согласованной игры или выбрать автоматическую";// "You can choose the way of a coherent game or choose to automatically";
@@ -61,7 +63,7 @@ public class VRGUtils {
 	public static final String FIELD_TXT_NUMBERS_OF_PLAYERS = "Введите кол-во игроков";// "Enter the number of players";
 	public static final String TXT_VERTEX_LABEL = "Вершина, x[j]";// "Vertex, x[j]";
 	public static final String TXT_COORDS = "Координаты";// "Coordinates";
-	public static final String TXT_COORDS_CARTESIAN_POLAR = "Координаты Декартовы и Полярные";// "Coordinates";
+	public static final String TXT_COORDS_CARTESIAN_POLAR = "Декартовы и Полярные";// "Coordinates";
 	public static final String TXT_DEMAND = "d(x[j])";
 	public static final String TXT_DELAY = "Задержка";
 	public static final String TXT_PRICE = "p(x[j])";
@@ -346,7 +348,7 @@ public class VRGUtils {
 
 		@Override
 		public String toString() {
-			return "(" + x + ", " + y + "), ";
+			return "(" + x + "; " + y + ") ";
 		}
 
 	}
