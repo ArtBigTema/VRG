@@ -55,7 +55,56 @@ public class VRGwithTimeWindow {
 
 	public static int getCountCoords() {
 		return coordinates.size();
+	}
 
+	public static void generateAll(int n) {
+		clearAll();
+		generateCoordinates(n);
+		generateCars(n);
+		sort();
+		generateLengthRoutesAndTable();// XXX
+		print();
+	}
+
+	public static void generateNewRows(int n) {
+		generateCoordinates(n);
+		generateCars(n);
+		sort();
+		generateLengthRoutesAndTable();// XXX
+		print();
+	}
+
+	public static void generateCoordinates(int n) {
+		int x = VRGUtils.windowWidth;
+		int y = VRGUtils.windowHeight;
+		coordinates.add(new PointT(random(x / 20, x / 2), random(y / 20, y / 2)));
+		for (int i = 0; i < n; i++) {
+			PointT p = new PointT(random(y / 20, y), random(y / 20, y));
+			p.setDelay(random(1, 5));
+			p.setTimeWindow(1, coordinates.size() + n);
+			coordinates.add(p);
+		}
+	}
+
+	public static void generateCars(int n) {
+		for (int i = 0; i < n; i++) {
+			cars.add(random(1, n));
+		}
+	}
+
+	public static int[][] getRoutes() {
+		if (routes == null || routes.size() == 0) {
+			main(null);
+		}
+		int n = routes.size();
+		int[][] paths = new int[n][n];
+		for (int i = 0; i < n; i++) {
+			paths[i] = new int[lengthOfRoutes.get(i).size()];
+			for (int j = 0; j < routes.get(i).size(); j++) {
+				paths[i][j] = routes.get(i).get(j);
+			}
+		}
+		return paths;
 	}
 
 	public static int getCountCars() {
@@ -66,7 +115,7 @@ public class VRGwithTimeWindow {
 		System.err.println(o.toString());
 	}
 
-	public static void generateRoutesAndTable() {
+	public static void generateLengthRoutesAndTable() {
 		for (int i = 0; i < coordinates.size(); i++) {
 			allIndexes.add(i);
 			ArrayList<Double> tmp = new ArrayList<Double>();
@@ -97,7 +146,7 @@ public class VRGwithTimeWindow {
 
 		sort();
 
-		generateRoutesAndTable();// XXX
+		generateLengthRoutesAndTable();// XXX
 
 		print();
 
@@ -124,7 +173,11 @@ public class VRGwithTimeWindow {
 		Collections.sort(coordinates, new PointT.C.Cr());
 		p("Отсортированные координаты по r");
 		pp(coordinates);
-		Collections.sort(coordinates, new PointT.C.Cx());// FIXME
+		sortX();
+	}
+
+	private static void sortX() {
+		Collections.sort(coordinates, new PointT.C.Cx());
 	}
 
 	private static void showGraphIfNeed() {// FIXME
@@ -140,6 +193,10 @@ public class VRGwithTimeWindow {
 			coord.add(p);
 		}
 		return coord;
+	}
+
+	public static PointT getCoords(int index) {
+		return coordinates.get(index);
 	}
 
 	public static Integer getDelays(int index) {
@@ -289,6 +346,24 @@ public class VRGwithTimeWindow {
 		return diff;
 	}
 
+	public static int random(int start, int end) {
+		Random rand = new Random();
+		if (start >= end)
+			return (int) (start + rand.nextInt(start - end + 1));// FIXME
+		else
+			return (int) (start + rand.nextInt(end - start));
+	}
+
+	public static int random(int start, int end, int oldValue) {
+		int result = 0;
+
+		do {
+			result = random(start, end);
+		} while (result == oldValue);
+
+		return result;
+	}
+
 	public static class Pair {
 		double delay;
 		int num;
@@ -358,6 +433,14 @@ public class VRGwithTimeWindow {
 		public void setTimeWindow(int s, int e) {
 			start = s;
 			end = e;
+		}
+
+		public void setDelay(int d) {
+			delay = d;
+		}
+
+		public Point getPoint() {
+			return new Point(x, y);
 		}
 
 		public String toStr() {

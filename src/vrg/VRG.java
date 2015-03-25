@@ -63,6 +63,18 @@ public class VRG {
 		createTableOfRoutes();
 	}
 
+	public static void generateNewRows(int n) {
+		n += countCoords;
+		clearAll();
+		countCoords = n;
+		generateCoordinates(n);
+		generateCars(n);
+		generateDemand(n);
+		generatePrice(n);
+		createTableOfRoutes();
+		generateGraphRoutes();
+	}
+
 	public static void generateAll(int n) {
 		clearAll();
 		countCoords = n;
@@ -116,8 +128,8 @@ public class VRG {
 		for (int i = 1; i < n; i++) {
 			coordinates.add(new Point(random(y / 20, y), random(y / 20, y)));
 		}
-		generatePrice(random(x / 20, x));
-		generateDemand(random(y / 5, y));
+		generatePrice(random(x / 20, x));// FIXME
+		generateDemand(random(y / 5, y));// FIXME
 	}
 
 	public static void generatePrice(int n) {

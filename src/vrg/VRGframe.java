@@ -2,7 +2,6 @@ package vrg;
 
 import java.awt.Component;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -398,22 +397,19 @@ public class VRGframe extends JFrame {
 			}
 		});
 
-		javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(p7);
-		p7.setLayout(jPanel9Layout);
-		jPanel9Layout.setHorizontalGroup(jPanel9Layout
+		javax.swing.GroupLayout jp9l = new javax.swing.GroupLayout(p7);
+		p7.setLayout(jp9l);
+		jp9l.setHorizontalGroup(jp9l
 				.createParallelGroup(LEADING)
 				.addComponent(jScrollPane5, D_SIZE, 526, S_MAX)
 				.addGroup(
-						jPanel9Layout
-								.createSequentialGroup()
+						jp9l.createSequentialGroup()
 								.addContainerGap()
 								.addGroup(
-										jPanel9Layout
-												.createParallelGroup(LEADING)
+										jp9l.createParallelGroup(LEADING)
 												.addComponent(jLabel6, D_SIZE, D_SIZE, S_MAX)
 												.addGroup(
-														jPanel9Layout
-																.createSequentialGroup()
+														jp9l.createSequentialGroup()
 																.addComponent(buttonAnSolve)
 																.addGap(18, 18, 18)
 																.addComponent(buttonBestSolve,
@@ -421,16 +417,15 @@ public class VRGframe extends JFrame {
 																		javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 																.addGap(18, 18, 18).addComponent(buttonSearchBestSolve)))
 								.addContainerGap()));
-		jPanel9Layout.setVerticalGroup(jPanel9Layout.createParallelGroup(LEADING).addGroup(
+		jp9l.setVerticalGroup(jp9l.createParallelGroup(LEADING).addGroup(
 				trail,
-				jPanel9Layout
-						.createSequentialGroup()
+				jp9l.createSequentialGroup()
 						.addGap(4, 4, 4)
 						.addComponent(jLabel6)
 						.addGap(18, 18, 18)
 						.addGroup(
-								jPanel9Layout.createParallelGroup(basel).addComponent(buttonAnSolve)
-										.addComponent(buttonBestSolve).addComponent(buttonSearchBestSolve)).addPreferredGap(cR)
+								jp9l.createParallelGroup(basel).addComponent(buttonAnSolve).addComponent(buttonBestSolve)
+										.addComponent(buttonSearchBestSolve)).addPreferredGap(cR)
 						.addComponent(jScrollPane5, D_SIZE, 353, S_MAX)));
 
 		tabbedPane.addTab(VRGUtils.TAB_TXT_RESULT, p7);
@@ -613,7 +608,7 @@ public class VRGframe extends JFrame {
 					tabbedPane.setSelectedIndex(0);
 					buttonDeleteVertexActionPerformed(evt);
 					VRG.readTableFromFile(VRGframe.this);
-					if (VRG.isValid()) {
+					if (isVal()) {
 						fillAllStandart();
 						VRG.generateGraphRoutes();
 					} else {
@@ -643,6 +638,17 @@ public class VRGframe extends JFrame {
 				}
 			});
 		}
+	}
+
+	private void generateAllRows(int n) {
+		clearAll();
+		isNeedToUpdate = true;
+		if (!isTW()) {
+			VRG.generateAll(n);
+		} else {
+			VRGwithTimeWindow.generateAll(n - 1);
+		}
+		fillAllStandart();
 	}
 
 	private void generateAllStandart() {
@@ -694,9 +700,11 @@ public class VRGframe extends JFrame {
 
 		addRowCount(k, dtm);
 
-		fillArrays(dtm.getRowCount());
+		fillArrays(k);
 		fillCoordsTable(dtm);
-		buttonSaveCountCarsActionPerformed(evt);
+		if (!isTW()) {
+			buttonSaveCountCarsActionPerformed(evt);
+		}
 	}
 
 	private void setValueInFirstColumn(DefaultTableModel dtm) {
@@ -743,7 +751,7 @@ public class VRGframe extends JFrame {
 		if (dtm.getRowCount() < 3) {
 			buttonAddVertexActionPerformed(evt);
 		}
-		fillArrays(dtm.getRowCount());
+		fillNewArray(dtm.getRowCount());
 
 		fillCoordsTable(dtm);
 		buttonSaveCountCarsActionPerformed(evt);
@@ -753,9 +761,13 @@ public class VRGframe extends JFrame {
 		generateAllStandart();
 	}
 
+	private void fillNewArray(int rowCount) {
+		generateAllRows(rowCount);
+	}
+
 	private void fillArrays(int n) {
 		isNeedToUpdate = true;
-		VRG.generateAll(n);
+		generateNewRows(n);
 	}
 
 	private void fillCarsArray(int n) {
@@ -764,7 +776,7 @@ public class VRGframe extends JFrame {
 
 	private void fillFirstStrokeCoordsTable(DefaultTableModel dtm) {
 		dtm.setValueAt(VRGUtils.X + "[" + (0) + "]", 0, 0);
-		dtm.setValueAt(getCoordinates().get(0).toString(), 0, 1);
+		dtm.setValueAt(getCoordinates(0).toString(), 0, 1);
 		dtm.setValueAt("0", 0, 2);
 		dtm.setValueAt("0", 0, 3);
 	}
@@ -775,7 +787,7 @@ public class VRGframe extends JFrame {
 		setValueInFirstColumn(dtm);
 
 		for (int i = 1; i < dtm.getRowCount(); i++) {
-			dtm.setValueAt(getCoordinates().get(i).toString(), i, 1);
+			dtm.setValueAt(getCoordinates(i).toString(), i, 1);
 			dtm.setValueAt(getSecondCollumn(i), i, 2);
 			dtm.setValueAt(getLastCollumn(i), i, 3);
 		}
@@ -806,13 +818,15 @@ public class VRGframe extends JFrame {
 	}
 
 	private void setRoutesTable() {
-		setModelForRoutes(tableRoutes, VRGUtils.TXT_ROUTE, VRG.coordinates.size(), VRG.countCars);
-		VRG.createTableOfRoutes();
+		setModelForRoutes(tableRoutes, VRGUtils.TXT_ROUTE, getCountCoords(), getCountCars());
+		if (!isTW()) {// FIXME
+			VRG.createTableOfRoutes();
+		}
 		fillRoutesTable();
 	}
 
 	private void fillRoutesTable() {
-		int[][] s = VRG.getRoutes();
+		int[][] s = getRoutes();
 		for (int i = 0; i < s.length; i++) {
 			for (int j = 0; j < s[i].length; j++) {
 				tableRoutes.setValueAt(s[i][j], i, j);
@@ -825,7 +839,7 @@ public class VRGframe extends JFrame {
 	}
 
 	private void generateSolution() {
-		if (VRG.isValid()) {
+		if (isVal()) {
 			VRG.generateOptimalRoutes();
 			fillValueToResultTable();
 		}
@@ -837,7 +851,7 @@ public class VRGframe extends JFrame {
 
 	private void buttonSolveActionPerformed(ActionEvent evt) {
 		VRG.constructSolution();
-		if (VRG.isValid()) {
+		if (isVal()) {
 			fillValueToResultTable();
 		}
 		System.gc();
@@ -917,7 +931,7 @@ public class VRGframe extends JFrame {
 
 		for (int i = 1; i < dtm.getColumnCount(); i++) {
 			for (int j = 0; j < dtm.getRowCount(); j++) {
-				String s = VRG.getDistanceText(VRG.coordinates.get(i - 1), VRG.coordinates.get(j));
+				String s = VRG.getDistanceText(getCoordinates(i - 1), getCoordinates(j));
 				dtm.setValueAt(VRGUtils.get(s), j, i);
 			}
 		}
@@ -955,7 +969,7 @@ public class VRGframe extends JFrame {
 			break;
 		}
 		case 2: {// Transports costs
-			setModelForTC(tableTC, VRGUtils.TXT_VERTEX, VRG.coordinates.size());
+			setModelForTC(tableTC, VRGUtils.TXT_VERTEX, getCountCoords());
 			fillValueToTransportTable();
 			setRoutesTable();
 			break;
@@ -973,7 +987,7 @@ public class VRGframe extends JFrame {
 	}
 
 	private void fillResultTable() {
-		if (VRG.isValid()) {
+		if (isVal()) {
 			fillColumnValueToResultTable();
 			fillValueToResultTable(VRGUtils.TXT_IS_ALL);
 		} else {
@@ -1255,46 +1269,52 @@ public class VRGframe extends JFrame {
 		}
 	};
 
-	private void buttonTimeWindowActionPerformed(ActionEvent evt) {// FIXME
-		// int k = VRGUtils.getIntFromDialog(this,
-		// VRGUtils.FIELD_INT_TIMEWINDOW, 5);
-		// buttonTimeWindow.setSelected(k > 0);
-		// if (k > 0) {
+	private boolean isVal() {
 		if (isTW()) {
-			// VRG.timeWindow = k;
+			return VRGwithTimeWindow.isValid();
+		} else {
+			return VRG.isValid();
+		}
+	}
+
+	private void buttonTimeWindowActionPerformed(ActionEvent evt) {// FIXME
+		if (isTW()) {
 			VRG.withTimeWindow = true;
-			setInterfaceForTimeWindow();// FIXME
-			// ArrayList<Integer> indexes =
-			// VRG.generateAllStandartWithTimeWindow();// FIXME
-			// deleteNotUsingRows(indexes);
+			setInterfaceForTimeWindow();
 		} else {
 			setOldInterface();
-			// VRGUtils.showErrorMess(this, VRGUtils.MSG_ERR_TITLE,
-			// VRGUtils.MSG_ERR_TIMEWINDOW);
 		}
 	}
 
 	private int getCountCoords() {
 		if (isTW()) {
-			return VRGwithTimeWindow.coordinates.size();
+			return VRGwithTimeWindow.getCountCoords();
 		} else {
 			return VRG.getCountCoords();
 		}
 	}
 
+	private int[][] getRoutes() {
+		if (isTW()) {
+			return VRGwithTimeWindow.getRoutes();
+		} else {
+			return VRG.getRoutes();
+		}
+	}
+
 	private int getCountCars() {
 		if (isTW()) {
-			return VRGwithTimeWindow.cars.size();
+			return VRGwithTimeWindow.getCountCars();
 		} else {
 			return VRG.getCountCars();
 		}
 	}
 
-	private ArrayList<Point> getCoordinates() {
+	private Point getCoordinates(int index) {
 		if (isTW()) {
-			return VRGwithTimeWindow.getCoords();
+			return VRGwithTimeWindow.getCoords(index);
 		} else {
-			return VRG.coordinates;
+			return VRG.coordinates.get(index);
 		}
 	}
 
@@ -1319,6 +1339,14 @@ public class VRGframe extends JFrame {
 			return VRGwithTimeWindow.getCars(index - 1);
 		} else {
 			return VRG.cars.get(index);
+		}
+	}
+
+	private void generateNewRows(int n) {
+		if (isTW()) {
+			VRGwithTimeWindow.generateNewRows(n);
+		} else {
+			VRG.generateNewRows(n);
 		}
 	}
 
