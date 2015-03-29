@@ -102,7 +102,7 @@ public class VRG {
 
 	public static int getCountCoords() {
 		if (countCoords != coordinates.size()) {
-			err("See this " + countCoords + "  " + coordinates.size());
+			err("See getCountCoords() " + countCoords + "  " + coordinates.size());
 			return coordinates.size();
 		}
 		return countCoords;
@@ -625,7 +625,7 @@ public class VRG {
 			return result;
 		}
 
-		ArrayList<Integer> tmp = routes.get(k - 1);
+		ArrayList<Integer> tmp = routes.get(k);
 		int index = 0;
 
 		for (int i : tmp) {
@@ -634,6 +634,13 @@ public class VRG {
 		}
 
 		return result;
+	}
+
+	public static ArrayList<Integer> getRoutes(int j) {
+		if (routes == null || routes.size() == 0) {
+			generateOptimalRoutes();
+		}
+		return routes.get(j);
 	}
 
 	public static String getPriceString(int index) {

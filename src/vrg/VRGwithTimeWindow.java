@@ -20,10 +20,11 @@ public class VRGwithTimeWindow {
 	public static ArrayList<Integer> cars = new ArrayList<Integer>();
 	public static ArrayList<PointT> coordinates = new ArrayList<PointT>();
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
-	public static ArrayList<Integer> oldPath = new ArrayList<Integer>();
 	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
+
+	public static ArrayList<Pair> cities;
 
 	public VRGwithTimeWindow() {
 		main(null);
@@ -37,7 +38,6 @@ public class VRGwithTimeWindow {
 		cars.clear();
 		coordinates.clear();
 		lengthOfRoutes.clear();
-		oldPath.clear();
 		allIndexes.clear();
 		routes.clear();
 		table.clear();
@@ -105,6 +105,34 @@ public class VRGwithTimeWindow {
 			}
 		}
 		return paths;
+	}
+
+	public static ArrayList<ArrayList<Integer>> getRoutesAll() {
+		if (routes == null || routes.size() == 0) {
+			main(null);
+		}
+		return routes;
+	}
+
+	public static Double getDelayOfRoutes(int j) {
+		if (j >= cities.size() || j < 0) {
+			err("See getLengthOfRoutes");
+		}
+		return cities.get(j).delay;
+	}
+
+	public static Double getLengthOfRoutes(int j) {
+		if (j >= cities.size() || j < 0) {
+			err("See getLengthOfRoutes");
+		}
+		return cities.get(j).length;
+	}
+
+	public static ArrayList<Integer> getRoutes(int j) {
+		if (routes == null || routes.size() == 0) {
+			main(null);
+		}
+		return routes.get(j);
 	}
 
 	public static int getCountCars() {
@@ -182,9 +210,13 @@ public class VRGwithTimeWindow {
 
 	private static void showGraphIfNeed() {// FIXME
 		if (showGraph) {
-			VRGgraphOld frame = new VRGgraphOld(getCoords(), routes);
-			frame.isTimeWindow = true;
+			showGraph();
 		}
+	}
+
+	public static void showGraph() {// FIXME
+		VRGgraphOld frame = new VRGgraphOld(getCoords(), routes);
+		frame.isTimeWindow = true;
 	}
 
 	public static ArrayList<Point> getCoords() {
@@ -210,6 +242,40 @@ public class VRGwithTimeWindow {
 
 	public static Integer getCars(int index) {
 		return cars.get(index);
+	}
+
+	public static void generateRoutesRand() {
+		// randomSort();
+		sortX();// FIXME
+		generateLengthRoutesAndTable();// XXX
+		try {
+			solve(lengthOfRoutes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void randomSort() {
+		int k = random(0, 4);
+		switch (k) {
+		case 0:
+			Collections.sort(coordinates, new PointT.C.Cx());
+			break;
+		case 1:
+			Collections.sort(coordinates, new PointT.C.Cy());
+			break;
+		case 2:
+			Collections.sort(coordinates, new PointT.C.Cr());
+			break;
+		case 3:
+			Collections.sort(coordinates, new PointT.C.Cf());
+			break;
+		default:
+			Collections.sort(coordinates, new PointT.C.Cx());
+			break;
+		}
+		p("Отсортированные координаты по рандому " + k);
+		pp(coordinates);
 	}
 
 	private static void print() {
@@ -266,7 +332,8 @@ public class VRGwithTimeWindow {
 	private static void solve(ArrayList<ArrayList<Double>> l) throws Exception {
 		int k = cars.size();
 
-		ArrayList<Pair> cities = new ArrayList<Pair>();
+		ArrayList<Integer> oldPath = new ArrayList<Integer>();
+		cities = new ArrayList<Pair>();
 
 		for (int i = 0; i < k; i++) {
 			cities.add(new Pair(0, 0, i + 1));
@@ -282,6 +349,7 @@ public class VRGwithTimeWindow {
 
 			double end = Math.max(cities.get(i).delay, s) + m;
 			Pair p = new Pair(end, q.indexOf(m), cities.get(i).num);
+			p.addLength(m);
 			cities.get(i).setNewValue(p);
 
 			p(p);
@@ -312,9 +380,17 @@ public class VRGwithTimeWindow {
 			double m = getMin(q);
 			double s = 1; // FIXME задержка в городе
 			int num = getNumOfCarsWithPlace(cities, q.indexOf(m)) - 1;
+			Pair p = null;
+			double end = 0;
 
-			double end = Math.max(cities.get(num).delay, s) + m;
-			Pair p = new Pair(end + s, currPlace, cities.get(num).num);
+			try {
+				end = Math.max(cities.get(num).delay, s) + m;
+				p = new Pair(end + s, currPlace, cities.get(num).num);
+				p.addLength(m);
+			} catch (Exception e) {
+				p(e);
+				e.printStackTrace();
+			}
 			cities.get(num).setNewValue(p);
 
 			p(qq + " смотрим " + q.indexOf(m) + " из " + currPlace);
@@ -329,6 +405,7 @@ public class VRGwithTimeWindow {
 			p(p.toStr());
 			routes.add(p.path);
 		}
+		allIndexes.clear();
 	}
 
 	public static int getNumOfCarsWithPlace(ArrayList<Pair> s, int place) {
@@ -368,6 +445,7 @@ public class VRGwithTimeWindow {
 		double delay;
 		int num;
 		int place;
+		double length;
 		ArrayList<Integer> path;
 
 		public Pair(double d, int n) {
@@ -375,6 +453,7 @@ public class VRGwithTimeWindow {
 			delay = d;
 			num = n;
 			place = 0;
+			length = 0;
 		}
 
 		public Pair(double d, int i, int n) {
@@ -387,6 +466,7 @@ public class VRGwithTimeWindow {
 			num = n;
 			place = i;
 			path.add(i);
+			length = 0;
 		}
 
 		public void setNewValue(Pair p) {
@@ -394,6 +474,11 @@ public class VRGwithTimeWindow {
 			delay = p.delay;
 			num = p.num;
 			place = p.place;
+			length += p.length;
+		}
+
+		public void addLength(double l) {
+			length += l;
 		}
 
 		public boolean equalsPlace(int in) {
@@ -401,7 +486,8 @@ public class VRGwithTimeWindow {
 		}
 
 		public String toStr() {
-			return "Num: " + num + ", Общее время в пути: " + delay + ",  Весь путь: " + path.toString();
+			return "Num: " + num + ", Общее время в пути: " + delay + ",  Весь путь: " + path.toString() + " Длина пути: "
+					+ length;
 		}
 
 		@Override
@@ -411,13 +497,14 @@ public class VRGwithTimeWindow {
 	}
 
 	public static class PointT extends Point {
-		int x;
-		int y;
-		double r;
-		double f;
-		int start;
-		int end;
-		int delay;
+		public int x;
+		public int y;
+		public double r;
+		public double f;
+		public int start;
+		public int end;
+		public int delay;
+		public boolean flag;
 
 		public PointT(int xx, int yy) {
 			super(xx, yy);
@@ -428,6 +515,7 @@ public class VRGwithTimeWindow {
 			start = 0;
 			end = Byte.MAX_VALUE;
 			delay = 1;
+			flag = false;
 		}
 
 		public void setTimeWindow(int s, int e) {
@@ -439,13 +527,18 @@ public class VRGwithTimeWindow {
 			delay = d;
 		}
 
+		public void close() {
+			flag = true;
+		}
+
 		public Point getPoint() {
 			return new Point(x, y);
 		}
 
 		public String toStr() {
-			return "Декартовы: (" + x + ", " + y + ")," + "\t" + "Полярные: (" + df.format(r) + ", " + df.format(f)
-					+ VRGUtils.DEEGRES + ")," + "\t" + "Окна: (" + start + ", " + end + "),\tЗадержка в городе: " + delay;// FIXME
+			return "Активность " + flag + " Декартовы: (" + x + ", " + y + ")," + "\t" + "Полярные: (" + df.format(r) + ", "
+					+ df.format(f) + VRGUtils.DEEGRES + ")," + "\t" + "Окна: (" + start + ", " + end
+					+ "),\tЗадержка в городе: " + delay;// FIXME
 		}
 
 		@Override
@@ -518,4 +611,5 @@ public class VRGwithTimeWindow {
 			}
 		}
 	}
+
 }

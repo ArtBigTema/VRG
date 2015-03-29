@@ -2,6 +2,7 @@ package vrg;
 
 import java.awt.Component;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -840,8 +841,16 @@ public class VRGframe extends JFrame {
 
 	private void generateSolution() {
 		if (isVal()) {
-			VRG.generateOptimalRoutes();
+			generateRoutes();
 			fillValueToResultTable();
+		}
+	}
+
+	public void generateRoutes() {
+		if (isTW()) {
+			VRGwithTimeWindow.generateRoutesRand();
+		} else {
+			VRG.generateOptimalRoutes();
 		}
 	}
 
@@ -914,13 +923,17 @@ public class VRGframe extends JFrame {
 
 	private void openGraph(boolean isNewStyle) {
 		if (isNewStyle) {
-			newGraphComponent.init(this);
+			newGraphComponent.init(this, isTW());
 			repaint();
 		} else {
 			if (graphIsFirstOpened) {
 				tabbedPane.setSelectedIndex(3);
-				VRGgraphOld frame = new VRGgraphOld();
-				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				if (isTW()) {
+					VRGwithTimeWindow.showGraph();
+				} else {
+					VRGgraphOld frame = new VRGgraphOld();
+					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				}
 			}
 		}
 		graphIsFirstOpened = false;
@@ -1018,25 +1031,27 @@ public class VRGframe extends JFrame {
 		// VRG.createTableOfRoutes();//FIXME
 		for (int j = 0; j < n; j++) {
 			// Second column is routes
-			dtm.setValueAt(VRG.routes.get(j).toString(), j, 1);
+			dtm.setValueAt(getRoutes(j).toString(), j, 1);
 		}
 
 		for (int j = 0; j < n; j++) {
 			// Third column is length of routes
-			dtm.setValueAt(VRGUtils.get(VRG.getLengthOfRoutes(j + 1)), j, 2);
+			dtm.setValueAt(VRGUtils.get(getLengthOfRoutes(j)), j, 2);
 		}
 
 		for (int j = 0; j < n; j++) {
-			// Fourth column is weight of routes
-			dtm.setValueAt(VRG.getRoutesWeight(j), j, 3);
+			// Fourth column is weight or delay of routes
+			dtm.setValueAt(getRoutesWeight(j), j, 3);// FIXME
 		}
 
 		for (int j = 0; j < n; j++) {
 			// Fiveth column is benefit of routes
-			dtm.setValueAt(VRGUtils.get(VRG.getBenefit(j)), j, 4);
+			dtm.setValueAt(VRGUtils.get(getBenefit(j)), j, 4);
 		}
 
-		setLastStroke(dtm);
+		if (!isTW()) {
+			setLastStroke(dtm);// FIXME
+		}
 	}
 
 	private void setLastStroke(DefaultTableModel dtm) {
@@ -1075,7 +1090,7 @@ public class VRGframe extends JFrame {
 		}
 		for (int j = 0; j < n; j++) {
 			dtm.setValueAt(VRGUtils.SPACE + (j + 1) + VRGUtils.COMMA + VRGUtils.SPACE + VRGUtils.LABEL_WEIGHT + VRGUtils.SPACE
-					+ VRG.cars.get(j + 1), j, 0);
+					+ getCarsRows(j + 1), j, 0);// VRG.cars.get(j + 1), j, 0);
 		}
 	}
 
@@ -1294,11 +1309,43 @@ public class VRGframe extends JFrame {
 		}
 	}
 
+	private Double getBenefit(int j) {
+		if (isTW()) {
+			return VRGwithTimeWindow.getLengthOfRoutes(j);// FIXME
+		} else {
+			return VRG.getBenefit(j);
+		}
+	}
+
+	private Integer getRoutesWeight(int j) {
+		if (isTW()) {
+			return VRGwithTimeWindow.getDelayOfRoutes(j).intValue();// FIXME
+		} else {
+			return VRG.getRoutesWeight(j);
+		}
+	}
+
+	private Double getLengthOfRoutes(int j) {
+		if (isTW()) {
+			return VRGwithTimeWindow.getLengthOfRoutes(j);// FIXME
+		} else {
+			return VRG.getLengthOfRoutes(j);
+		}
+	}
+
 	private int[][] getRoutes() {
 		if (isTW()) {
 			return VRGwithTimeWindow.getRoutes();
 		} else {
 			return VRG.getRoutes();
+		}
+	}
+
+	private ArrayList<Integer> getRoutes(int j) {
+		if (isTW()) {
+			return VRGwithTimeWindow.getRoutes(j);
+		} else {
+			return VRG.getRoutes(j);
 		}
 	}
 
