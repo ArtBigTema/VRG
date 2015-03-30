@@ -10,7 +10,6 @@ import ru.amse.smyshlyaev.grapheditor.graph.Graph;
 import ru.amse.smyshlyaev.grapheditor.graph.Vertex;
 import ru.amse.smyshlyaev.grapheditor.ui.JGraphComponent;
 import vrg.VRGUtils.Point;
-import vrg.VRGwithTimeWindow.Pair;
 
 @SuppressWarnings("serial")
 public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpacePressed {
@@ -34,8 +33,8 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 	public int translateX = 0;
 	public int translateY = 0;
 
-	public static ArrayList<Point> coordinates = new ArrayList<Point>();
-	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
+	public ArrayList<Point> coordinates = new ArrayList<Point>();
+	public ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 
 	ArrayList<VRGvertexes> vrgVertexes;
 
