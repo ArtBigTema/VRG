@@ -854,12 +854,20 @@ public class VRGframe extends JFrame {
 		}
 	}
 
+	public void constructSolution() {
+		if (isTW()) {
+			VRGwithTimeWindow.constructSolution();
+		} else {
+			VRG.constructSolution();
+		}
+	}
+
 	private void buttonSearchSolveActionPerformed(ActionEvent evt) {
 		turnOnTimer(evt);
 	}
 
 	private void buttonSolveActionPerformed(ActionEvent evt) {
-		VRG.constructSolution();
+		constructSolution();
 		if (isVal()) {
 			fillValueToResultTable();
 		}
