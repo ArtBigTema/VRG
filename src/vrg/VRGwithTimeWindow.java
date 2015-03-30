@@ -13,29 +13,34 @@ public class VRGwithTimeWindow {
 
 	// public static final int[][] COORDS = { { 5, 3 }, { 8, 1 }, { 8, 5 }, {
 	// 11, 1 }, { 8, 6 }, { 2, 1 }, { 2, 3 }, { 1, 3 } };
+	public static final int MAX_TIME = 100;
 	public static final int[][] COORDS = { { 0, 0 }, { 0, 3 }, { 4, 0 }, { 4, 3 }, { 8, 3 }, { 0, 6 }, { 8, 6 }, { 2, 6 },
 			{ 8, 0 }, { 4, 5 } };
 	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
+	public static final int[][] TIMES = { { 0, MAX_TIME }, { 1, 5 }, { 3, 7 }, { 5, 7 }, { 15, 30 }, { 2, 3 }, { 20, 30 },
+			{ 1, 1 }, { 15, 20 }, { 9, 20 }, };
 
-	public static ArrayList<Integer> cars = new ArrayList<Integer>();
+	public static ArrayList<Integer> carsWeight = new ArrayList<Integer>();
 	public static ArrayList<PointT> coordinates = new ArrayList<PointT>();
+
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
+	public static ArrayList<PointT> passedPath;// FIXME
 
-	public static ArrayList<Pair> cities;
+	public static ArrayList<Pair> cars;
 
 	public VRGwithTimeWindow() {
 		main(null);
 	}
 
 	public static boolean isValid() {
-		return (coordinates != null) && (coordinates.size() > 0) && (cars != null) && (cars.size() > 0);
+		return (coordinates != null) && (coordinates.size() > 0) && (carsWeight != null) && (carsWeight.size() > 0);
 	}
 
 	public static void clearAll() {
-		cars.clear();
+		carsWeight.clear();
 		coordinates.clear();
 		lengthOfRoutes.clear();
 		allIndexes.clear();
@@ -46,10 +51,17 @@ public class VRGwithTimeWindow {
 	public static void generateAllStandart() {
 		clearAll();
 		for (int i = 0; i < COORDS.length; i++) {
-			coordinates.add(new PointT(COORDS[i][0], COORDS[i][1]));
+			PointT p = new PointT(COORDS[i][0], COORDS[i][1]);
+			// p.setDelay(random(1, 5));
+			// p.setTimeWindow(random(1, MAX_TIME / 2), random(MAX_TIME / 2,
+			// MAX_TIME));
+			p.setTimeWindow(TIMES[i][0], TIMES[i][1]);
+			p.setDelay(1);
+			coordinates.add(p);
 		}
+		coordinates.get(0).setDelay(0);// FIXME
 		for (int i = 0; i < CARS_WEIGHT.length; i++) {
-			cars.add(CARS_WEIGHT[i]);
+			carsWeight.add(CARS_WEIGHT[i]);
 		}
 	}
 
@@ -81,20 +93,22 @@ public class VRGwithTimeWindow {
 		for (int i = 0; i < n; i++) {
 			PointT p = new PointT(random(y / 20, y), random(y / 20, y));
 			p.setDelay(random(1, 5));
-			p.setTimeWindow(1, coordinates.size() + n);
+			p.setTimeWindow(random(1, MAX_TIME / 2), random(MAX_TIME / 2, MAX_TIME));
 			coordinates.add(p);
 		}
 	}
 
 	public static void generateCars(int n) {
 		for (int i = 0; i < n; i++) {
-			cars.add(random(1, n));
+			carsWeight.add(random(1, n));
 		}
 	}
 
 	public static int[][] getRoutes() {
 		if (routes == null || routes.size() == 0) {
-			main(null);
+			sortX();// FIXME
+			generateLengthRoutesAndTable();
+			solve(lengthOfRoutes);
 		}
 		int n = routes.size();
 		int[][] paths = new int[n][n];
@@ -115,17 +129,17 @@ public class VRGwithTimeWindow {
 	}
 
 	public static Double getDelayOfRoutes(int j) {
-		if (j >= cities.size() || j < 0) {
+		if (j >= cars.size() || j < 0) {
 			err("See getLengthOfRoutes");
 		}
-		return cities.get(j).delay;
+		return cars.get(j).delay;
 	}
 
 	public static Double getLengthOfRoutes(int j) {
-		if (j >= cities.size() || j < 0) {
+		if (j >= cars.size() || j < 0) {
 			err("See getLengthOfRoutes");
 		}
-		return cities.get(j).length;
+		return cars.get(j).distance;
 	}
 
 	public static ArrayList<Integer> getRoutes(int j) {
@@ -136,7 +150,7 @@ public class VRGwithTimeWindow {
 	}
 
 	public static int getCountCars() {
-		return cars.size();
+		return carsWeight.size();
 	}
 
 	public static void err(Object o) {
@@ -172,18 +186,15 @@ public class VRGwithTimeWindow {
 	public static void main(String[] args) {
 		generateAllStandart();
 
-		sort();
+		sortX();
+		pp(coordinates);
 
 		generateLengthRoutesAndTable();// XXX
 
 		print();
 
-		try {
-			solve(lengthOfRoutes);// XXX
-			out.flush();
-		} catch (Exception e) {
-			p(e);
-		}
+		constructRoutes(lengthOfRoutes);// FIXME
+		out.flush();
 
 		showGraphIfNeed();
 	}
@@ -241,7 +252,7 @@ public class VRGwithTimeWindow {
 	}
 
 	public static Integer getCars(int index) {
-		return cars.get(index);
+		return carsWeight.get(index);
 	}
 
 	public static void generateRoutesRand() {
@@ -250,6 +261,14 @@ public class VRGwithTimeWindow {
 		generateLengthRoutesAndTable();// XXX
 		try {
 			solve(lengthOfRoutes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void constructSolution() {
+		try {
+			main(null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -295,7 +314,7 @@ public class VRGwithTimeWindow {
 
 	public static void pp(ArrayList<PointT> pp) {
 		for (PointT p : pp) {
-			p(p.toStr());
+			p(pp.indexOf(p) + " " + p.toStr());
 		}
 	}
 
@@ -313,6 +332,7 @@ public class VRGwithTimeWindow {
 
 	public static void p(Point o) {
 		out.print("(" + o.x + ", " + o.y + "), ");
+		out.flush();
 	}
 
 	public static double getDistance(Point p1, Point p2) {
@@ -329,35 +349,41 @@ public class VRGwithTimeWindow {
 		return x;
 	}
 
-	private static void solve(ArrayList<ArrayList<Double>> l) throws Exception {
-		int k = cars.size();
+	private static void solve(ArrayList<ArrayList<Double>> l) {
+		int k = getCountCars();
 
 		ArrayList<Integer> oldPath = new ArrayList<Integer>();
-		cities = new ArrayList<Pair>();
+		passedPath = new ArrayList<PointT>();
 
-		for (int i = 0; i < k; i++) {
-			cities.add(new Pair(0, 0, i + 1));
-		}
+		cars = new ArrayList<Pair>();
+
+		setStartPlaceForCars();
+
+		oldPath.add(0);
+		passedPath.add(coordinates.get(0).close());
 
 		Queue<Double> qq = new LinkedList<Double>(lengthOfRoutes.get(0));
 		ArrayList<Double> q = new ArrayList<Double>(qq);
-		oldPath.add(0);
+
 		for (int i = 0; i < k; i++) {
 			double s = 1; // FIXME
 
 			double m = getMin(qq); // getMin(arr); // 0; // readInt();
 
-			double end = Math.max(cities.get(i).delay, s) + m;
-			Pair p = new Pair(end, q.indexOf(m), cities.get(i).num);
-			p.addLength(m);
-			cities.get(i).setNewValue(p);
+			double end = Math.max(cars.get(i).delay, s) + m;
+			Pair p = new Pair(end, q.indexOf(m), cars.get(i).num);
+			p.addDistance(m);
+			cars.get(i).setNewValue(p);
 
 			p(p);
 			oldPath.add(p.place);
+			passedPath.add(coordinates.get(q.indexOf(m)).close());
 
 			qq.remove(m);
 		}
 		p(oldPath + " пройдено");
+		p("passedPath");
+		pp(passedPath);
 		p("");
 
 		ArrayList<Integer> pathNew = getDifferenceBetweenSets(allIndexes, oldPath);
@@ -379,33 +405,162 @@ public class VRGwithTimeWindow {
 
 			double m = getMin(q);
 			double s = 1; // FIXME задержка в городе
-			int num = getNumOfCarsWithPlace(cities, q.indexOf(m)) - 1;
+			int num = getNumOfCarsWithPlace(cars, q.indexOf(m)) - 1;
 			Pair p = null;
 			double end = 0;
 
 			try {
-				end = Math.max(cities.get(num).delay, s) + m;
-				p = new Pair(end + s, currPlace, cities.get(num).num);
-				p.addLength(m);
+				end = Math.max(cars.get(num).delay, s) + m;
+				p = new Pair(end + s, currPlace, cars.get(num).num);
+				p.addDistance(m);
 			} catch (Exception e) {
-				p(e);
+				err(e);
 				e.printStackTrace();
 			}
-			cities.get(num).setNewValue(p);
+			cars.get(num).setNewValue(p);
 
 			p(qq + " смотрим " + q.indexOf(m) + " из " + currPlace);
 			p(p + " оптимальное место");
 			oldPath.add(p.place);
 			p("");
+			passedPath.add(coordinates.get(q.indexOf(m)).close());
 		}
 
 		p(oldPath + " всё пройдено ");
+		p("passedPath");
+		pp(passedPath);
 		p("");
-		for (Pair p : cities) {
+		for (Pair p : cars) {
 			p(p.toStr());
 			routes.add(p.path);
 		}
+		passedPath.clear();
 		allIndexes.clear();
+	}
+
+	private static void constructRoutes(ArrayList<ArrayList<Double>> l) {
+		int k = getCountCars();
+
+		ArrayList<Integer> oldPath = new ArrayList<Integer>();
+		passedPath = new ArrayList<PointT>();
+
+		cars = new ArrayList<Pair>();
+
+		setStartPlaceForCars();
+
+		oldPath.add(0);
+		passedPath.add(coordinates.get(0));
+
+		for (int i = 0; i < k; i++) {
+			// double m = getMin(qq); // getMin(arr); // 0; // readInt();
+			PointT optimPlace = getOptimPlace(cars.get(i));
+			p(optimPlace.toStr());
+
+			// double end = Math.max(cars.get(i).delay, s) + m;
+			double endDD = cars.get(i).delay + getDistance(cars.get(i).getLastPlace(), optimPlace) + optimPlace.delay;
+			p("конечное время " + endDD);
+
+			Pair p = new Pair(endDD, coordinates.indexOf(optimPlace), cars.get(i).num);
+			p.setLastPlace(optimPlace);
+			p.addDistance(getDistance(cars.get(i).getLastPlace(), optimPlace));
+			cars.get(i).setNewValue(p);
+
+			p(p.toStr());
+			p(cars.get(i).toStr());
+			oldPath.add(p.place);
+			passedPath.add(optimPlace.close());
+		}
+
+		p("passedPath");
+		pp(passedPath);
+		p("");
+		pp(coordinates);
+		p("");
+		pr(cars);
+
+		for (Pair p : cars) {
+			routes.add(p.path);
+		}
+		// FIXME past part
+		passedPath.clear();
+		allIndexes.clear();
+	}
+
+	private static PointT getOptimPlace(Pair car) {
+		p(car.toStr());
+
+		ArrayList<PointT> recom = new ArrayList<PointT>();
+		for (int i = 1; i < coordinates.size(); i++) {
+			PointT t = coordinates.get(i);
+			int start = 0, end = 0;
+			double distance = 0;
+
+			if (!t.isPassed()) {
+				start = t.start;
+				end = t.end;
+				distance = table.get(i).get(car.place);// car.place = old place
+
+				p("from " + car.place + " to " + i + ", start= " + start + ",\tend= " + end + ", distance= " + distance);
+				if (distance > end) {
+					p("Не успеем");
+				} else {
+					if (distance < start) {
+						p("успеем и ждём");
+					} else {
+						p("успеем");
+					}
+					recom.add(t);
+				}
+			}
+		}
+		p("");
+		pp(recom);
+		p("");
+
+		int tmpStart = MAX_TIME;
+		PointT optim = null;
+		for (PointT t : recom) {
+			if (tmpStart >= t.start) {// t.start+distance
+				if (tmpStart == t.start) {
+					double distance1 = table.get(coordinates.indexOf(t)).get(car.place);
+					double distance2 = table.get(coordinates.indexOf(optim)).get(car.place);
+					if (distance1 < distance2) {
+						tmpStart = t.start;
+						optim = t;
+					}
+				} else {
+					tmpStart = t.start;
+					optim = t;
+				}
+			}
+		}
+		if (optim == null) {
+			err("see getOptimPlace");
+		} else {
+			p(optim);
+		}
+
+		return optim;
+	}
+
+	public static void pr(ArrayList<Pair> pp) {
+		for (Pair p : pp) {
+			p(p.toStr());
+		}
+	}
+
+	private static void setStartPlaceForCars() {
+		for (int i = 0; i < getCountCars(); i++) {
+			cars.add(new Pair(0, 0, i + 1));
+			cars.get(i).setLastPlace(coordinates.get(0));
+		}
+		closePlace(0);
+		p("close depo");
+		pp(coordinates);
+	}
+
+	private static void closePlace(int i) {
+		coordinates.get(i).close();
 	}
 
 	public static int getNumOfCarsWithPlace(ArrayList<Pair> s, int place) {
@@ -428,7 +583,7 @@ public class VRGwithTimeWindow {
 		if (start >= end)
 			return (int) (start + rand.nextInt(start - end + 1));// FIXME
 		else
-			return (int) (start + rand.nextInt(end - start));
+			return (int) (start + rand.nextInt(end - start + 1));
 	}
 
 	public static int random(int start, int end, int oldValue) {
@@ -445,20 +600,21 @@ public class VRGwithTimeWindow {
 		double delay;
 		int num;
 		int place;
-		double length;
+		double distance;
 		ArrayList<Integer> path;
+		PointT lastPlace;
 
 		public Pair(double d, int n) {
 			path = new ArrayList<Integer>();
 			delay = d;
 			num = n;
 			place = 0;
-			length = 0;
+			distance = 0;
 		}
 
 		public Pair(double d, int i, int n) {
 			path = new ArrayList<Integer>();
-			if (i != 0) {
+			if (i != 0) {// FIXME
 				delay = d;
 			} else {
 				delay = 0;
@@ -466,7 +622,7 @@ public class VRGwithTimeWindow {
 			num = n;
 			place = i;
 			path.add(i);
-			length = 0;
+			distance = 0;
 		}
 
 		public void setNewValue(Pair p) {
@@ -474,11 +630,20 @@ public class VRGwithTimeWindow {
 			delay = p.delay;
 			num = p.num;
 			place = p.place;
-			length += p.length;
+			distance += p.distance;
+			setLastPlace(p.lastPlace);
 		}
 
-		public void addLength(double l) {
-			length += l;
+		public void setLastPlace(PointT t) {
+			lastPlace = t;
+		}
+
+		public PointT getLastPlace() {
+			return lastPlace;
+		}
+
+		public void addDistance(double d) {
+			distance += d;
 		}
 
 		public boolean equalsPlace(int in) {
@@ -487,7 +652,7 @@ public class VRGwithTimeWindow {
 
 		public String toStr() {
 			return "Num: " + num + ", Общее время в пути: " + delay + ",  Весь путь: " + path.toString() + " Длина пути: "
-					+ length;
+					+ distance;// + ", Last Point " + getLastPlace().toSt();
 		}
 
 		@Override
@@ -518,6 +683,10 @@ public class VRGwithTimeWindow {
 			flag = false;
 		}
 
+		public boolean isPassed() {
+			return flag;
+		}
+
 		public void setTimeWindow(int s, int e) {
 			start = s;
 			end = e;
@@ -527,12 +696,17 @@ public class VRGwithTimeWindow {
 			delay = d;
 		}
 
-		public void close() {
+		public PointT close() {
 			flag = true;
+			return this;
 		}
 
 		public Point getPoint() {
 			return new Point(x, y);
+		}
+
+		public String toSt() {
+			return flag + " " + x + ", " + y + "\t" + start + " - " + end + ", delay " + delay;
 		}
 
 		public String toStr() {
@@ -543,7 +717,8 @@ public class VRGwithTimeWindow {
 
 		@Override
 		public String toString() {
-			return "(" + x + "; " + y + "),  " + "\t" + "(" + df.format(r) + "; " + df.format(f) + VRGUtils.DEEGRES + ")";
+			return "(" + x + "; " + y + "),  " + "\t" + "(" + df.format(r) + "; " + df.format(f) + VRGUtils.DEEGRES + ")"
+					+ "\t";
 		}
 
 		public static class C {
