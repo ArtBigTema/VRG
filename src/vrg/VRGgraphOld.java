@@ -22,12 +22,12 @@ import com.mxgraph.view.mxGraph;
 @SuppressWarnings("serial")
 public class VRGgraphOld extends javax.swing.JFrame {
 	public mxGraphComponent graphComponent;
-	public static final int length = 20;
-	public static final int baseLength = 15;
-	public static boolean isCompleted = false;
+	public final int length = 20;
+	public final int baseLength = 15;
+	public boolean isCompleted = false;
 	public boolean isTimeWindow;// FIXME
-	public static ArrayList<Point> coordinates = new ArrayList<Point>();
-	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
+	public ArrayList<Point> coordinates = new ArrayList<Point>();
+	public ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 
 	public static int distance = VRGUtils.DISTANCE;
 	public static int zoom = 1;
