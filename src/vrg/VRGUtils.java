@@ -13,6 +13,7 @@ import java.text.DecimalFormat;
 import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import ru.amse.smyshlyaev.grapheditor.graph.Graph;
@@ -102,6 +103,8 @@ public class VRGUtils {
 	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";// "Standard data";
 	public static final String TXT_BUTT_TIME_WINDOW = "Временные окна";// "Time window";
 	public static final String MSG_ERR_TIMEWINDOW = "Время не может быть отрицательным или равным нулю";
+	public static final String MSG_TITLE_GENER = "Генерация путей";
+	public static final String MSG_BODY_GENER = "Генерация путей";
 
 	public static final String SYMBOLS_ON = "☑";
 	public static final String SYMBOLS_OFF = "☐";
@@ -114,7 +117,7 @@ public class VRGUtils {
 	public static final int START = 10;
 	public static int DISTANCE = 1;
 	public static int radius = 10;
-	public static final int MAX_SIZE = 1000;// FIXME
+	public static final int MAX_SIZE = 400;// FIXME
 	public static int windowWidth = 20;
 	public static int windowHeight = 20;
 
@@ -200,8 +203,39 @@ public class VRGUtils {
 		showMessage(frame, title, body, JOptionPane.ERROR_MESSAGE);
 	}
 
-	public static void showInfoMess(java.awt.Component frame, String title, String body) {
+	public static void showQuestionMess(java.awt.Component frame, String title, String body) {
 		showMessage(frame, title, body, JOptionPane.QUESTION_MESSAGE);
+	}
+
+	public static void showInfoMess(java.awt.Component frame, String title, String body) {
+		showMessage(frame, title, body, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public static void showAutoCLoseMess(java.awt.Component frame, String title, String body) {
+		showAutoCloseMess(frame, title, body, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	public static void showAutoCloseMess(java.awt.Component frame, String title, String body, int type) {
+		final JOptionPane optionPane = new JOptionPane(title, type, JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
+
+		final JDialog dialog = new JDialog();
+		dialog.setTitle("Message");
+		dialog.setModal(true);
+		dialog.setLocationRelativeTo(frame);
+		dialog.setContentPane(optionPane);
+
+		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+		dialog.pack();
+
+		java.util.Timer timer = new java.util.Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+
+			public void run() {
+				dialog.dispose();
+			}
+		}, VRGUtils.MAX_SIZE, VRGUtils.START);
+
+		dialog.setVisible(true);
 	}
 
 	public static boolean showInputDialog(java.awt.Component frame, String title, String body) {
@@ -209,7 +243,7 @@ public class VRGUtils {
 	}
 
 	public static void showInitMessage(javax.swing.JFrame frame, String text) {
-		showInfoMess(frame, "", text);
+		showQuestionMess(frame, "", text);
 	}
 
 	public static void saveWindowSize(int w, int h) {
