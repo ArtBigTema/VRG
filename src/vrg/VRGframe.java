@@ -457,7 +457,7 @@ public class VRGframe extends JFrame {
 		newGraphComponent.addKeyListener(keyListener);
 	}
 
-	private void setInterfaceForTimeWindow() {// XXX
+	private void setInterfaceForTimeWindow() {
 		setAllModel(tableCoordsDP, new String[] { VRGUtils.TXT_VERTEX_LABEL, VRGUtils.TXT_COORDS_CARTESIAN_POLAR,
 				VRGUtils.TXT_DELAY, VRGUtils.TXT_START_END });
 		setAllModel(tableResult, new String[] { VRGUtils.TXT_CARS_NUMBER, VRGUtils.TXT_ROUTE_NUMBER,
@@ -466,7 +466,7 @@ public class VRGframe extends JFrame {
 		setAllModel(tableRoutes, new String[] { VRGUtils.TXT_ROUTE, "", "", VRGUtils.TXT_PROFIT });
 	}
 
-	private void setOldInterface() {// XXX
+	private void setOldInterface() {
 		setAllModel(tableCoordsDP, new String[] { VRGUtils.TXT_VERTEX_LABEL, VRGUtils.TXT_COORDS, VRGUtils.TXT_DEMAND,
 				VRGUtils.TXT_PRICE });
 		setAllModel(tableCars, new String[] { VRGUtils.TXT_GAMERS_AUTO, "1", "2", "3" });
@@ -670,8 +670,7 @@ public class VRGframe extends JFrame {
 		setValueInFirstColumn(dtm);
 		fillCoordsTable(dtm);
 
-		// setModelForCars(tableCars, VRGUtils.TXT_GAMERS_AUTO,
-		// VRG.countCars);//FIXME
+		setModelForCars(tableCars, VRGUtils.TXT_GAMERS_AUTO, getCountCars());
 		fillCarsTable();
 		setRoutesTable();
 	}
@@ -822,6 +821,8 @@ public class VRGframe extends JFrame {
 		setModelForRoutes(tableRoutes, VRGUtils.TXT_ROUTE, getCountCoords(), getCountCars());
 		if (!isTW()) {// FIXME
 			VRG.createTableOfRoutes();
+		} else {
+			VRGwithTimeWindow.generateLengthRoutesAndTable();
 		}
 		fillRoutesTable();
 	}
@@ -847,10 +848,14 @@ public class VRGframe extends JFrame {
 	}
 
 	public void generateRoutes() {
+		String mess = null;
 		if (isTW()) {
-			VRGwithTimeWindow.generateRoutesRand();
+			mess = VRGwithTimeWindow.generateOptim(false);
 		} else {
 			VRG.generateOptimalRoutes();
+		}
+		if (mess != null) {
+			VRGUtils.showAutoCLoseMess(this, VRGUtils.MSG_TITLE_GENER, mess);
 		}
 	}
 
@@ -1098,7 +1103,7 @@ public class VRGframe extends JFrame {
 		}
 		for (int j = 0; j < n; j++) {
 			dtm.setValueAt(VRGUtils.SPACE + (j + 1) + VRGUtils.COMMA + VRGUtils.SPACE + VRGUtils.LABEL_WEIGHT + VRGUtils.SPACE
-					+ getCarsRows(j + 1), j, 0);// VRG.cars.get(j + 1), j, 0);
+					+ getCarsRows(j + 1), j, 0);
 		}
 	}
 
@@ -1361,7 +1366,7 @@ public class VRGframe extends JFrame {
 		if (isTW()) {
 			return VRGwithTimeWindow.getCountCars();
 		} else {
-			return VRG.getCountCars();
+			return VRG.getCountCars() - 1;
 		}
 	}
 
@@ -1389,7 +1394,7 @@ public class VRGframe extends JFrame {
 		}
 	}
 
-	private Integer getCarsRows(int index) {
+	private int getCarsRows(int index) {
 		if (isTW()) {
 			return VRGwithTimeWindow.getCars(index - 1);
 		} else {
@@ -1425,8 +1430,13 @@ public class VRGframe extends JFrame {
 			}
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_SPACE) {
 				if (spaceListener != null) {
-					spaceListener.spacePressed(isTW());
+					spaceListener.spacePressed(KeyEvent.VK_SPACE);
 					reSize();
+				}
+			}
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+				if (spaceListener != null) {
+					spaceListener.spacePressed(KeyEvent.VK_BACK_SPACE);
 				}
 			}
 		}
@@ -1442,7 +1452,7 @@ public class VRGframe extends JFrame {
 	};
 
 	public interface onSpacePressed {
-		public void spacePressed(boolean withTW);
+		public void spacePressed(int key);
 	}
 
 	public void setListener(onSpacePressed listener) {
