@@ -5,11 +5,12 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import vrg.VRGUtils.Point;
+import vrg.VRGwithTimeWindow.PointT.C.OptimalPoint;
 
 public class VRGwithTimeWindow {
 	private static DecimalFormat df = new DecimalFormat("#.#");
 	private static final PrintWriter out = new PrintWriter(System.out);
-	private static final boolean showGraph = true;// XXX
+	private static final boolean showGraph = false;// XXX
 
 	// public static final int[][] COORDS = { { 5, 3 }, { 8, 1 }, { 8, 5 }, {
 	// 11, 1 }, { 8, 6 }, { 2, 1 }, { 2, 3 }, { 1, 3 } };
@@ -28,6 +29,7 @@ public class VRGwithTimeWindow {
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<PointT> passedPath;// FIXME
+	public static PointT.C.OptimalPoint optimalPoint = OptimalPoint.OptimalDistance;
 
 	public static ArrayList<Pair> cars;
 
@@ -46,6 +48,7 @@ public class VRGwithTimeWindow {
 		allIndexes.clear();
 		routes.clear();
 		table.clear();
+		optimalPoint = OptimalPoint.OptimalTime;
 	}
 
 	public static void generateAllStandart() {
@@ -108,7 +111,7 @@ public class VRGwithTimeWindow {
 		if (routes == null || routes.size() == 0) {
 			sortX();// FIXME
 			generateLengthRoutesAndTable();
-			solve(lengthOfRoutes);
+			solve();
 		}
 		int n = routes.size();
 		int[][] paths = new int[n][n];
@@ -123,6 +126,7 @@ public class VRGwithTimeWindow {
 
 	public static ArrayList<ArrayList<Integer>> getRoutesAll() {
 		if (routes == null || routes.size() == 0) {
+			optimalPoint = OptimalPoint.OptimalDistance;
 			main(null);
 		}
 		return routes;
@@ -159,6 +163,7 @@ public class VRGwithTimeWindow {
 
 	public static void generateLengthRoutesAndTable() {
 		for (int i = 0; i < coordinates.size(); i++) {
+			openPlace();// FIXME
 			allIndexes.add(i);
 			ArrayList<Double> tmp = new ArrayList<Double>();
 			Queue<Double> q = new LinkedList<Double>();
@@ -193,7 +198,7 @@ public class VRGwithTimeWindow {
 
 		print();
 
-		constructRoutes(lengthOfRoutes);// FIXME
+		constructRoutes();// FIXME
 		out.flush();
 
 		showGraphIfNeed();
@@ -256,19 +261,27 @@ public class VRGwithTimeWindow {
 	}
 
 	public static void generateRoutesRand() {// button an solve
-		// randomSort();
-		sortX();// FIXME
-		generateLengthRoutesAndTable();// XXX
+		randomSort();
+		//sortX();// FIXME
+		generateLengthRoutesAndTable();
+		openPlace();
+		routes.clear();
 		try {
-			solve(lengthOfRoutes);
+			optimalPoint = OptimalPoint.OptimalTime;
+			constructRoutes();// solve
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void constructSolution() {// button best solve
+		sortX();
+		generateLengthRoutesAndTable();
+		openPlace();
+		routes.clear();
 		try {
-			main(null);
+			optimalPoint = OptimalPoint.OptimalDistance;
+			constructRoutes();// solve
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -349,7 +362,7 @@ public class VRGwithTimeWindow {
 		return x;
 	}
 
-	private static void solve(ArrayList<ArrayList<Double>> l) {
+	private static void solve() {
 		int k = getCountCars();
 
 		ArrayList<Integer> oldPath = new ArrayList<Integer>();
@@ -438,7 +451,7 @@ public class VRGwithTimeWindow {
 		allIndexes.clear();
 	}
 
-	private static void constructRoutes(ArrayList<ArrayList<Double>> l) {
+	private static void constructRoutes() {
 		int k = getCountCars();
 
 		ArrayList<Integer> oldPath = new ArrayList<Integer>();
@@ -489,13 +502,13 @@ public class VRGwithTimeWindow {
 			PointT t = remnant.get(i);
 			p(coordinates.indexOf(t) + " " + t.toStr());
 
-			PointT optimPlaceTim = getOptimPlaceForTime(cars, t);
-			PointT optimPlaceDis = getOptimPlaceForDistance(cars, t);
-			PointT optimPlace = optimPlaceDis;// FIXME
+			// PointT optimPlaceTim = getOptimPlace(cars, t);
+			// PointT optimPlaceDis = getOptimPlaceForDistance(cars, t);
+			PointT optimPlace = getOptimPlace(cars, t);
 			p("оптимально по времени");
 			p(optimPlace.toStr());
 			p("оптимально по расстоянию");
-			p(optimPlaceDis.toStr());
+			p(optimPlace.toStr());
 
 			int carIndex = getNumOfCarsWithPlace(cars, optimPlace) - 1;// car.num
 
@@ -526,6 +539,18 @@ public class VRGwithTimeWindow {
 
 		passedPath.clear();
 		allIndexes.clear();
+	}
+
+	private static PointT getOptimPlace(ArrayList<Pair> cs, PointT t) {
+		switch (optimalPoint) {
+		case OptimalDistance:
+			return getOptimPlaceForDistance(cs, t);
+		case OptimalTime:
+			return getOptimPlaceForTime(cs, t);
+		default:
+			return getOptimPlaceForDistance(cs, t);
+		}
+
 	}
 
 	private static PointT getOptimPlaceForTime(ArrayList<Pair> cs, PointT t) {
@@ -662,6 +687,12 @@ public class VRGwithTimeWindow {
 
 	private static void closePlace(int i) {
 		coordinates.get(i).close();
+	}
+
+	private static void openPlace() {
+		for (PointT t : coordinates) {
+			t.open();
+		}
 	}
 
 	private static void closeUnnecessaryPlace() {
@@ -835,6 +866,10 @@ public class VRGwithTimeWindow {
 			return this;
 		}
 
+		public void open() {
+			flag = false;
+		}
+
 		public Point getPoint() {
 			return new Point(x, y);
 		}
@@ -856,6 +891,10 @@ public class VRGwithTimeWindow {
 		}
 
 		public static class C {
+			public static enum OptimalPoint {
+				OptimalTime, OptimalDistance
+			}
+
 			public static class Cx implements Comparator<PointT> {
 
 				@Override
