@@ -17,6 +17,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 	public Graph graph;
 	public boolean isCompleted = false;
 	public boolean withTimeWindow = false;
+	public boolean withBackground = true;
 
 	public VRGgraphComponent(Graph graph, int width, int height) {
 		super(graph, width, height);
@@ -63,7 +64,6 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 		constructGraph(graph);
 		this.setGraph(graph);
 		isCompleted = true;
-		// Graph.unmodifiableGraph(graph);
 	}
 
 	private void setData(boolean withTimeWindow) {
@@ -143,6 +143,21 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 
 		translateX = 2 * coef;
 		translateY = 2 * coef;
+		// tr + coordinates.get(i) * distance
+		p(this.getWidth() + " width");
+		p(this.getHeight() + " height");
+		p(translateX + x.x * distance);
+		p(translateY + y.y * distance);
+		float coeffx = translateX + x.x * distance;
+		float coeffy = translateY + y.y * distance;
+
+		if ((translateX + x.x * distance) > getWidth() || (translateY + y.y * distance) > getHeight()) {
+			distance *= Math.min(getWidth() / coeffx, getHeight() / coeffy);
+		}
+	}
+
+	public void p(Object o) {
+		System.out.println(o.toString());
 	}
 
 	public void constructVertexes() {
@@ -181,8 +196,8 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 		}
 
 		if ((numberOfSpace + 1) > routes.size()) {
-			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
-				generateRoutes(withTimeWindow);
+			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES_OPTIM)) {
+				generateRoutes(true);
 			}
 			VRGframe.isNeedToUpdate = true;
 			numberOfSpace = 0;
@@ -231,32 +246,48 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 	}
 
 	@Override
-	public void paint(Graphics paramGraphics) {
-		super.paint(paramGraphics);
-		VRGUtils.paintCarcass(paramGraphics.create());
+	public void paint(Graphics g) {
+		if (withBackground) {
+			g.drawImage(VRGUtils.getImageForGraph().getImage(), 0, 0, g.getClipBounds().width, g.getClipBounds().height, null);
+		}
+
+		super.paint(g);
+		VRGUtils.paintCarcass(g.create());
 		if (isCompleted) {
-			paramGraphics.drawOval(translateX + coordinates.get(0).x * distance - VRGUtils.radius,
-					translateY + coordinates.get(0).y * distance - VRGUtils.radius, VRGUtils.radius, VRGUtils.radius);
+			g.drawOval(translateX + coordinates.get(0).x * distance - VRGUtils.radius, translateY + coordinates.get(0).y
+					* distance - VRGUtils.radius, VRGUtils.radius, VRGUtils.radius);
 			// x-radius, y-radius, radius*2, radius*2
 		}
 	}
 
-	public void generateRoutes(boolean withTW) {
-		numberOfSpace = 0;
-		if (withTW) {
-			VRGwithTimeWindow.generateRoutesRand();
+	public void generateRoutes(boolean isOptim) {
+		if (isOptim) {
+			numberOfSpace = 0;
+		}
+		String mess = "Координаты отсортированы";
+		if (withTimeWindow) {
+			mess = VRGwithTimeWindow.generateOptim(isOptim);
 		} else {
 			VRG.generateEdges();
 		}
-		VRGUtils.showAutoCLoseMess(this, VRGUtils.MSG_TITLE_GENER, "Координаты отсортированы");
-		setData(withTW);
+		VRGUtils.showAutoCLoseMess(this, VRGUtils.MSG_TITLE_GENER, mess);
+		setData(withTimeWindow);
 		constructGraph(getGraph());
 		updateEdges(getGraph());
 	}
 
+	public void generateRoutes() {
+		generateRoutes(false);
+	}
+
 	@Override
-	public void spacePressed(boolean withTW) {
-		generateRoutes(withTW);
-		numberOfSpace++;
+	public void spacePressed(int key) {
+		if (key == 8) {
+			withBackground = !withBackground;
+			repaint();
+		} else {
+			generateRoutes();
+			numberOfSpace++;
+		}
 	}
 }

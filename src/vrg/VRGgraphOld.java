@@ -25,7 +25,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	public final int length = 20;
 	public final int baseLength = 15;
 	public boolean isCompleted = false;
-	public boolean isTimeWindow;// FIXME
+	public boolean withTimeWindow;
 	public ArrayList<Point> coordinates = new ArrayList<Point>();
 	public ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 
@@ -47,14 +47,14 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	public VRGgraphOld(ArrayList<Point> p, ArrayList<ArrayList<Integer>> r) {
 		coordinates = new ArrayList<Point>(p);
 		routes = new ArrayList<ArrayList<Integer>>(r);
-		isTimeWindow = true;
+		withTimeWindow = true;
 		setUp();
 	}
 
 	public VRGgraphOld() {
 		coordinates = new ArrayList<Point>(VRG.coordinates);
 		routes = new ArrayList<ArrayList<Integer>>(VRG.routes);
-		isTimeWindow = false;
+		withTimeWindow = false;
 		setUp();
 	}
 
@@ -100,16 +100,21 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 		graphComponent.addKeyListener(keyListener);
 		graphComponent.addFocusListener(focusListener);
+
+		graphComponent.setBackgroundImage(VRGUtils.getImageForGraph());
+		repaint();
 	}
 
 	@Override
-	public void paint(Graphics paramGraphics) {
-		super.paint(paramGraphics);
+	public void paint(Graphics g) {
+		super.paint(g);
 		if (isCompleted) {
-			paramGraphics.drawOval(translateX + (coordinates.get(0).x) * distance - VRGUtils.radius,
-					translateY + (coordinates.get(0).y) * distance - VRGUtils.radius, VRGUtils.radius, VRGUtils.radius);
+			g.drawOval(translateX + (coordinates.get(0).x) * distance - VRGUtils.radius, translateY + (coordinates.get(0).y)
+					* distance - VRGUtils.radius, VRGUtils.radius, VRGUtils.radius);
 			// x-radius, y-radius, radius*2, radius*2
 		}
+		// g.drawImage(VRGUtils.getImageForGraph().getImage(), 0, 0,
+		// g.getClipBounds().width, g.getClipBounds().height, null);
 	}
 
 	public static void reSize(int w, int h) {
@@ -117,28 +122,10 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		height = h;
 	}
 
-	private void setZoomIfNeed() {
-		VRGUtils.Point point = VRG.getMaxCoords();
-		if ((point.x < width / 3) || (point.y < height / 4)) {
-			distance = (width + height) / 50;
-		} else {
-			distance = 1;
-			VRGUtils.DISTANCE = distance;
-		}
-		point = VRG.getMinCoords();
-		if ((point.x < width / 10) || (point.y < height / 10)) {
-			translateX = -point.x * distance + 2 * radius;
-			translateY = -point.y * distance + 2 * radius;
-		} else {
-			translateX = 0;
-			translateY = 0;
-		}
-	}
-
 	private void setZoomIfNeed(boolean b) {
+		int coef = 8;
 		if (!b) {
-			setZoomIfNeed();
-			return;
+			coef = 5;
 		}
 		Point point;
 		Point x, y;
@@ -156,18 +143,17 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		});
 
 		point = new Point(x.x, y.y);
+		distance = (point.x + point.y) * coef / 2;
 
-		distance = (point.x + point.y) * 4;
-
-		translateX = 10;
-		translateY = 10;
+		translateX = 2 * coef;
+		translateY = 2 * coef;
 	}
 
 	public void constuctGraph(mxGraph graph) {
 		if (graph == null && !VRG.isValid()) {
 			return;
 		}
-		setZoomIfNeed(isTimeWindow);
+		setZoomIfNeed(withTimeWindow);
 
 		Object parent = graph.getDefaultParent();
 
@@ -185,7 +171,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 				vrgVertexes.add(a);
 			}
 
-			if (!isTimeWindow) {
+			if (!withTimeWindow) {
 				addCars(graph);
 			}
 
@@ -196,7 +182,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 						translateX + coordinates.get(i).x * distance, translateY + coordinates.get(i).y * distance, length,
 						length);// x,y,width,height//StrUtils.GRAPH_PARAM_3
 
-				if (!isTimeWindow) {
+				if (!withTimeWindow) {
 					vertex.demand = VRG.demand.get(i);
 					vertex.price = VRG.price.get(i);
 				}
@@ -221,7 +207,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 		for (int i = 1; i < coordinates.size(); i++) {
 			VRGvertexes vertex = new VRGvertexes();
-			if (!isTimeWindow) {
+			if (!withTimeWindow) {
 				vertex.demand = VRG.demand.get(i);
 				vertex.price = VRG.price.get(i);
 			}
@@ -252,8 +238,8 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 		if ((numberOfSpace + 1) > routes.size()) {
 			VRGframe.isNeedToUpdate = false;
-			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
-				generateRoutes();
+			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES_OPTIM)) {
+				generateRoutes(true);
 			}
 			VRGframe.isNeedToUpdate = true;
 			numberOfSpace = 0;
@@ -276,15 +262,24 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		}
 	}
 
-	private void generateRoutes() {
-		if (isTimeWindow) {
-			VRGwithTimeWindow.generateRoutesRand();
+	private void generateRoutes(boolean isOptim) {
+		if (isOptim) {
+			numberOfSpace = 0;
+		}
+		String mess = "Координаты отсортированы";
+		if (withTimeWindow) {
+			mess = VRGwithTimeWindow.generateOptim(isOptim);
 			routes = new ArrayList<ArrayList<Integer>>(VRGwithTimeWindow.getRoutesAll());
 		} else {
 			VRG.generateEdges();
 			routes = new ArrayList<ArrayList<Integer>>(VRG.routes);
 		}
+		VRGUtils.showAutoCLoseMess(VRGgraphOld.this, VRGUtils.MSG_TITLE_GENER, mess);
 		removeAllEdges(graphComponent.getGraph());
+	}
+
+	private void generateRoutes() {
+		generateRoutes(false);
 	}
 
 	private void removeAllEdges(mxGraph graph) {
@@ -309,8 +304,8 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		@Override
 		public void keyReleased(KeyEvent paramKeyEvent) {
 			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE)) {
-				VRGUtils.showAutoCLoseMess(VRGgraphOld.this, VRGUtils.MSG_TITLE_GENER, "Координаты отсортированы");
 				numberOfSpace++;
+				generateRoutes();
 				updateEdges(graphComponent.getGraph());
 			}
 
@@ -319,6 +314,10 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			}
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_CONTROL) {
 				VRGUtils.takeScreenCapture(VRGgraphOld.this);
+			}
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+				graphComponent.setBackgroundImage(null);
+				repaint();
 			}
 		};
 
