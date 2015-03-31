@@ -10,16 +10,18 @@ import vrg.VRGwithTimeWindow.PointT.C.OptimalPoint;
 public class VRGwithTimeWindow {
 	private static DecimalFormat df = new DecimalFormat("#.#");
 	private static final PrintWriter out = new PrintWriter(System.out);
-	private static final boolean showGraph = false;// XXX
+	private static final boolean showGraph = true;
 
 	// public static final int[][] COORDS = { { 5, 3 }, { 8, 1 }, { 8, 5 }, {
 	// 11, 1 }, { 8, 6 }, { 2, 1 }, { 2, 3 }, { 1, 3 } };
 	public static final int MAX_TIME = 100;
-	public static final int[][] COORDS = { { 0, 0 }, { 0, 3 }, { 4, 0 }, { 4, 3 }, { 8, 3 }, { 0, 6 }, { 8, 6 }, { 2, 6 },
-			{ 8, 0 }, { 4, 5 } };
+	public static final int[][] COORDS = { { 0, 0 }, { 0, 3 }, { 4, 0 }, { 4, 3 }, { 4, 5 }, { 8, 3 }, { 0, 6 }, { 8, 6 },
+			{ 2, 6 }, { 8, 0 } };
+	public static final int[][] COORDS_END = { { 0, 0 }, { 1, 3 }, { 7, 4 }, { 7, 7 }, { 7, 1 }, { 2, 3 }, { 3, 2 }, { 5, 6 },
+			{ 4, 6 }, { 8, 4 } };
 	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
-	public static final int[][] TIMES = { { 0, MAX_TIME }, { 1, 5 }, { 3, 7 }, { 5, 7 }, { 15, 19 }, { 2, 3 }, { 20, 30 },
-			{ 1, 1 }, { 15, 18 }, { 9, 20 }, };
+	public static final int[][] TIMES = { { 0, MAX_TIME }, { 1, 5 }, { 3, 7 }, { 5, 7 }, { 9, 20 }, { 15, 19 }, { 2, 3 },
+			{ 20, 30 }, { 1, 1 }, { 15, 18 } };
 
 	public static ArrayList<Integer> carsWeight = new ArrayList<Integer>();
 	public static ArrayList<PointT> coordinates = new ArrayList<PointT>();
@@ -57,6 +59,7 @@ public class VRGwithTimeWindow {
 			PointT p = new PointT(COORDS[i][0], COORDS[i][1]);
 			p.setTimeWindow(TIMES[i][0], TIMES[i][1]);
 			p.setDelay(1);
+			p.setEndPlace(COORDS_END[i][0], COORDS_END[i][1]);
 			coordinates.add(p);
 		}
 		coordinates.get(0).setDelay(0);// FIXME
@@ -102,6 +105,7 @@ public class VRGwithTimeWindow {
 			PointT p = new PointT(random(min.x, max.x), random(min.y, max.y));
 			p.setDelay(random(1, 5));
 			p.setTimeWindow(random(1, MAX_TIME / 2), random(MAX_TIME / 2, MAX_TIME));
+			p.setEndPlace(random(min.x, max.x), random(min.y, max.y));// FIXME
 			coordinates.add(p);
 		}
 	}
@@ -168,7 +172,7 @@ public class VRGwithTimeWindow {
 
 	public static void generateLengthRoutesAndTable() {
 		for (int i = 0; i < coordinates.size(); i++) {
-			openPlace();// FIXME
+			openPlace();
 			allIndexes.add(i);
 			ArrayList<Double> tmp = new ArrayList<Double>();
 			Queue<Double> q = new LinkedList<Double>();
@@ -194,6 +198,8 @@ public class VRGwithTimeWindow {
 	}
 
 	public static void main(String[] args) {
+		printWithEnd();
+
 		generateAllStandart();
 
 		sortX();
@@ -207,6 +213,13 @@ public class VRGwithTimeWindow {
 		out.flush();
 
 		showGraphIfNeed();
+	}
+
+	private static void printWithEnd() {
+		for (int i = 0; i < COORDS.length; i++) {
+			p(i + " " + COORDS[i][0] + " " + COORDS[i][1] + " - " + COORDS_END[i][0] + " " + COORDS_END[i][1] + ", "
+					+ TIMES[i][0] + " " + TIMES[i][1]);
+		}
 	}
 
 	private static void sort() {
@@ -344,7 +357,7 @@ public class VRGwithTimeWindow {
 
 	public static void pp(ArrayList<PointT> pp) {
 		for (PointT p : pp) {
-			p(pp.indexOf(p) + " " + p.toStr());
+			p(pp.indexOf(p) + " " + p.toS());
 		}
 	}
 
@@ -852,6 +865,8 @@ public class VRGwithTimeWindow {
 		public int end;
 		public int delay;
 		public boolean flag;
+		public Point endPlace; // PointT
+		public double dis;
 
 		public PointT(int xx, int yy) {
 			super(xx, yy);
@@ -863,6 +878,7 @@ public class VRGwithTimeWindow {
 			end = Byte.MAX_VALUE;
 			delay = 1;
 			flag = false;
+			dis = 0;
 		}
 
 		public boolean isPassed() {
@@ -891,14 +907,33 @@ public class VRGwithTimeWindow {
 			return new Point(x, y);
 		}
 
+		public void setEndPlace(int xx, int yy) {
+			setEndPlace(new Point(xx, yy));
+		}
+
+		public void setEndPlace(Point t) {
+			endPlace = t;// FIXME
+			delay = 0;// for taxi
+			dis = getDistance(this, endPlace);
+		}
+
 		public String toSt() {
-			return flag + " " + x + ", " + y + "\t" + start + " - " + end + ", delay " + delay;
+			return flag + " " + x + ", " + y + "\t" + start + " - " + end + ", end " + endPlace.toString() + ", distance "
+					+ df.format(dis);
+		}
+
+		public String toS() {
+			if (endPlace == null) {
+				return flag + " " + x + ", " + y + "\t" + start + " - " + end + ", end ";
+			} else {
+				return toSt();
+			}
 		}
 
 		public String toStr() {
 			return "Активность " + flag + " Декартовы: (" + x + ", " + y + ")," + "\t" + "Полярные: (" + df.format(r) + ", "
 					+ df.format(f) + VRGUtils.DEEGRES + ")," + "\t" + "Окна: (" + start + ", " + end
-					+ "),\tЗадержка в городе: " + delay;// FIXME
+					+ "),\tЗадержка в городе: " + delay;
 		}
 
 		@Override
