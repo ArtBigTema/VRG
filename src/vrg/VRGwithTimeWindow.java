@@ -28,13 +28,13 @@ public class VRGwithTimeWindow {
 	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
 	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
-	public static ArrayList<PointT> passedPath;// FIXME
+	public static ArrayList<PointT> passedPath;
 	public static PointT.C.OptimalPoint optimalPoint = OptimalPoint.OptimalDistance;
 
 	public static ArrayList<Pair> cars;
 
 	public VRGwithTimeWindow() {
-		main(null);
+		solve();// FIXME
 	}
 
 	public static boolean isValid() {
@@ -55,9 +55,6 @@ public class VRGwithTimeWindow {
 		clearAll();
 		for (int i = 0; i < COORDS.length; i++) {
 			PointT p = new PointT(COORDS[i][0], COORDS[i][1]);
-			// p.setDelay(random(1, 5));
-			// p.setTimeWindow(random(1, MAX_TIME / 2), random(MAX_TIME / 2,
-			// MAX_TIME));
 			p.setTimeWindow(TIMES[i][0], TIMES[i][1]);
 			p.setDelay(1);
 			coordinates.add(p);
@@ -77,24 +74,32 @@ public class VRGwithTimeWindow {
 		generateCoordinates(n);
 		generateCars(n);
 		sort();
-		generateLengthRoutesAndTable();// XXX
+		generateLengthRoutesAndTable();
 		print();
 	}
 
 	public static void generateNewRows(int n) {
 		generateCoordinates(n);
-		generateCars(n);
 		sort();
-		generateLengthRoutesAndTable();// XXX
+		generateLengthRoutesAndTable();
 		print();
 	}
 
 	public static void generateCoordinates(int n) {
 		int x = VRGUtils.windowWidth;
 		int y = VRGUtils.windowHeight;
-		coordinates.add(new PointT(random(x / 20, x / 2), random(y / 20, y / 2)));
+		Point min = new Point(x / 20, y / 20);
+		Point max = new Point(x, y);
+		if (coordinates != null && coordinates.size() > 0) {
+			min.x = Collections.min(coordinates, new PointT.C.Cx()).x;
+			min.y = Collections.min(coordinates, new PointT.C.Cy()).y;
+			max.x = Collections.max(coordinates, new PointT.C.Cx()).x;
+			max.y = Collections.max(coordinates, new PointT.C.Cy()).y;
+		}
+
+		coordinates.add(new PointT(random(min.x, max.x), random(min.y, max.y)));
 		for (int i = 0; i < n; i++) {
-			PointT p = new PointT(random(y / 20, y), random(y / 20, y));
+			PointT p = new PointT(random(min.x, max.x), random(min.y, max.y));
 			p.setDelay(random(1, 5));
 			p.setTimeWindow(random(1, MAX_TIME / 2), random(MAX_TIME / 2, MAX_TIME));
 			coordinates.add(p);
@@ -111,7 +116,7 @@ public class VRGwithTimeWindow {
 		if (routes == null || routes.size() == 0) {
 			sortX();// FIXME
 			generateLengthRoutesAndTable();
-			solve();
+			constructRoutes();
 		}
 		int n = routes.size();
 		int[][] paths = new int[n][n];
@@ -194,11 +199,11 @@ public class VRGwithTimeWindow {
 		sortX();
 		pp(coordinates);
 
-		generateLengthRoutesAndTable();// XXX
+		generateLengthRoutesAndTable();
 
 		print();
 
-		constructRoutes();// FIXME
+		constructRoutes();
 		out.flush();
 
 		showGraphIfNeed();
@@ -232,7 +237,7 @@ public class VRGwithTimeWindow {
 
 	public static void showGraph() {// FIXME
 		VRGgraphOld frame = new VRGgraphOld(getCoords(), routes);
-		frame.isTimeWindow = true;
+		frame.withTimeWindow = true;
 	}
 
 	public static ArrayList<Point> getCoords() {
@@ -260,18 +265,27 @@ public class VRGwithTimeWindow {
 		return carsWeight.get(index);
 	}
 
-	public static void generateRoutesRand() {// button an solve
-		randomSort();
-		//sortX();// FIXME
+	public static String generateOptim(boolean isOptim) {// button an solve
+		if (isOptim) {
+			optimalPoint = OptimalPoint.OptimalDistance;
+			return generateRoutesRand();
+		} else {
+			optimalPoint = OptimalPoint.OptimalTime;
+			return generateRoutesRand();
+		}
+	}
+
+	public static String generateRoutesRand() {// button an solve
+		String s = randomSort();
 		generateLengthRoutesAndTable();
 		openPlace();
 		routes.clear();
 		try {
-			optimalPoint = OptimalPoint.OptimalTime;
 			constructRoutes();// solve
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return s;
 	}
 
 	public static void constructSolution() {// button best solve
@@ -287,27 +301,30 @@ public class VRGwithTimeWindow {
 		}
 	}
 
-	public static void randomSort() {
+	public static String randomSort() {
 		int k = random(0, 4);
+		Comparator<PointT> c = null;
 		switch (k) {
 		case 0:
-			Collections.sort(coordinates, new PointT.C.Cx());
+			c = new PointT.C.Cx();
 			break;
 		case 1:
-			Collections.sort(coordinates, new PointT.C.Cy());
+			c = new PointT.C.Cy();
 			break;
 		case 2:
-			Collections.sort(coordinates, new PointT.C.Cr());
+			c = new PointT.C.Cr();
 			break;
 		case 3:
-			Collections.sort(coordinates, new PointT.C.Cf());
+			c = new PointT.C.Cf();
 			break;
 		default:
-			Collections.sort(coordinates, new PointT.C.Cx());
+			c = new PointT.C.Cx();
 			break;
 		}
-		p("Отсортированные координаты по рандому " + k);
+		Collections.sort(coordinates, c);
+		p("Отсортированные координаты по рандому " + c.toString());
 		pp(coordinates);
+		return c.toString();
 	}
 
 	private static void print() {
@@ -906,6 +923,11 @@ public class VRGwithTimeWindow {
 							return 1;
 					return -1;
 				}
+
+				@Override
+				public String toString() {
+					return "Отсортировано по X";
+				}
 			}
 
 			public static class Cy implements Comparator<PointT> {
@@ -918,6 +940,11 @@ public class VRGwithTimeWindow {
 						if (p.x >= pp.x)
 							return 1;
 					return -1;
+				}
+
+				@Override
+				public String toString() {
+					return "Отсортировано по Y";
 				}
 			}
 
@@ -932,6 +959,11 @@ public class VRGwithTimeWindow {
 							return 1;
 					return -1;
 				}
+
+				@Override
+				public String toString() {
+					return "Отсортировано по Start";
+				}
 			}
 
 			public static class Cr implements Comparator<PointT> {
@@ -942,6 +974,11 @@ public class VRGwithTimeWindow {
 						return 1;
 					else
 						return -1;
+				}
+
+				@Override
+				public String toString() {
+					return "Отсортировано по R";
 				}
 			}
 
@@ -956,8 +993,12 @@ public class VRGwithTimeWindow {
 							return 1;
 					return -1;
 				}
+
+				@Override
+				public String toString() {
+					return "Отсортировано по f";
+				}
 			}
 		}
 	}
-
 }
