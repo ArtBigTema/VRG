@@ -9,10 +9,12 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.TimerTask;
 
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
@@ -99,6 +101,7 @@ public class VRGUtils {
 	public static final String MSG_ERR_ADD_VERTEX = "Добавьте несколько вершин";// "Add more vertexes";
 	public static final String TXT_IS_ALL = "Всего";// "All: ";
 	public static final String MSG_ERR_ROUTES = "Возможные пути исчерпаны \n " + "Сгенерировать другие?";// "Generate routes?";//yes,
+	public static final String MSG_ERR_ROUTES_OPTIM = "Сгенерировать оптимальный путь?";// "Generate routes?";//yes,
 	public static final String FIELD_INT_TIMEWINDOW = "Введите максимальное время в пути";
 	public static final String TXT_GENERATE_STANDARD_DATA = "Стандартные данные";// "Standard data";
 	public static final String TXT_BUTT_TIME_WINDOW = "Временные окна";// "Time window";
@@ -215,11 +218,11 @@ public class VRGUtils {
 		showAutoCloseMess(frame, title, body, JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	public static void showAutoCloseMess(java.awt.Component frame, String title, String body, int type) {
-		final JOptionPane optionPane = new JOptionPane(title, type, JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
+	private static void showAutoCloseMess(java.awt.Component frame, String title, String body, int type) {
+		final JOptionPane optionPane = new JOptionPane(body, type, JOptionPane.DEFAULT_OPTION, null, new Object[] {}, null);
 
 		final JDialog dialog = new JDialog();
-		dialog.setTitle("Message");
+		dialog.setTitle(title);
 		dialog.setModal(true);
 		dialog.setLocationRelativeTo(frame);
 		dialog.setContentPane(optionPane);
@@ -239,10 +242,10 @@ public class VRGUtils {
 	}
 
 	public static boolean showInputDialog(java.awt.Component frame, String title, String body) {
-		return (JOptionPane.showConfirmDialog(frame, body, title, JOptionPane.YES_OPTION) == JOptionPane.YES_OPTION);
+		return JOptionPane.showConfirmDialog(frame, body, title, JOptionPane.YES_OPTION) == JOptionPane.YES_OPTION;
 	}
 
-	public static void showInitMessage(javax.swing.JFrame frame, String text) {
+	public static void showInitMessage(java.awt.Component frame, String text) {
 		showQuestionMess(frame, "", text);
 	}
 
@@ -331,6 +334,23 @@ public class VRGUtils {
 		return filename;
 	}
 
+	public static ImageIcon getImageForGraph() {
+		File f;
+		if (Math.random() * 100 % 2 == 0) {
+			f = new File("backCountry.jpg");
+		} else {
+			f = new File("backSamara.jpg");
+		}
+		BufferedImage image = null;
+		try {
+			image = ImageIO.read(f);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return new ImageIcon(image);
+	}
+
 	private static boolean openGraph(VRGgraphComponent component) {
 		boolean result = false;
 		File file = FileChooser.choose(component, BTN_TXT_OPEN);
@@ -384,6 +404,5 @@ public class VRGUtils {
 		public String toString() {
 			return "(" + x + "; " + y + ") ";
 		}
-
 	}
 }
