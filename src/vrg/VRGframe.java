@@ -999,7 +999,7 @@ public class VRGframe extends JFrame {
 			fillResultTable();
 			if (graphIsFirstOpened) {
 				graphIsFirstOpened = false;
-				VRGUtils.showInfoMess(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_BODY_ATTENTION);
+				VRGUtils.showQuestionMess(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_BODY_ATTENTION);
 				return;
 			}
 			break;
@@ -1425,7 +1425,7 @@ public class VRGframe extends JFrame {
 			}
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_SPACE) {
 				if (spaceListener != null) {
-					spaceListener.spacePressed();
+					spaceListener.spacePressed(isTW());
 					reSize();
 				}
 			}
@@ -1442,7 +1442,7 @@ public class VRGframe extends JFrame {
 	};
 
 	public interface onSpacePressed {
-		public void spacePressed();
+		public void spacePressed(boolean withTW);
 	}
 
 	public void setListener(onSpacePressed listener) {

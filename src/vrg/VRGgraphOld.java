@@ -245,8 +245,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			return;
 		}
 		if (routes == null || routes.size() == 0) {
-			VRG.generateEdges();
-			routes = new ArrayList<ArrayList<Integer>>(VRG.routes);
+			generateRoutes();
 		}
 
 		Object parent = graph.getDefaultParent();
@@ -254,7 +253,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		if ((numberOfSpace + 1) > routes.size()) {
 			VRGframe.isNeedToUpdate = false;
 			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
-				VRG.generateEdges();
+				generateRoutes();
 			}
 			VRGframe.isNeedToUpdate = true;
 			numberOfSpace = 0;
@@ -270,6 +269,22 @@ public class VRGgraphOld extends javax.swing.JFrame {
 				in = index;
 			}
 		}
+		Object[] edges = graph.getEdgesBetween(vrgVertexes.get(0).objectVertex, vrgVertexes.get(0).objectVertex);
+
+		for (Object edge : edges) {
+			graph.getModel().remove(edge);
+		}
+	}
+
+	private void generateRoutes() {
+		if (isTimeWindow) {
+			VRGwithTimeWindow.generateRoutesRand();
+			routes = new ArrayList<ArrayList<Integer>>(VRGwithTimeWindow.getRoutesAll());
+		} else {
+			VRG.generateEdges();
+			routes = new ArrayList<ArrayList<Integer>>(VRG.routes);
+		}
+		removeAllEdges(graphComponent.getGraph());
 	}
 
 	private void removeAllEdges(mxGraph graph) {
@@ -293,7 +308,8 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	public KeyListener keyListener = new KeyListener() {
 		@Override
 		public void keyReleased(KeyEvent paramKeyEvent) {
-			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE) && VRG.routes != null && VRG.routes.size() > 0) {
+			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE)) {
+				VRGUtils.showAutoCLoseMess(VRGgraphOld.this, VRGUtils.MSG_TITLE_GENER, "Координаты отсортированы");
 				numberOfSpace++;
 				updateEdges(graphComponent.getGraph());
 			}

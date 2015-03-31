@@ -7,6 +7,7 @@ import java.util.Comparator;
 
 import ru.amse.smyshlyaev.grapheditor.graph.Edge;
 import ru.amse.smyshlyaev.grapheditor.graph.Graph;
+import ru.amse.smyshlyaev.grapheditor.graph.ISelectableVertex;
 import ru.amse.smyshlyaev.grapheditor.graph.Vertex;
 import ru.amse.smyshlyaev.grapheditor.ui.JGraphComponent;
 import vrg.VRGUtils.Point;
@@ -35,6 +36,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 
 	public ArrayList<Point> coordinates = new ArrayList<Point>();
 	public ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
+	public ArrayList<Edge> edges;
 
 	ArrayList<VRGvertexes> vrgVertexes;
 
@@ -58,7 +60,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 		setData(withTimeWindow);
 		graph = new Graph();
 		vrgVertexes = new ArrayList<VRGvertexes>();
-		constuctGraph(graph);
+		constructGraph(graph);
 		this.setGraph(graph);
 		isCompleted = true;
 		// Graph.unmodifiableGraph(graph);
@@ -75,10 +77,11 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 		this.withTimeWindow = withTimeWindow;
 	}
 
-	public void constuctGraph(Graph graph) {
-		if (graph == null && !VRG.isValid()) {
+	public void constructGraph(Graph graph) {
+		if (graph == null) {
 			return;
 		}
+		removeAllVertexes(graph);
 		vrgVertexes.clear();
 		setZoomIfNeed(withTimeWindow);// FIXME
 
@@ -115,28 +118,10 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 		updateEdges(graph);
 	}
 
-	private void setZoomIfNeed() {
-		VRGUtils.Point point = VRG.getMaxCoords();
-		if ((point.x < width / 3) || (point.y < height / 4)) {
-			distance = (width + height) / 50;
-		} else {
-			distance = 1;
-			VRGUtils.DISTANCE = distance;
-		}
-		point = VRG.getMinCoords();
-		if ((point.x < width / 10) || (point.y < height / 10)) {
-			translateX = -point.x * distance + 2 * radius;
-			translateY = -point.y * distance + 2 * radius;
-		} else {
-			translateX = 0;
-			translateY = 0;
-		}
-	}
-
 	private void setZoomIfNeed(boolean b) {
+		int coef = 8;
 		if (!b) {
-			setZoomIfNeed();
-			return;
+			coef = 5;
 		}
 		Point point;
 		Point x, y;
@@ -154,14 +139,14 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 		});
 
 		point = new Point(x.x, y.y);
+		distance = (point.x + point.y) * coef / 2;
 
-		distance = (point.x + point.y) * 4;
-
-		translateX = 20;
-		translateY = 20;
+		translateX = 2 * coef;
+		translateY = 2 * coef;
 	}
 
 	public void constructVertexes() {
+		vrgVertexes.clear();
 		VRGvertexes a = new VRGvertexes();
 		a.demand = 0;
 		a.price = 0;
@@ -188,6 +173,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 
 	private void updateEdges(Graph graph) {
 		removeAllEdges(graph);
+		edges = new ArrayList<Edge>();
 
 		Double distance = 0D;
 		if (graph == null) {
@@ -196,7 +182,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 
 		if ((numberOfSpace + 1) > routes.size()) {
 			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES)) {
-				VRG.constructSolution();// FIXME
+				generateRoutes(withTimeWindow);
 			}
 			VRGframe.isNeedToUpdate = true;
 			numberOfSpace = 0;
@@ -218,17 +204,21 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 				Edge edge = new Edge(vertex1, vertex2, VRGUtils.get(distance));
 				graph.addEdge(edge);
 				vrgVertexes.get(in).edges = edge;
+				edges.add(edge);
 				in = index;
 			}
 		}
 	}
 
 	private void removeAllEdges(Graph graph) {
-		for (VRGvertexes v : vrgVertexes) {
-			if (v.edges instanceof Edge) {
-				graph.removeEdge(Edge.class.cast(v.edges));
+		if (edges != null && edges.size() > 0)
+			for (Edge e : edges) {
+				graph.removeEdge(e);
 			}
-		}
+	}
+
+	private void removeAllVertexes(Graph graph) {
+		graph.removeVertices(new ArrayList<ISelectableVertex>(graph.getVertices()));
 	}
 
 	public Graph getGraph() {
@@ -251,11 +241,22 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 		}
 	}
 
-	@Override
-	public void spacePressed() {
-		VRG.generateEdges();// FIXME
-		numberOfSpace++;
-		updateEdges(graph);
+	public void generateRoutes(boolean withTW) {
+		numberOfSpace = 0;
+		if (withTW) {
+			VRGwithTimeWindow.generateRoutesRand();
+		} else {
+			VRG.generateEdges();
+		}
+		VRGUtils.showAutoCLoseMess(this, VRGUtils.MSG_TITLE_GENER, "Координаты отсортированы");
+		setData(withTW);
+		constructGraph(getGraph());
+		updateEdges(getGraph());
 	}
 
+	@Override
+	public void spacePressed(boolean withTW) {
+		generateRoutes(withTW);
+		numberOfSpace++;
+	}
 }
