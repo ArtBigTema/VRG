@@ -13,8 +13,6 @@ public class VRGwithTimeWindow {
 	private static final boolean showGraph = true;
 	private static final boolean forTaxi = true;
 
-	// public static final int[][] COORDS = { { 5, 3 }, { 8, 1 }, { 8, 5 }, {
-	// 11, 1 }, { 8, 6 }, { 2, 1 }, { 2, 3 }, { 1, 3 } };
 	public static final int MAX_TIME = 100;
 	public static final int[][] COORDS = { { 0, 0 }, { 0, 3 }, { 4, 0 }, { 4, 3 }, { 4, 5 }, { 8, 3 }, { 0, 6 }, { 8, 6 },
 			{ 2, 6 }, { 8, 0 } };
@@ -26,6 +24,7 @@ public class VRGwithTimeWindow {
 
 	public static ArrayList<Integer> carsWeight = new ArrayList<Integer>();
 	public static ArrayList<PointT> coordinates = new ArrayList<PointT>();
+	public static Routes routess;
 
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
@@ -37,7 +36,7 @@ public class VRGwithTimeWindow {
 	public static ArrayList<Pair> cars;
 
 	public VRGwithTimeWindow() {
-		solve();// FIXME
+		constructRoutes();// solve();// FIXME
 	}
 
 	public static boolean isValid() {
@@ -45,6 +44,7 @@ public class VRGwithTimeWindow {
 	}
 
 	public static void clearAll() {
+		clearRoutess();// FIXME
 		carsWeight.clear();
 		coordinates.clear();
 		lengthOfRoutes.clear();
@@ -52,6 +52,17 @@ public class VRGwithTimeWindow {
 		routes.clear();
 		table.clear();
 		optimalPoint = OptimalPoint.OptimalTime;
+		generateRoutess();
+	}
+
+	private static void clearRoutess() {
+		if (routess != null) {
+			routess.clear();
+		}
+	}
+
+	private static void generateRoutess() {
+		routess = new Routes();
 	}
 
 	public static void generateAllStandart() {
@@ -125,7 +136,7 @@ public class VRGwithTimeWindow {
 		if (routes == null || routes.size() == 0) {
 			sortX();// FIXME
 			generateLengthRoutesAndTable();
-			constructRoutes();
+			solve();// constructRoutes();
 		}
 		int n = routes.size();
 		int[][] paths = new int[n][n];
@@ -215,7 +226,7 @@ public class VRGwithTimeWindow {
 		print();
 
 		optimalPoint = OptimalPoint.OptimalDistance;
-		solve();// constructRoutes();// FIXME
+		solve();// constructRoutes();//FIXME
 		out.flush();
 
 		showGraphIfNeed();
@@ -300,7 +311,7 @@ public class VRGwithTimeWindow {
 		openPlace();
 		routes.clear();
 		try {
-			constructRoutes();// solve
+			solve();// constructRoutes();// solve
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -314,7 +325,7 @@ public class VRGwithTimeWindow {
 		routes.clear();
 		try {
 			optimalPoint = OptimalPoint.OptimalDistance;
-			constructRoutes();// solve
+			solve();// constructRoutes();// solve
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -399,6 +410,7 @@ public class VRGwithTimeWindow {
 	}
 
 	private static void solve() {// for taxi optimDistance
+		clearRoutess();
 		int k = getCountCars();
 
 		ArrayList<Integer> oldPath = new ArrayList<Integer>();
@@ -411,10 +423,13 @@ public class VRGwithTimeWindow {
 
 		oldPath.add(0);
 		passedPath.add(coordinates.get(0));
+		routess.addDepo();
+		p(routess);
 
 		for (int i = 0; i < k; i++) {
 			PointT optimPlace = getOptimPlace(cars.get(i));
 			p(optimPlace.toStr());
+			routess.addSectionForIndex(i, optimPlace.getPoint(), optimPlace.getEndPlace());
 
 			double endDD = cars.get(i).delay + getDistance(cars.get(i).getLastPoint(), optimPlace) + optimPlace.getDelay();
 
@@ -430,6 +445,7 @@ public class VRGwithTimeWindow {
 			passedPath.add(optimPlace.close());
 		}
 
+		p(routess);
 		p("passedPath");
 		pp(passedPath);
 		p("");
@@ -446,8 +462,12 @@ public class VRGwithTimeWindow {
 			p(coordinates.indexOf(t) + " " + t.toStr());
 
 			PointT optimPlace = getOptimPlace(cars, t);
+			if (optimPlace == null) {
+				err("optim place not found");
+				continue;
+			}
 			p("оптимально по " + optimalPoint.toString());
-			p(optimPlace.getEndPlace().toString() + " - " + optimPlace.toSt());
+			p(optimPlace.getEndPlace().toString() + " - " + optimPlace.toStr());
 
 			int carIndex = getNumOfCarsWithPlace(cars, optimPlace) - 1;// car.num
 			double waiting = t.start - cars.get(carIndex).delay - getDistance(cars.get(carIndex).getLastPoint(), t);
@@ -458,6 +478,7 @@ public class VRGwithTimeWindow {
 				err("it's late");
 			}
 			p("ожидание пассажира " + df.format(waiting));
+			routess.addSectionForIndex(carIndex, t.getPoint(), t.getEndPlace());
 
 			double endDD = cars.get(carIndex).delay + getDistance(cars.get(carIndex).getLastPoint(), t) + waiting
 					+ t.getDelay();
@@ -485,11 +506,13 @@ public class VRGwithTimeWindow {
 			routes.add(p.path);
 		}
 
+		p(routess);
 		passedPath.clear();
 		allIndexes.clear();
 	}
 
 	private static void constructRoutes() {
+		clearRoutess();
 		int k = getCountCars();
 
 		ArrayList<Integer> oldPath = new ArrayList<Integer>();
@@ -499,6 +522,8 @@ public class VRGwithTimeWindow {
 
 		setStartPlaceForCars();
 		closeUnnecessaryPlace();
+		routess.addDepo();
+		p(routess);
 
 		oldPath.add(0);
 		passedPath.add(coordinates.get(0));
@@ -507,6 +532,7 @@ public class VRGwithTimeWindow {
 			// double m = getMin(qq); // getMin(arr); // 0; // readInt();
 			PointT optimPlace = getOptimPlace(cars.get(i));
 			p(optimPlace.toStr());
+			routess.addSectionForIndex(i, optimPlace.getPoint(), optimPlace.getEndPlace());
 
 			// double end = Math.max(cars.get(i).delay, s) + m;
 			double endDD = cars.get(i).delay + getDistance(cars.get(i).getLastPlace(), optimPlace) + optimPlace.getDelay();
@@ -542,10 +568,15 @@ public class VRGwithTimeWindow {
 			p(coordinates.indexOf(t) + " " + t.toStr());
 
 			PointT optimPlace = getOptimPlace(cars, t);
+			if (optimPlace == null) {
+				err("optim place not found");
+				continue;
+			}
 			p("оптимально по " + optimalPoint.toString());
-			p(optimPlace.getEndPlace().toString() + " - " + optimPlace.toSt());
+			p(optimPlace.getEndPlace().toString() + " - " + optimPlace.toStr());
 
 			int carIndex = getNumOfCarsWithPlace(cars, optimPlace) - 1;// car.num
+			routess.addSectionForIndex(carIndex, t.getPoint(), t.getEndPlace());
 
 			double endDD = cars.get(carIndex).delay + getDistance(cars.get(carIndex).getLastPlace(), t) + optimPlace.delay;
 			p("конечное время " + endDD);
@@ -572,6 +603,7 @@ public class VRGwithTimeWindow {
 			routes.add(p.path);
 		}
 
+		p(routess);
 		passedPath.clear();
 		allIndexes.clear();
 	}
@@ -609,6 +641,7 @@ public class VRGwithTimeWindow {
 		p(in + " =index, min= " + min);
 		if (in == -1) {
 			err("see getOptimPlaceForTime");
+			return null;
 		}
 		return cs.get(in).lastPlace;
 	}
@@ -718,6 +751,7 @@ public class VRGwithTimeWindow {
 		closePlace(0);
 		p("close depo");
 		pp(coordinates);
+		routess.setCountRoutess(getCountCars());
 	}
 
 	private static void closePlace(int i) {
@@ -1074,6 +1108,116 @@ public class VRGwithTimeWindow {
 					return "Отсортировано по f";
 				}
 			}
+		}
+
+	}
+
+	public static class Routes {
+		public class Route {
+			public class Section {
+				public Point start;
+				public Point end;
+
+				public Section(Point s, Point e) {
+					start = s;
+					end = e;
+				}
+
+				public Section(Point s) {
+					start = s;
+					end = new Point(-1, -1);// FIXME
+				}
+
+				public boolean isOnePoint() {
+					return ((start.x == end.x) && (start.y == end.y));
+				}
+
+				@Override
+				public String toString() {
+					return start.toString() + " - " + end.toString() + ", ";
+				}
+			}
+
+			public ArrayList<Section> route;
+			public int index; // num of car
+
+			public Route() {
+				route = new ArrayList<Section>();
+			}
+
+			public Route(int i) {
+				this();
+				setIndex(i);
+			}
+
+			public void addSection(Section s) {
+				route.add(s);
+			}
+
+			public void addSection(Point s, Point e) {
+				route.add(new Section(s, e));
+			}
+
+			public void addSection(Point s) {
+				route.add(new Section(s));
+			}
+
+			public void setIndex(int i) {
+				index = i;
+			}
+
+			public int getIndex() {
+				return index;
+			}
+
+			@Override
+			public String toString() {
+				return getIndex() + " " + route.toString() + "";
+			}
+		}
+
+		public ArrayList<Route> routes;
+
+		public Routes() {
+			routes = new ArrayList<Route>();
+		}
+
+		public int getCountRoutess() {
+			return routes.size();
+		}
+
+		public void setCountRoutess(int count) {
+			for (int i = 0; i < count; i++) {
+				routes.add(new Route(i));
+			}
+		}
+
+		public void addRoute(Route r) {
+			routes.add(r);
+		}
+
+		public void clear() {
+			this.routes.clear();
+		}
+
+		public void addSectionForIndex(int i, Point s, Point e) {
+			routes.get(i).addSection(s, e);
+		}
+
+		public void addDepo() {
+			for (int i = 0; i < getCountRoutess(); i++) {
+				routes.get(i).addSection(new Point(0, 0), new Point(0, 0));
+				// routes.get(i).addSection(new Point(0, 0));
+			}
+		}
+
+		@Override
+		public String toString() {
+			String s = "";
+			for (Route r : this.routes) {
+				s += r.toString() + "\n";
+			}
+			return s;
 		}
 	}
 }
