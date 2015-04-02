@@ -5,23 +5,40 @@ import vrg.VRGUtils.Point;
 public class VRGvertexes {
 
 	public static class VertexCoords {
-		private Point coords;
+		private Point coord;
+		private Point endCoord;
 
 		public VertexCoords(Point p) {
-			this.coords = p;
+			this.coord = p;
 		}
 
 		public VertexCoords(int x, int y) {
-			this.coords = new Point(x, y);
+			this.coord = new Point(x, y);
+		}
+
+		public void setEndCoord(int x, int y) {
+			setEndCoord(new Point(x, y));
+		}
+
+		public void setEndCoord(Point p) {
+			endCoord = p;
+		}
+
+		public Point getEndCoord() {
+			return endCoord;
+		}
+
+		public boolean isContainsEndPoint() {
+			return endCoord != null;
 		}
 
 		public Point getPoint() {
-			return this.coords;
+			return this.coord;
 		}
 
 		@Override
 		public String toString() {
-			return VRGUtils.TXT_COORDS + VRGUtils.SPACE + VRGUtils.OPENEDBKT + coords.x + VRGUtils.SEMICOLON + coords.y
+			return VRGUtils.TXT_COORDS + VRGUtils.SPACE + VRGUtils.OPENEDBKT + coord.x + VRGUtils.SEMICOLON + coord.y
 					+ VRGUtils.CLOSEDBKT;
 		}
 
