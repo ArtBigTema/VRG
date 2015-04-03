@@ -1,8 +1,14 @@
 package vrg;
 
+import java.text.DecimalFormat;
+
+import com.mxgraph.model.mxCell;
+
 import vrg.VRGUtils.Point;
+import vrg.VRGroutes.Route.Section;
 
 public class VRGvertexes {
+	private static DecimalFormat df = new DecimalFormat("#.#");// FIXME
 
 	public static class VertexCoords {
 		private Point coord;
@@ -10,6 +16,11 @@ public class VRGvertexes {
 
 		public VertexCoords(Point p) {
 			this.coord = p;
+		}
+
+		public VertexCoords(Point s, Point e) {
+			this.coord = s;
+			this.endCoord = e;
 		}
 
 		public VertexCoords(int x, int y) {
@@ -24,6 +35,14 @@ public class VRGvertexes {
 			endCoord = p;
 		}
 
+		public void setStartCoord(int x, int y) {
+			setStartCoord(new Point(x, y));
+		}
+
+		public void setStartCoord(Point p) {
+			coord = p;
+		}
+
 		public Point getEndCoord() {
 			return endCoord;
 		}
@@ -32,7 +51,7 @@ public class VRGvertexes {
 			return endCoord != null;
 		}
 
-		public Point getPoint() {
+		public Point getStartPoint() {
 			return this.coord;
 		}
 
@@ -47,23 +66,51 @@ public class VRGvertexes {
 	public int demand = 0;
 	public int price = 0;
 	public Object objectVertex;
+	public Object startObjectVertex;
+	public Object endObjectVertex;
 	public VertexCoords vertexCoords;
 	public Object edges;
+	public Section section;
+	public mxCell cell;
+	public mxCell cellStart;
+	public mxCell cellEnd;
 
 	public static double getDistance(VertexCoords p1, VertexCoords p2) {
-		return Math.sqrt((p2.getPoint().x - p1.getPoint().x) * (p2.getPoint().x - p1.getPoint().x)
-				+ (p2.getPoint().y - p1.getPoint().y) * (p2.getPoint().y - p1.getPoint().y));
+		return Math.sqrt((p2.getStartPoint().x - p1.getStartPoint().x) * (p2.getStartPoint().x - p1.getStartPoint().x)
+				+ (p2.getStartPoint().y - p1.getStartPoint().y) * (p2.getStartPoint().y - p1.getStartPoint().y));
+	}
+
+	public void setStartCell(Object o) {
+		startObjectVertex = o;
+		cellStart = (mxCell) o;
+	}
+
+	public void setEndCell(Object o) {
+		endObjectVertex = o;
+		cellEnd = (mxCell) o;
+	}
+
+	public static String getStrDistance(VertexCoords p1, VertexCoords p2) {
+		return df.format(getDistance(p1, p2));
 	}
 
 	public VRGvertexes() {
-		objectVertex = new Object();
+		// objectVertex = new Object();
 	}
 
 	public VRGvertexes(int x, int y, int d, int p) {
-		objectVertex = new Object();
+		// objectVertex = new Object();
 		vertexCoords = new VertexCoords(x, y);
 		price = p;
 		demand = d;
+	}
+
+	public void setSection(Section s) {
+		section = s;
+	}
+
+	public Section getSection() {
+		return section;
 	}
 
 	public VRGvertexes(String[] array) {
