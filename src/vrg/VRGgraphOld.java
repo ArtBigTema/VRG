@@ -6,9 +6,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Map;
-
-import ru.amse.smyshlyaev.grapheditor.graph.Edge;
 
 import vrg.VRGUtils.Point;
 import vrg.VRGroutes.Route;
@@ -23,15 +22,15 @@ import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxPoint;
 import com.mxgraph.util.mxRectangle;
-import com.mxgraph.util.mxUtils;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxEdgeStyle;
 import com.mxgraph.view.mxGraph;
+import com.mxgraph.view.mxStylesheet;
 
 @SuppressWarnings("serial")
 public class VRGgraphOld extends javax.swing.JFrame {
 	public mxGraphComponent graphComponent;
-	public final int length = 20;
+	public final int length = 40;
 	public final int baseLength = 15;
 	public boolean isCompleted = false;
 	public boolean withTimeWindow;
@@ -107,13 +106,12 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		this.setSize(600, 450);
 		this.setVisible(true);
 
-		showInitMessage();
+		// graphComponent.setBackgroundImage(VRGUtils.getImageForGraph());
+		repaint();
+		// showInitMessage();FIXME
 
 		graphComponent.addKeyListener(keyListener);
 		graphComponent.addFocusListener(focusListener);
-
-		// graphComponent.setBackgroundImage(VRGUtils.getImageForGraph());//FIXME
-		repaint();
 	}
 
 	@Override
@@ -135,13 +133,13 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	}
 
 	private void setZoomIfNeed(boolean b) {
-		int coef = 8;
+		int coef = 15;
 		if (!b) {
 			coef = 5;
 		}
 		Point point;
 		Point x, y;
-		y = routess.maxY();// FIXME
+		y = routess.maxY();
 		x = routess.maxX();
 
 		point = new Point(x.x, y.y);
@@ -167,8 +165,11 @@ public class VRGgraphOld extends javax.swing.JFrame {
 				a.objectVertex = graph.insertVertex(parent, null, VRGUtils.LABEL_BASE, translateX + routess.getDepo().x
 						* distance, translateY + routess.getDepo().y * distance, baseLength, baseLength,
 						"shape=ellipse;perimeter=trianglePerimeter");// x,y,width,height
+				a.setEndCell(a.objectVertex);
+				a.setStartCell(a.objectVertex);
+				// a.setSection(new Section(new Point(0, 0)));
 				// a.setSection(new Section(routess.getDepo()));
-				vrgVertexes.add(a);
+				// vrgVertexes.add(a);
 			}
 
 			if (!withTimeWindow) {
@@ -179,9 +180,9 @@ public class VRGgraphOld extends javax.swing.JFrame {
 					VRGvertexes vertex = new VRGvertexes();
 					// Null is id
 					vertex.setStartCell(graph.insertVertex(parent, null, s.getStart().toString(), translateX + s.getStart().x
-							* distance, translateY + s.getStart().y * distance, length, length));// x,y,width,height//StrUtils.GRAPH_PARAM_3
+							* distance, translateY + s.getStart().y * distance, length, length / 2));// x,y,width,height//StrUtils.GRAPH_PARAM_3
 					vertex.setEndCell(graph.insertVertex(parent, null, s.getEnd().toString(), translateX + s.getEnd().x
-							* distance, translateY + s.getEnd().y * distance, length, length));// x,y,width,height//StrUtils.GRAPH_PARAM_3
+							* distance, translateY + s.getEnd().y * distance, length, length / 2));// x,y,width,height//StrUtils.GRAPH_PARAM_3
 					vertex.setSection(s);
 
 					if (!withTimeWindow) {
@@ -212,43 +213,42 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 		final int PORT_DIAMETER = 20;
 		final int PORT_RADIUS = PORT_DIAMETER / 2;
-		mxCell v1 = (mxCell) graph.insertVertex(parent, null, "Depo", -20, -20, 50, 50, "");
-		mxGeometry geo = graph.getModel().getGeometry(v1);
+		mxCell depo = (mxCell) graph.insertVertex(parent, null, "Depo", 0, 0, 50, 50, "");
+		depo.setConnectable(false);
+
+		mxGeometry geo = graph.getModel().getGeometry(depo);
 		// The size of the rectangle when the minus sign is clicked
-		geo.setAlternateBounds(new mxRectangle(20, 20, 100, 50));
+		geo.setAlternateBounds(new mxRectangle(00, 00, 50, 50));
 
-		mxGeometry geo1 = new mxGeometry(0.5, 1.0, PORT_DIAMETER, PORT_DIAMETER);
-		geo1.setOffset(new mxPoint(-PORT_RADIUS, -PORT_RADIUS));
-		geo1.setRelative(true);
+		float[][][] coords = new float[][][] { { { 1, 1 } }, { { 0.5f, 1 }, { 1, 0.5f } },
+				{ { 0.5f, 1 }, { 1, 1 }, { 1, 0.5f } } };
+		ArrayList<mxCell> ports = new ArrayList<mxCell>();
 
-		mxCell port1 = new mxCell(null, geo1, "shape=ellipse;perimter=ellipsePerimeter");
-		port1.setVertex(true);
+		int size = routess.getCountRoutess();
+		for (int i = 0; i < size; i++) {
+			float x = coords[size - 1][i][0];
+			float y = coords[size - 1][i][1];
+			mxGeometry g = new mxGeometry(x, y, PORT_DIAMETER, PORT_DIAMETER);
+			g.setOffset(new mxPoint(-PORT_RADIUS, -PORT_RADIUS));
+			g.setRelative(true);
 
-		mxGeometry geo3 = new mxGeometry(1.0, 1.0, PORT_DIAMETER, PORT_DIAMETER);
-		geo3.setOffset(new mxPoint(-PORT_RADIUS, -PORT_RADIUS));
-		geo3.setRelative(true);
+			mxCell port = new mxCell(null, g, "shape=rectangle;perimter=rectanglePerimeter");
+			port.setVertex(true);
+			ports.add(port);
 
-		mxCell port3 = new mxCell(null, geo3, "shape=ellipse;perimter=ellipsePerimeter");
-		port3.setVertex(true);
+			graph.addCell(port, depo);
+		}
 
-		mxGeometry geo2 = new mxGeometry(1.0, 0.5, PORT_DIAMETER, PORT_DIAMETER);
-		geo2.setOffset(new mxPoint(-PORT_RADIUS, -PORT_RADIUS));
-		geo2.setRelative(true);
+		for (int i = 0; i < size; i++) {
+			Object v = (graph.insertVertex(parent, null, getFirstRoute(i).toString(), translateX + getFirstRoute(i).x
+					* distance, translateY + getFirstRoute(i).y * distance, length, length / 2, "FILLCOLOR=green;"));
+			graph.insertEdge(parent, null, VRGroutes.getStrDistance(new Point(0, 0), getFirstRoute(i)), ports.get(i), v,
+					"strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;");
+		}
+	}
 
-		mxCell port2 = new mxCell(null, geo2, "shape=ellipse;perimter=ellipsePerimeter");
-		port2.setVertex(true);
-		v1.setConnectable(false);
-
-		graph.addCell(port1, v1);
-		graph.addCell(port2, v1);
-		graph.addCell(port3, v1);
-
-		Object v2 = graph.insertVertex(parent, null, "World!", 240, 150, 80, 30);
-		graph.insertEdge(parent, null, "Edge", port2, v2);
-		Object v3 = graph.insertVertex(parent, null, "World!", 240, 250, 80, 30);
-		graph.insertEdge(parent, null, "Edge", port1, v3);
-		Object v4 = graph.insertVertex(parent, null, "World!", 140, 250, 80, 30);
-		graph.insertEdge(parent, null, "Edge", port3, v4);
+	private Point getFirstRoute(int i) {
+		return routess.getRoutes().get(i).getRoute().get(1).getStart();
 	}
 
 	private void updateEdges(mxGraph graph) {
@@ -273,12 +273,15 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			numberOfSpace = 0;
 		}
 
-		Map<String, Object> style = graph.getStylesheet().getDefaultEdgeStyle();
-		style.put(mxConstants.STYLE_EDGE, mxEdgeStyle.Loop);// FIXME сделай своё
+		setStyle(graph);
+
+		String GRAPH_PARAM_2 = "strokeColor=red;edgeStyle=EntityRelation;elbow=vertical;entryX=0;entryY=1;entryPerimeter=0;exitPerimeter=1;";
+		String GRAPH_PARAM_4 = "strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;";
 
 		String distance = "";
+		Point tmp = new Point(0, 0);
 		for (VRGvertexes v : vrgVertexes) {
-			if (v.getSection() == null) {
+			if (v.getSection() == null || v.vertexCoords.eq(tmp)) {
 				continue;
 			}
 			distance = " " + v.getSection().getStrInnerDistance() + " ";
@@ -286,17 +289,24 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { v.startObjectVertex });
 			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "red", new Object[] { v.endObjectVertex });
 
-			graph.insertEdge(parent, null, distance, v.cellStart, v.cellEnd);// VRGUtils.GRAPH_PARAM_4);
-
+			graph.insertEdge(parent, null, distance, v.cellStart, v.cellEnd, GRAPH_PARAM_2);
 		}
+		int in = 0;
+		int index = 0;
 		for (Route arr : routess.getRoutes()) {
 			for (Section s : arr.getRoute()) {
-				// VRGvertexes vertex = new VRGvertexes();
-				// graph.insertEdge(parent, null, s.getStrInnerDistance(),
-				// vrgVertexes.get(in).objectVertex,
-				// vrgVertexes.get(index).objectVertex);//
-				// VRGUtils.GRAPH_PARAM_4);
-
+				in = getVertex(s.getStart(), s.getEnd());
+				if (vrgVertexes.get(in).vertexCoords.eq(tmp)) {
+					index = in;
+					continue;
+				}
+				graph.insertEdge(
+						parent,
+						null,
+						VRGroutes.getStrDistance(vrgVertexes.get(index).getSection().getEnd(), vrgVertexes.get(in).getSection()
+								.getStart()), vrgVertexes.get(index).endObjectVertex, vrgVertexes.get(in).startObjectVertex,
+						GRAPH_PARAM_4);
+				index = in;
 			}
 		}
 		graph.setAutoSizeCells(true);
@@ -306,6 +316,27 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		for (Object edge : edges) {
 			graph.getModel().remove(edge);
 		}
+	}
+
+	private void setStyle(mxGraph graph) {
+		Map<String, Object> style = graph.getStylesheet().getDefaultEdgeStyle();
+		// styl.put(mxConstants.STYLE_EDGE, mxEdgeStyle.Loop);// FIXME сделай
+		style.put(mxConstants.STYLE_EDGE, mxEdgeStyle.EntityRelation);//
+		style.put(mxConstants.STYLE_STROKEWIDTH, 2);
+		style.put(mxConstants.STYLE_FONTSIZE, 12);
+		style.put(mxConstants.STYLE_FONTCOLOR, "black");
+		style.put(mxConstants.STYLE_STARTARROW, mxConstants.ARROW_OVAL);
+		style.put(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "#ffffff");
+		style.put(mxConstants.STYLE_LABEL_BORDERCOLOR, "#000000");
+		style.put(mxConstants.STYLE_LABEL_POSITION, mxConstants.ALIGN_TOP);
+	}
+
+	private int getVertex(Point start, Point end) {
+		for (VRGvertexes v : vrgVertexes) {
+			if (v.equalsPoint(start, end))
+				return vrgVertexes.indexOf(v);
+		}
+		return 0;
 	}
 
 	private void generateRoutes(boolean isOptim) {
