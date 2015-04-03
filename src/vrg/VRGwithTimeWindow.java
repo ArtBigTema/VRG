@@ -1,5 +1,7 @@
 package vrg;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -272,6 +274,18 @@ public class VRGwithTimeWindow {
 	public static void showGraph() {// FIXME
 		VRGgraphOld frame = new VRGgraphOld(routess);
 		frame.withTimeWindow = true;
+		frame.addFocusListener(new FocusListener() {
+
+			@Override
+			public void focusLost(FocusEvent paramFocusEvent) {
+				System.exit(0);
+			}
+
+			@Override
+			public void focusGained(FocusEvent paramFocusEvent) {
+
+			}
+		});
 	}
 
 	public static ArrayList<Point> getCoords() {

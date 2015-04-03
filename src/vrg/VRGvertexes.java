@@ -51,8 +51,12 @@ public class VRGvertexes {
 			return endCoord != null;
 		}
 
-		public Point getStartPoint() {
+		public Point getStartCoord() {
 			return this.coord;
+		}
+		
+		public boolean eq(Point p){
+			return (p.x == this.coord.x) && (p.y == this.coord.y);
 		}
 
 		@Override
@@ -76,8 +80,8 @@ public class VRGvertexes {
 	public mxCell cellEnd;
 
 	public static double getDistance(VertexCoords p1, VertexCoords p2) {
-		return Math.sqrt((p2.getStartPoint().x - p1.getStartPoint().x) * (p2.getStartPoint().x - p1.getStartPoint().x)
-				+ (p2.getStartPoint().y - p1.getStartPoint().y) * (p2.getStartPoint().y - p1.getStartPoint().y));
+		return Math.sqrt((p2.getStartCoord().x - p1.getStartCoord().x) * (p2.getStartCoord().x - p1.getStartCoord().x)
+				+ (p2.getStartCoord().y - p1.getStartCoord().y) * (p2.getStartCoord().y - p1.getStartCoord().y));
 	}
 
 	public void setStartCell(Object o) {
@@ -111,6 +115,10 @@ public class VRGvertexes {
 
 	public Section getSection() {
 		return section;
+	}
+
+	public boolean equalsPoint(Point ps, Point pe) {
+		return vertexCoords.getStartCoord().equals(ps) && vertexCoords.getEndCoord().equals(pe);
 	}
 
 	public VRGvertexes(String[] array) {
