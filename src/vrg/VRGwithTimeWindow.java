@@ -31,7 +31,8 @@ public class VRGwithTimeWindow {
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
-	public static ArrayList<ArrayList<Double>> table = new ArrayList<ArrayList<Double>>();
+	// public static ArrayList<ArrayList<Double>> table = new
+	// ArrayList<ArrayList<Double>>();
 	public static ArrayList<PointT> passedPath;
 	public static PointT.C.OptimalPoint optimalPoint = OptimalPoint.OptimalDistance;
 
@@ -46,13 +47,13 @@ public class VRGwithTimeWindow {
 	}
 
 	public static void clearAll() {
-		clearRoutess();// FIXME
+		clearRoutess();
 		carsWeight.clear();
 		coordinates.clear();
 		lengthOfRoutes.clear();
 		allIndexes.clear();
 		routes.clear();
-		table.clear();
+		// table.clear();
 		optimalPoint = OptimalPoint.OptimalTime;
 		generateRoutess();
 	}
@@ -61,6 +62,7 @@ public class VRGwithTimeWindow {
 		if (routess != null) {
 			routess.clear();
 		}
+		openPlace();
 	}
 
 	private static void generateRoutess() {
@@ -211,27 +213,29 @@ public class VRGwithTimeWindow {
 				q.add(tmp.get(j));
 			}
 			lengthOfRoutes.add(new ArrayList<Double>(tmp));
-
-			for (int j = i; j < coordinates.size(); j++) {
-				tmp.set(j, Double.NaN);
-			}
-			table.add(tmp);
 		}
 	}
 
 	public static void main(String[] args) {
-		printWithEnd();
+		boolean b = false;
 
-		generateAllStandart();
-
-		sortX();
+		if (b) {
+			clearAll();
+			coordinates = VRGfile.readCoordFromFile();
+			carsWeight = VRGfile.readCarsFromFile();
+			sort();
+		} else {
+			printWithEnd();
+			generateAllStandart();
+			sortX();
+		}
 		pp(coordinates);
 
 		generateLengthRoutesAndTable();
 
 		print();
 
-		optimalPoint = OptimalPoint.OptimalDistance;
+		optimalPoint = OptimalPoint.OptimalTime;
 		solve();// constructRoutes();//FIXME
 		out.flush();
 
@@ -249,11 +253,11 @@ public class VRGwithTimeWindow {
 		Collections.sort(coordinates, new PointT.C.Cx());
 		p("Отсортированные координаты по Х");
 		pp(coordinates);
-		Collections.sort(coordinates, new PointT.C.Cy());
-		p("Отсортированные координаты по Y");
-		pp(coordinates);
 		Collections.sort(coordinates, new PointT.C.Cf());
 		p("Отсортированные координаты по fi");
+		pp(coordinates);
+		Collections.sort(coordinates, new PointT.C.Cy());
+		p("Отсортированные координаты по Y");
 		pp(coordinates);
 		Collections.sort(coordinates, new PointT.C.Cr());
 		p("Отсортированные координаты по r");
@@ -265,7 +269,7 @@ public class VRGwithTimeWindow {
 		Collections.sort(coordinates, new PointT.C.Cx());
 	}
 
-	private static void showGraphIfNeed() {// FIXME
+	private static void showGraphIfNeed() {
 		if (showGraph) {
 			showGraph();
 		}
@@ -278,7 +282,7 @@ public class VRGwithTimeWindow {
 
 			@Override
 			public void focusLost(FocusEvent paramFocusEvent) {
-				System.exit(0);
+				// System.exit(0);
 			}
 
 			@Override
@@ -351,6 +355,7 @@ public class VRGwithTimeWindow {
 
 	public static String randomSort() {
 		int k = random(0, 4);
+		rrr = 0;
 		Comparator<PointT> c = null;
 		switch (k) {
 		case 0:
@@ -379,9 +384,6 @@ public class VRGwithTimeWindow {
 		p("");
 		p("таблица всех путей");
 		p(lengthOfRoutes);
-		p("");
-		p("таблица оставшихся путей");
-		p(table);
 		p("");
 	}
 
@@ -433,7 +435,6 @@ public class VRGwithTimeWindow {
 
 		ArrayList<Integer> oldPath = new ArrayList<Integer>();
 		passedPath = new ArrayList<PointT>();
-
 		cars = new ArrayList<Pair>();
 
 		setStartPlaceForCars();
@@ -686,6 +687,10 @@ public class VRGwithTimeWindow {
 		double min = getMin(endTimes);
 		int in = endTimes.indexOf(min);
 
+		if (min == MAX_TIME) {
+			err("see getOptimPlaceForDistance not found optim ");
+		}
+
 		p(in + " =index, min= " + min);
 		return cs.get(in).lastPlace;
 	}
@@ -705,6 +710,8 @@ public class VRGwithTimeWindow {
 		return result;
 	}
 
+	static int rrr = 0;
+
 	private static PointT getOptimPlace(Pair car) {
 		p("Ищем место для машины");
 		p(car.toStr());
@@ -718,16 +725,26 @@ public class VRGwithTimeWindow {
 			if (!t.isPassed()) {
 				start = t.start;
 				end = t.end;
-				distance = table.get(i).get(car.place);// car.place = old place
+				distance = getDistance(t, car.getLastPoint());
 
 				p("from " + car.place + " to " + i + ", start= " + start + ",\tend= " + end + ", distance= " + distance);
+				if (distance == 8.1) {
+					rrr++;
+				}
 				if (distance > end) {
 					p("Не успеем");// FIXME close place
+					t.close();
 				} else {
+					if (t.getPoint().equals(new Point(8, 1))) {
+						err("stop");
+					}
 					if (distance < start) {
 						p("успеем и ждём");
 					} else {
 						p("успеем");
+					}
+					if (t.getPoint().x == 8) {
+						err("stop");
 					}
 					recom.add(t);
 				}
@@ -742,8 +759,10 @@ public class VRGwithTimeWindow {
 		for (PointT t : recom) {
 			if (tmpStart >= t.start) {// t.start+distance
 				if (tmpStart == t.start) {
-					double distance1 = table.get(coordinates.indexOf(t)).get(car.place);
-					double distance2 = table.get(coordinates.indexOf(optim)).get(car.place);
+					double distance1 = getDistance(t, car.getLastPlace());
+					// table.get(coordinates.indexOf(t)).get(car.place);
+					double distance2 = getDistance(optim, car.getLastPlace());
+					// table.get(coordinates.indexOf(optim)).get(car.place);
 					if (distance1 < distance2) {
 						tmpStart = t.start;
 						optim = t;
@@ -758,6 +777,9 @@ public class VRGwithTimeWindow {
 			err("see getOptimPlace from depo");
 		} else {
 			p(optim);
+		}
+		if (optim.getPoint().x == 8) {
+			err("stop");
 		}
 
 		return optim;
@@ -797,7 +819,7 @@ public class VRGwithTimeWindow {
 			double distance = 0;
 			start = t.start;
 			end = t.end;
-			distance = table.get(i).get(0);// car.place = old place
+			distance = getDistance(t, coordinates.get(0));
 
 			p("from " + 0 + " to " + i + ", start= " + start + ",\tend= " + end + ", distance= " + distance);
 			if (distance > end) {
@@ -960,6 +982,10 @@ public class VRGwithTimeWindow {
 			delay = 1;
 			flag = false;
 			dis = 0;
+		}
+
+		public PointT(Point t) {
+			this(t.x, t.y);
 		}
 
 		public double getDistance() {
@@ -1135,6 +1161,5 @@ public class VRGwithTimeWindow {
 				}
 			}
 		}
-
 	}
 }
