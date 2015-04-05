@@ -20,7 +20,6 @@ import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxPoint;
-import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxEdgeStyle;
 import com.mxgraph.view.mxGraph;
@@ -45,7 +44,9 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	public int radius = 40;
 	public int translateX = 0;
 	public int translateY = 0;
-	int coef = 5;
+	int coef = 6;
+	float w = length;
+	float h = length / 2;
 
 	public static ArrayList<VRGvertexes> vrgVertexes;
 	public int numberOfSpace = 0;
@@ -59,6 +60,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		routess = new VRGroutes(r);
 		withTimeWindow = true;
 		setUp();
+		showInitMessage();
 	}
 
 	public VRGgraphOld() {
@@ -66,6 +68,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		routess = new VRGroutes(VRG.routes, VRG.coordinates);
 		withTimeWindow = false;
 		setUp();
+		showInitMessage();
 	}
 
 	private void setUp() {
@@ -94,7 +97,6 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		// graphComponent.setBackgroundImage(VRGUtils.getImageForGraph());
 		repaint();
 		invalidate();
-		showInitMessage();
 
 		graphComponent.addKeyListener(keyListener);
 		graphComponent.addFocusListener(focusListener);
@@ -144,6 +146,11 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	}
 
 	private void setZoomIfNeed() {
+		if (withTimeWindow) {
+			w = length * coef / 8;
+			h = length * coef / 15;
+		}
+
 		Point point;
 		Point x, y;
 		y = routess.maxY();
@@ -166,24 +173,29 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 		graph.getModel().beginUpdate();
 		try {
-			if (!withTimeWindow) {
-				// addCars(graph);
-			}
 			for (Route arr : routess.getRoutes()) {
 				for (Section s : arr.getRoute()) {
 					VRGvertexes vertex = new VRGvertexes();
-					// Null is id
+
 					vertex.setStartCell(graph.insertVertex(parent, null, s.getStart().toString(), translateX + s.getStart().x
-							* distance, translateY + s.getStart().y * distance, length, length / 2));// x,y,width,height//StrUtils.GRAPH_PARAM_3
+							* distance, translateY + s.getStart().y * distance, w, h));// x,y,width,height//StrUtils.GRAPH_PARAM_3
 					vertex.setEndCell(graph.insertVertex(parent, null, s.getEnd().toString(), translateX + s.getEnd().x
-							* distance, translateY + s.getEnd().y * distance, length, length / 2));// x,y,width,height//StrUtils.GRAPH_PARAM_3
+							* distance, translateY + s.getEnd().y * distance, w, h));// x,y,width,height//StrUtils.GRAPH_PARAM_3
 					vertex.setSection(s);
 
-					if (!withTimeWindow) {
-						// vertex.demand = VRG.demand.get(i);
-						// vertex.price = VRG.price.get(i);
-					}
 					vertex.vertexCoords = new VRGvertexes.VertexCoords(s.getStart(), s.getEnd());
+
+					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { vertex.startObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "red", new Object[] { vertex.endObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "green",
+							new Object[] { vertex.startObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "red", new Object[] { vertex.endObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2),
+							new Object[] { vertex.startObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2),
+							new Object[] { vertex.endObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "black", new Object[] { vertex.startObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "black", new Object[] { vertex.endObjectVertex });
 
 					vrgVertexes.add(vertex);
 				}
@@ -198,17 +210,14 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	private void addDepo(mxGraph graph) {
 		Object parent = graph.getDefaultParent();
 
-		final int PORT_DIAMETER = 20;
+		final int PORT_DIAMETER = 4 * coef;
 		final int PORT_RADIUS = PORT_DIAMETER / 2;
-		depo = (mxCell) graph.insertVertex(parent, null, "Depo", 0, 0, 50, 50, "");
+		depo = (mxCell) graph.insertVertex(parent, null, "Depo", 0, 0, coef * 10, coef * 10, "");
 		depo.setConnectable(false);
-
-		mxGeometry geo = graph.getModel().getGeometry(depo);
-		// The size of the rectangle when the minus sign is clicked
-		geo.setAlternateBounds(new mxRectangle(00, 00, 50, 50));
 
 		float[][][] coords = new float[][][] { { { 1, 1 } }, { { 0.5f, 1 }, { 1, 0.5f } },
 				{ { 0.5f, 1 }, { 1, 0.5f }, { 1, 1 } } };
+
 		ArrayList<mxCell> ports = new ArrayList<mxCell>();
 
 		int size = routess.getCountRoutess();
@@ -219,7 +228,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			g.setOffset(new mxPoint(-PORT_RADIUS, -PORT_RADIUS));
 			g.setRelative(true);
 
-			mxCell port = new mxCell(null, g, "shape=rectangle;perimter=rectanglePerimeter");
+			mxCell port = new mxCell(null, g, VRGUtils.GRAPH_PARAM_1);
 			port.setVertex(true);
 			ports.add(port);
 
@@ -227,10 +236,16 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		}
 
 		for (int i = 0; i < size; i++) {
-			Object v = (graph.insertVertex(parent, null, getFirstRoute(i).toString(), translateX + getFirstRoute(i).x
-					* distance, translateY + getFirstRoute(i).y * distance, length, length / 2, "FILLCOLOR=green;"));
+			Object v = graph.insertVertex(parent, null, getFirstRoute(i).toString(),
+					translateX + getFirstRoute(i).x * distance, translateY + getFirstRoute(i).y * distance, w, h);
+
+			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "green", new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2), new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "black", new Object[] { v });
+
 			graph.insertEdge(parent, null, VRGroutes.getStrDistance(new Point(0, 0), getFirstRoute(i)), ports.get(i), v,
-					"strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;");
+					VRGUtils.GRAPH_PARAM_3);
 		}
 	}
 
@@ -256,9 +271,6 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 		setStyle(graph);
 
-		String GRAPH_PARAM_2 = "strokeColor=red;edgeStyle=EntityRelation;elbow=vertical;entryX=0;entryY=1;entryPerimeter=0;exitPerimeter=1;";
-		String GRAPH_PARAM_4 = "strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;";
-
 		String distance = "";
 		Point tmp = new Point(0, 0);
 		for (VRGvertexes v : vrgVertexes) {
@@ -267,11 +279,8 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			}
 			distance = " " + v.getSection().getStrInnerDistance() + " ";
 
-			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { v.startObjectVertex });
-			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "red", new Object[] { v.endObjectVertex });
-
 			if (v.getSection().getInnerDistance() != 0.0) {
-				graph.insertEdge(parent, null, distance, v.cellStart, v.cellEnd, GRAPH_PARAM_2);
+				graph.insertEdge(parent, null, distance, v.cellStart, v.cellEnd, VRGUtils.GRAPH_PARAM_2);
 			}
 		}
 		int in = 0;
@@ -288,11 +297,11 @@ public class VRGgraphOld extends javax.swing.JFrame {
 						null,
 						VRGroutes.getStrDistance(vrgVertexes.get(index).getSection().getEnd(), vrgVertexes.get(in).getSection()
 								.getStart()), vrgVertexes.get(index).endObjectVertex, vrgVertexes.get(in).startObjectVertex,
-						GRAPH_PARAM_4);
+						VRGUtils.GRAPH_PARAM_4);
 				index = in;
 			}
 		}
-		graph.setAutoSizeCells(true);
+		graph.setAutoSizeCells(false);
 
 		if (!withTimeWindow) {
 			return;
@@ -322,10 +331,9 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 	private void setStyle(mxGraph graph) {
 		Map<String, Object> style = graph.getStylesheet().getDefaultEdgeStyle();
-		// styl.put(mxConstants.STYLE_EDGE, mxEdgeStyle.Loop);// сделай
 		style.put(mxConstants.STYLE_EDGE, mxEdgeStyle.EntityRelation);//
-		style.put(mxConstants.STYLE_STROKEWIDTH, 2);
-		style.put(mxConstants.STYLE_FONTSIZE, 12);
+		style.put(mxConstants.STYLE_STROKEWIDTH, coef / 4);
+		style.put(mxConstants.STYLE_FONTSIZE, coef * 2);
 		style.put(mxConstants.STYLE_FONTCOLOR, "black");
 		style.put(mxConstants.STYLE_STARTARROW, mxConstants.ARROW_OVAL);
 		style.put(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "#ffffff");
