@@ -941,15 +941,19 @@ public class VRGframe extends JFrame {
 		} else {
 			if (graphIsFirstOpened) {
 				tabbedPane.setSelectedIndex(3);
-				if (isTW()) {
-					VRGwithTimeWindow.showGraph();
-				} else {
-					VRGgraphOld frame = new VRGgraphOld();
-					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				}
+				showOldFrame();
 			}
 		}
 		graphIsFirstOpened = false;
+	}
+
+	private void showOldFrame() {
+		if (isTW()) {
+			VRGwithTimeWindow.showGraph();
+		} else {
+			VRGgraphOld frame = new VRGgraphOld();
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		}
 	}
 
 	private void fillValueToTransportTable() {
@@ -989,7 +993,11 @@ public class VRGframe extends JFrame {
 			fillResultTable();
 			graphIsFirstOpened = true;
 
-			openGraph(!((ms + 300) > System.currentTimeMillis()));// DoubleClick
+			if (isTW()) {
+				showOldFrame();
+			} else {
+				openGraph(!((ms + 300) > System.currentTimeMillis()));// DoubleClick
+			}
 
 			ms = System.currentTimeMillis();
 			break;
