@@ -77,18 +77,18 @@ public class VRGUtils {
 	public static final String TXT_PLAYER_LABEL = "Всего игроков: ";// "Total players: ";
 	public static final String LABEL_CARS = "Cars ";
 
-	public static final String GRAPH_PARAM_1 = "edgeStyle=elbowEdgeStyle;elbow=horizontal;"
+	public static final String GRAPH_PARAM_1 = "shape=rectangle;perimter=rectanglePerimeter"
 			+ "exitX=0.5;exitY=1;exitPerimeter=1;entryX=0;entryY=0;entryPerimeter=1;";
-	public static final String GRAPH_PARAM_2 = "edgeStyle=elbowEdgeStyle;elbow=vertical;orthogonal=1;"
+	public static final String GRAPH_PARAM_2 = "strokeColor=red;edgeStyle=EntityRelation;elbow=vertical;entryX=0;entryY=1;entryPerimeter=0;exitPerimeter=1;"
 			+ "entryX=0;entryY=1;entryPerimeter=0;";
-	public static final String GRAPH_PARAM_3 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
-	public static final String GRAPH_PARAM_4 = "edgeStyle=elbowEdgeStyle;elbow=horizontal;exitX=1;exitY=1;exitY=1;exitPerimeter=1;entryX=1;entryY=1;entryPerimeter=1;";
-	// "edgeStyle=elbowEdgeStyle;elbow=horizontal;orthogonal=0;";
+	public static final String GRAPH_PARAM_3 = "strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;";
+	public static final String GRAPH_PARAM_4 = "strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;";
 
 	public static final String MSG_INIT = "Здесь будет отображаться Ваш граф" + "\n"
 			+ "Чтобы сгенерировать другой маршрут нажмите пробел (spase)" + "\n"
 			+ "Чтобы сохранить текущее окно как картинку, нажмите CTRL" + "\n"
-			+ "Чтобы сохранить весь экран как картинку, нажмите ALT";
+			+ "Чтобы сохранить весь экран как картинку, нажмите ALT" + "\n"
+			+ "Чтобы увеличить или уменьшить картинку, нажмите Q/A";
 	public static final String MSG_ERR_FILE_ISNT_CREATED = "Не возможно создать файл!";// "File is not created!";
 	public static final String MSG_ERR_TITLE = "Error";
 	public static final String MSG_ERR_BODY_TC = "Перейдите по вкладке граф";// "Click graph tab";
@@ -225,6 +225,7 @@ public class VRGUtils {
 		dialog.setTitle(title);
 		dialog.setModal(true);
 		dialog.setLocationRelativeTo(frame);
+		dialog.setLocation(dialog.getLocation().x - 130, dialog.getLocation().y - 57);
 		dialog.setContentPane(optionPane);
 
 		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
@@ -337,9 +338,9 @@ public class VRGUtils {
 	public static ImageIcon getImageForGraph() {
 		File f;
 		if (Math.random() * 100 % 2 == 0) {
-			f = new File("backCountry.jpg");
+			f = new File("resources/backCountry.jpg");
 		} else {
-			f = new File("backSamara.jpg");
+			f = new File("resources/backSamara.jpg");
 		}
 		BufferedImage image = null;
 		try {
