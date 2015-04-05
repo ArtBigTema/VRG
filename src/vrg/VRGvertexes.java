@@ -54,9 +54,13 @@ public class VRGvertexes {
 		public Point getStartCoord() {
 			return this.coord;
 		}
-		
-		public boolean eq(Point p){
+
+		public boolean eq(Point p) {
 			return (p.x == this.coord.x) && (p.y == this.coord.y);
+		}
+
+		public boolean eqq(Point p) {
+			return (p.x == this.endCoord.x) && (p.y == this.endCoord.y);
 		}
 
 		@Override
@@ -118,6 +122,9 @@ public class VRGvertexes {
 	}
 
 	public boolean equalsPoint(Point ps, Point pe) {
+		if (ps == null) {
+			return vertexCoords.eq(pe);
+		}
 		return vertexCoords.getStartCoord().equals(ps) && vertexCoords.getEndCoord().equals(pe);
 	}
 
