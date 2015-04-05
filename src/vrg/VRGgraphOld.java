@@ -6,7 +6,6 @@ import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Map;
 
 import vrg.VRGUtils.Point;
@@ -25,7 +24,6 @@ import com.mxgraph.util.mxRectangle;
 import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxEdgeStyle;
 import com.mxgraph.view.mxGraph;
-import com.mxgraph.view.mxStylesheet;
 
 @SuppressWarnings("serial")
 public class VRGgraphOld extends javax.swing.JFrame {
@@ -38,6 +36,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	// public ArrayList<ArrayList<Integer>> routes = new
 	// ArrayList<ArrayList<Integer>>();
 	public static VRGroutes routess;
+	public static mxCell depo;
 
 	public static int distance = VRGUtils.DISTANCE;
 	public static int zoom = 1;
@@ -46,6 +45,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	public int radius = 40;
 	public int translateX = 0;
 	public int translateY = 0;
+	int coef = 5;
 
 	public static ArrayList<VRGvertexes> vrgVertexes;
 	public int numberOfSpace = 0;
@@ -69,9 +69,43 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	}
 
 	private void setUp() {
-
 		vrgVertexes = new ArrayList<VRGvertexes>();
-		mxGraph graph = new mxGraph() {
+		int w = 600;
+		int h = 450;
+		// this.removeAll();
+
+		if (graphComponent != null) {
+			this.getContentPane().remove(graphComponent);
+			mxGraph graph = graphComponent.getGraph();
+			graph = getNewGraph();
+			this.setTitle(graph.toString());
+			w = this.getBounds().width;
+			h = this.getBounds().height;
+		}
+		mxGraph graph = getNewGraph();
+
+		this.constuctGraph(graph);
+
+		setComponent(graph);
+		this.getContentPane().add(graphComponent);
+		this.setSize(w, h);
+		this.setVisible(true);
+
+		// graphComponent.setBackgroundImage(VRGUtils.getImageForGraph());
+		repaint();
+		invalidate();
+		showInitMessage();
+
+		graphComponent.addKeyListener(keyListener);
+		graphComponent.addFocusListener(focusListener);
+		this.addKeyListener(keyListener);
+		this.addFocusListener(focusListener);
+		graphComponent.requestFocus();
+		graphComponent.grabFocus();
+	}
+
+	private mxGraph getNewGraph() {
+		return new mxGraph() {
 			public void drawState(mxICanvas canvas, mxCellState state, boolean drawLabel) {
 				String label = (drawLabel) ? state.getLabel() : "";
 
@@ -85,8 +119,9 @@ public class VRGgraphOld extends javax.swing.JFrame {
 				}
 			}
 		};
+	}
 
-		this.constuctGraph(graph);
+	private void setComponent(mxGraph graph) {
 		graphComponent = new mxGraphComponent(graph) {
 
 			@Override
@@ -101,30 +136,6 @@ public class VRGgraphOld extends javax.swing.JFrame {
 				return canvas;
 			}
 		};
-
-		this.getContentPane().add(graphComponent);
-		this.setSize(600, 450);
-		this.setVisible(true);
-
-		// graphComponent.setBackgroundImage(VRGUtils.getImageForGraph());
-		repaint();
-		// showInitMessage();FIXME
-
-		graphComponent.addKeyListener(keyListener);
-		graphComponent.addFocusListener(focusListener);
-	}
-
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		if (isCompleted) {
-			// g.drawOval(translateX + (coordinates.get(0).x) * distance -
-			// VRGUtils.radius, translateY + (coordinates.get(0).y)
-			// * distance - VRGUtils.radius, VRGUtils.radius, VRGUtils.radius);
-			// x-radius, y-radius, radius*2, radius*2
-		}
-		// g.drawImage(VRGUtils.getImageForGraph().getImage(), 0, 0,
-		// g.getClipBounds().width, g.getClipBounds().height, null);
 	}
 
 	public static void reSize(int w, int h) {
@@ -132,11 +143,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		height = h;
 	}
 
-	private void setZoomIfNeed(boolean b) {
-		int coef = 15;
-		if (!b) {
-			coef = 5;
-		}
+	private void setZoomIfNeed() {
 		Point point;
 		Point x, y;
 		y = routess.maxY();
@@ -150,30 +157,17 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	}
 
 	public void constuctGraph(mxGraph graph) {
-		if (graph == null && !VRG.isValid()) {
+		if (graph == null) {
 			return;
 		}
-		setZoomIfNeed(withTimeWindow);
+		setZoomIfNeed();
 
 		Object parent = graph.getDefaultParent();
 
 		graph.getModel().beginUpdate();
 		try {
-			{
-				VRGvertexes a = new VRGvertexes();
-
-				a.objectVertex = graph.insertVertex(parent, null, VRGUtils.LABEL_BASE, translateX + routess.getDepo().x
-						* distance, translateY + routess.getDepo().y * distance, baseLength, baseLength,
-						"shape=ellipse;perimeter=trianglePerimeter");// x,y,width,height
-				a.setEndCell(a.objectVertex);
-				a.setStartCell(a.objectVertex);
-				// a.setSection(new Section(new Point(0, 0)));
-				// a.setSection(new Section(routess.getDepo()));
-				// vrgVertexes.add(a);
-			}
-
 			if (!withTimeWindow) {
-				addCars(graph);
+				// addCars(graph);
 			}
 			for (Route arr : routess.getRoutes()) {
 				for (Section s : arr.getRoute()) {
@@ -201,19 +195,12 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		}
 	}
 
-	private void addCars(mxGraph graph) {
-		for (int i = 1; i < VRG.carsCoordinates.size(); i++) {
-			graph.insertVertex(graph.getDefaultParent(), null, VRGUtils.LABEL_CARS + i, 50, VRG.carsCoordinates.get(i).y / 2,
-					2 * length, length);
-		}
-	}
-
 	private void addDepo(mxGraph graph) {
 		Object parent = graph.getDefaultParent();
 
 		final int PORT_DIAMETER = 20;
 		final int PORT_RADIUS = PORT_DIAMETER / 2;
-		mxCell depo = (mxCell) graph.insertVertex(parent, null, "Depo", 0, 0, 50, 50, "");
+		depo = (mxCell) graph.insertVertex(parent, null, "Depo", 0, 0, 50, 50, "");
 		depo.setConnectable(false);
 
 		mxGeometry geo = graph.getModel().getGeometry(depo);
@@ -221,7 +208,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		geo.setAlternateBounds(new mxRectangle(00, 00, 50, 50));
 
 		float[][][] coords = new float[][][] { { { 1, 1 } }, { { 0.5f, 1 }, { 1, 0.5f } },
-				{ { 0.5f, 1 }, { 1, 1 }, { 1, 0.5f } } };
+				{ { 0.5f, 1 }, { 1, 0.5f }, { 1, 1 } } };
 		ArrayList<mxCell> ports = new ArrayList<mxCell>();
 
 		int size = routess.getCountRoutess();
@@ -262,15 +249,9 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		}
 
 		Object parent = graph.getDefaultParent();
-		addDepo(graph);
 
-		if ((numberOfSpace + 1) > routess.getCountRoutess()) {
-			VRGframe.isNeedToUpdate = false;
-			if (VRGUtils.showInputDialog(this, VRGUtils.MSG_ATTENTION, VRGUtils.MSG_ERR_ROUTES_OPTIM)) {
-				generateRoutes(true);
-			}
-			VRGframe.isNeedToUpdate = true;
-			numberOfSpace = 0;
+		if (withTimeWindow) {
+			addDepo(graph);
 		}
 
 		setStyle(graph);
@@ -289,15 +270,17 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { v.startObjectVertex });
 			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "red", new Object[] { v.endObjectVertex });
 
-			graph.insertEdge(parent, null, distance, v.cellStart, v.cellEnd, GRAPH_PARAM_2);
+			if (v.getSection().getInnerDistance() != 0.0) {
+				graph.insertEdge(parent, null, distance, v.cellStart, v.cellEnd, GRAPH_PARAM_2);
+			}
 		}
 		int in = 0;
 		int index = 0;
 		for (Route arr : routess.getRoutes()) {
 			for (Section s : arr.getRoute()) {
 				in = getVertex(s.getStart(), s.getEnd());
-				if (vrgVertexes.get(in).vertexCoords.eq(tmp)) {
-					index = in;
+				if (vrgVertexes.get(in).vertexCoords.eq(tmp) || vrgVertexes.get(in).vertexCoords.eqq(tmp)) {
+					index = in;// rollback
 					continue;
 				}
 				graph.insertEdge(
@@ -311,16 +294,35 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		}
 		graph.setAutoSizeCells(true);
 
-		Object[] edges = graph.getEdgesBetween(vrgVertexes.get(0).objectVertex, vrgVertexes.get(0).objectVertex);
-
-		for (Object edge : edges) {
-			graph.getModel().remove(edge);
+		if (!withTimeWindow) {
+			return;
 		}
+		int k = 0;
+		for (int i = 0; i < routess.getCountRoutess(); i++) {
+			k = getFirstVertex(k);
+			Object[] edges = graph.getEdges(vrgVertexes.get(k).endObjectVertex);
+			for (Object edge : edges) {
+				graph.getModel().remove(edge);
+				graph.getModel().remove(vrgVertexes.get(k).endObjectVertex);
+				graph.getModel().remove(vrgVertexes.get(k).startObjectVertex);
+			}
+			k++;
+		}
+	}
+
+	private int getFirstVertex(int i) {
+		for (int j = i; j < vrgVertexes.size(); j++) {
+			VRGvertexes v = vrgVertexes.get(j);
+			if (v.equalsPoint(null, new Point(0, 0))) {
+				return j;
+			}
+		}
+		return -1;
 	}
 
 	private void setStyle(mxGraph graph) {
 		Map<String, Object> style = graph.getStylesheet().getDefaultEdgeStyle();
-		// styl.put(mxConstants.STYLE_EDGE, mxEdgeStyle.Loop);// FIXME сделай
+		// styl.put(mxConstants.STYLE_EDGE, mxEdgeStyle.Loop);// сделай
 		style.put(mxConstants.STYLE_EDGE, mxEdgeStyle.EntityRelation);//
 		style.put(mxConstants.STYLE_STROKEWIDTH, 2);
 		style.put(mxConstants.STYLE_FONTSIZE, 12);
@@ -351,8 +353,8 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			VRG.generateEdges();
 			routess = new VRGroutes(VRG.routes, VRG.coordinates);
 		}
-		VRGUtils.showAutoCLoseMess(VRGgraphOld.this, VRGUtils.MSG_TITLE_GENER, mess);
-		removeAllEdges(graphComponent.getGraph());
+		VRGUtils.showAutoCLoseMess(getContentPane(), VRGUtils.MSG_TITLE_GENER, mess);
+		setUp();
 	}
 
 	private void generateRoutes() {
@@ -362,11 +364,39 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	private void removeAllEdges(mxGraph graph) {
 		graph.getModel().beginUpdate();
 		try {
+			Object[] edges = graph.removeCells();
+			if (edges == null || edges.length == 0) {
+				return;
+			}
+			for (Object edge : edges) {
+				graph.getModel().remove(edge);
+			}
 			for (VRGvertexes v : vrgVertexes) {
 				if (v.objectVertex == null) {
 					continue;// FIXME to start/end
 				}
-				Object[] edges = graph.getEdges((mxCell) v.objectVertex);
+				edges = graph.getEdges((mxCell) v.objectVertex);
+				if (edges == null || edges.length == 0) {
+					continue;
+				}
+				for (Object edge : edges) {
+					graph.getModel().remove(edge);
+				}
+				edges = graph.getEdges(v.cellStart);
+				if (edges == null || edges.length == 0) {
+					continue;
+				}
+				for (Object edge : edges) {
+					graph.getModel().remove(edge);
+				}
+				edges = graph.getEdges(v.cellEnd);
+				if (edges == null || edges.length == 0) {
+					continue;
+				}
+				for (Object edge : edges) {
+					graph.getModel().remove(edge);
+				}
+				edges = graph.getEdges(depo);
 				if (edges == null || edges.length == 0) {
 					continue;
 				}
@@ -374,7 +404,6 @@ public class VRGgraphOld extends javax.swing.JFrame {
 					graph.getModel().remove(edge);
 				}
 			}
-
 		} finally {
 			graph.getModel().endUpdate();
 		}
@@ -385,8 +414,15 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		public void keyReleased(KeyEvent paramKeyEvent) {
 			if (paramKeyEvent.getKeyCode() == (KeyEvent.VK_SPACE)) {
 				numberOfSpace++;
-				generateRoutes();
-				updateEdges(graphComponent.getGraph());
+				if ((numberOfSpace + 1) > routess.getCountRoutess()) {
+					VRGframe.isNeedToUpdate = true;
+					numberOfSpace = 0;
+					generateRoutes(VRGUtils.showInputDialog(graphComponent, VRGUtils.MSG_ATTENTION,
+							VRGUtils.MSG_ERR_ROUTES_OPTIM));
+					VRGframe.isNeedToUpdate = true;
+				} else {
+					generateRoutes(false);
+				}
 			}
 
 			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_ALT) {
@@ -399,6 +435,13 @@ public class VRGgraphOld extends javax.swing.JFrame {
 				graphComponent.setBackgroundImage(null);
 				repaint();
 			}
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_Q) {
+				VRGgraphOld.this.setExtendedState(6);
+				setUp();
+			}
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_A) {
+				setUp();
+			}
 		};
 
 		@Override
@@ -408,7 +451,12 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 		@Override
 		public void keyPressed(KeyEvent paramKeyEvent) {
-
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_Q) {
+				coef += 2;
+			}
+			if (paramKeyEvent.getKeyCode() == KeyEvent.VK_A) {
+				coef -= 2;
+			}
 		}
 	};
 	FocusListener focusListener = new FocusListener() {
@@ -416,7 +464,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		@Override
 		public void focusLost(FocusEvent arg0) {
 			if (VRGframe.isNeedToUpdate) {
-				VRGgraphOld.this.dispose();
+				// VRGgraphOld.this.dispose();
 			}
 		}
 
