@@ -25,7 +25,9 @@ public class VRGroutes {
 
 			public Section(Point s) {
 				start = s;
-				end = new Point(-1, -1);// FIXME
+				end = new Point(s.x, s.y);// FIXME
+				setPointT(new PointT(s.x, s.y));
+				point.setEndPlace(s.x, s.y);
 			}
 
 			public Section(PointT s) {
@@ -123,14 +125,15 @@ public class VRGroutes {
 	}
 
 	public VRGroutes(ArrayList<ArrayList<Integer>> r, ArrayList<Point> coordinates) {
+		this();
 		setCountRoutess(r.size());
 		Route tmp;
 		for (ArrayList<Integer> arr : r) {
-			tmp = new Route(r.indexOf(arr));
+			tmp = new Route();
 			for (int i : arr) {
 				tmp.addSection(coordinates.get(i));
 			}
-			addRoute(tmp);
+			setRoute(r.indexOf(arr), tmp);
 		}
 	}
 
@@ -150,6 +153,10 @@ public class VRGroutes {
 
 	public void addRoute(Route r) {
 		routes.add(r);
+	}
+
+	public void setRoute(int i, Route r) {
+		routes.set(i, r);
 	}
 
 	public void clear() {
