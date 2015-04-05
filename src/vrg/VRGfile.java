@@ -14,18 +14,27 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.io.FileUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import vrg.VRGUtils.Point;
+import vrg.VRGwithTimeWindow.PointT;
+
 public class VRGfile {
 	public static String coordsFileName = "";
 
-	public static JFileChooser getFileChooser() {
+	public static JFileChooser getFileChooser(String ext) {
 		JFileChooser chooser = new JFileChooser();
-		FileFilter ff = new FileNameExtensionFilter(VRGUtils.TXT_FILES, "txt", "adb");
+		FileFilter ff = new FileNameExtensionFilter(VRGUtils.TXT_FILES, ext, "adb");
 		chooser.setFileFilter(ff);
 		return chooser;
 	}
 
-	public static File openFile(Component parent) {
-		JFileChooser chooser = getFileChooser();
+	public static File openFile(Component parent, String ext) {
+		JFileChooser chooser = getFileChooser(ext);
 		File file = chooser.getSelectedFile();
 		int result = chooser.showOpenDialog(parent);
 		if (result == JFileChooser.APPROVE_OPTION) {
@@ -56,7 +65,90 @@ public class VRGfile {
 	}
 
 	public static ArrayList<VRGvertexes> readFromFile(Component parent) {
-		return readFromFile(openFile(parent));
+		return readFromFile(openFile(parent, "txt"));
+	}
+
+	public static ArrayList<Integer> readCarsFromFile() {
+		ArrayList<Integer> res = new ArrayList<Integer>();
+		File file = new File("resources/cars.json");
+
+		String json = "";
+		if (file.exists()) {
+			try {
+				json = FileUtils.readFileToString(file, "UTF-8");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		JSONParser parser = new JSONParser();
+
+		Object obj = null;
+		try {
+			obj = parser.parse(json);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObj = (JSONObject) obj;
+
+		int n = getInt(jsonObj.get("count"));
+		for (int i = 0; i < n; i++) {
+			res.add((int) (10 + Math.random() * 10));// FIXME
+		}
+		return res;
+	}
+
+	public static ArrayList<PointT> readCoordFromFile() {
+		File file = new File("resources/coords.json");
+
+		String json = "";
+		if (file.exists()) {
+			try {
+				json = FileUtils.readFileToString(file, "UTF-8");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		JSONParser parser = new JSONParser();
+
+		Object obj = null;
+		try {
+			obj = parser.parse(json);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObj = (JSONObject) obj;
+
+		int n = getInt(jsonObj.get("count"));
+
+		JSONArray jstart = (JSONArray) jsonObj.get("CoordinatesStart");
+		JSONArray jend = (JSONArray) jsonObj.get("CoordinatesEnd");
+		JSONArray dels = (JSONArray) jsonObj.get("Delay");
+		JSONArray ts = (JSONArray) jsonObj.get("TimeStart");
+		JSONArray te = (JSONArray) jsonObj.get("TimeEnd");
+
+		ArrayList<PointT> res = new ArrayList<PointT>();
+		for (int i = 0; i < n; i++) {
+			JSONArray js = (JSONArray) jstart.get(i);
+			JSONArray je = (JSONArray) jend.get(i);
+
+			Point ps = new Point(getInt(js.get(0)), getInt(js.get(1)));
+			Point pe = new Point(getInt(je.get(0)), getInt(je.get(1)));
+
+			PointT t = new PointT(ps);
+			t.setEndPlace(pe);
+			t.setDelay(getInt(dels.get(i)));
+			t.setTimeWindow(getInt(ts.get(i)), getInt(te.get(i)));
+
+			res.add(t);
+		}
+
+		return res;
+	}
+
+	public static int getInt(Object o) {
+		return Integer.valueOf(String.valueOf(o.toString()));
 	}
 
 	public static File file = VRGUtils.getFile(new File(VRGUtils.LABEL_VRG), ".txt");
