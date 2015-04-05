@@ -79,7 +79,6 @@ public class VRG {
 		clearAll();
 		countCoords = n;
 		generateCoordinates(n);
-		generateCars(n);
 		generateDemand(n);
 		generatePrice(n);
 		createTableOfRoutes();
@@ -102,18 +101,19 @@ public class VRG {
 
 	public static int getCountCoords() {
 		if (countCoords != coordinates.size()) {
-			err("See getCountCoords() " + countCoords + "  " + coordinates.size());
+			// err("See getCountCoords() " + countCoords + "  " +
+			// coordinates.size());
 			return coordinates.size();
 		}
-		return countCoords;
+		return coordinates.size();
 	}
 
 	public static int getCountCars() {
 		if (countCars != cars.size()) {
-			err("See this " + countCars + "  " + cars.size());
+			err("See getCountCars() " + countCars + "  " + cars.size());
 			return cars.size();
 		}
-		return countCars;
+		return cars.size() - 1;
 	}
 
 	public static void err(Object o) {
@@ -816,7 +816,7 @@ public class VRG {
 		countCoords = vertexes.size();
 
 		for (int i = 0; i < countCoords; i++) {
-			coordinates.add(vertexes.get(i).vertexCoords.getPoint());
+			coordinates.add(vertexes.get(i).vertexCoords.getStartCoord());
 			price.add(vertexes.get(i).price);
 			demand.add(vertexes.get(i).demand);
 		}
