@@ -160,7 +160,8 @@ public class VRGwithTimeWindow {
 	public static ArrayList<ArrayList<Integer>> getRoutesAll() {
 		if (routes == null || routes.size() == 0) {
 			optimalPoint = OptimalPoint.OptimalDistance;
-			main(null);
+			generateLengthRoutesAndTable();
+			solve();
 		}
 		return routes;
 	}
@@ -181,7 +182,12 @@ public class VRGwithTimeWindow {
 
 	public static ArrayList<Integer> getRoutes(int j) {
 		if (routes == null || routes.size() == 0) {
-			main(null);
+			generateLengthRoutesAndTable();
+
+			print();
+
+			optimalPoint = OptimalPoint.OptimalTime;
+			solve();
 		}
 		return routes.get(j);
 	}
@@ -217,18 +223,11 @@ public class VRGwithTimeWindow {
 	}
 
 	public static void main(String[] args) {
-		boolean b = false;
 
-		if (b) {
-			clearAll();
-			coordinates = VRGfile.readCoordFromFile();
-			carsWeight = VRGfile.readCarsFromFile();
-			sort();
-		} else {
-			printWithEnd();
-			generateAllStandart();
-			sortX();
-		}
+		printWithEnd();
+		generateAllStandart();
+		sortX();
+
 		pp(coordinates);
 
 		generateLengthRoutesAndTable();
@@ -240,6 +239,16 @@ public class VRGwithTimeWindow {
 		out.flush();
 
 		showGraphIfNeed();
+	}
+
+	public static void readFromFile(java.awt.Component parent) {
+		clearAll();
+		coordinates = VRGfile.readCoordFromFile(parent);
+		carsWeight = VRGfile.readCarsFromFile();
+		if (coordinates == null || carsWeight == null) {
+			return;
+		}
+		sort();
 	}
 
 	private static void printWithEnd() {
@@ -1052,7 +1061,7 @@ public class VRGwithTimeWindow {
 			if (endPlace == null) {
 				return flag + " " + x + ", " + y + "\t" + start + " - " + end + ", end ";
 			} else {
-				return toSt();
+				return "(" + x + "; " + y + ") " + VRGUtils.ARROW + " " + endPlace.toString();
 			}
 		}
 
