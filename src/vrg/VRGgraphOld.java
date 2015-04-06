@@ -8,21 +8,21 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Map;
 
-import vrg.VRGUtils.Point;
-import vrg.VRGroutes.Route;
-import vrg.VRGroutes.Route.Section;
-
 import com.mxgraph.canvas.mxICanvas;
 import com.mxgraph.canvas.mxImageCanvas;
 import com.mxgraph.model.mxCell;
 import com.mxgraph.model.mxGeometry;
+import com.mxgraph.view.mxCellState;
 import com.mxgraph.swing.mxGraphComponent;
 import com.mxgraph.swing.view.mxInteractiveCanvas;
 import com.mxgraph.util.mxConstants;
 import com.mxgraph.util.mxPoint;
-import com.mxgraph.view.mxCellState;
 import com.mxgraph.view.mxEdgeStyle;
 import com.mxgraph.view.mxGraph;
+
+import vrg.VRGUtils.Point;
+import vrg.VRGroutes.Route;
+import vrg.VRGroutes.Route.Section;
 
 @SuppressWarnings("serial")
 public class VRGgraphOld extends javax.swing.JFrame {
@@ -367,6 +367,11 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 	private void generateRoutes() {
 		generateRoutes(false);
+	}
+
+	public void updateRoutess(VRGroutes r) {
+		routess = r;
+		setUp();
 	}
 
 	private void removeAllEdges(mxGraph graph) {
