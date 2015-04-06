@@ -9,11 +9,13 @@ import java.util.*;
 import vrg.VRGUtils.Point;
 import vrg.VRGwithTimeWindow.PointT.C.OptimalPoint;
 
-public class VRGwithTimeWindow {
+public class VRGwithTimeWindow implements VRGgeneratorListener {
 	private static DecimalFormat df = new DecimalFormat("#.#");// FIXME
 	private static final PrintWriter out = new PrintWriter(System.out);
 	private static final boolean showGraph = true;
 	private static final boolean forTaxi = true;
+	private static boolean newForEach = false;
+	private static VRGgraphOld frame;
 
 	public static final int MAX_TIME = 100;
 	public static final int[][] COORDS = { { 0, 0 }, { 0, 3 }, { 4, 0 }, { 4, 3 }, { 4, 5 }, { 8, 3 }, { 0, 6 }, { 8, 6 },
@@ -31,15 +33,86 @@ public class VRGwithTimeWindow {
 	public static ArrayList<ArrayList<Double>> lengthOfRoutes = new ArrayList<ArrayList<Double>>();
 	public static ArrayList<Integer> allIndexes = new ArrayList<Integer>();
 	public static ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
-	// public static ArrayList<ArrayList<Double>> table = new
-	// ArrayList<ArrayList<Double>>();
 	public static ArrayList<PointT> passedPath;
 	public static PointT.C.OptimalPoint optimalPoint = OptimalPoint.OptimalDistance;
-
+	public static Queue<PointT> newPointT = new LinkedList<PointT>();
 	public static ArrayList<Pair> cars;
 
+	@Override
+	public void generated(PointT t) {
+		newPointT.add(t);
+
+		if (newForEach) {
+			coordinates.add(t);
+			openPlace();
+			sortX();
+			generateLengthRoutesAndTable();
+			solve();
+
+			updateGraph();
+		}
+	}
+
+	@Override
+	public void started() {
+		newForEach = !newForEach;// FIXME
+		optimalPoint = OptimalPoint.OptimalTime;
+	}
+
+	@Override
+	public void stoped(int count) {
+		p("new points");
+		for (PointT t : newPointT) {
+			p(t.toSt());
+		}
+		if (newForEach) {
+			addNewPoints();// at last time
+			updateGraph();
+		}
+		// System.exit(0);//FIXME
+	}
+
+	private void addNewPoints() {
+		coordinates.addAll(newPointT);
+		openPlace();
+		sortX();
+		pp(coordinates);
+		generateLengthRoutesAndTable();
+
+		solve();
+		showGraphIfNeed();
+		newPointT.clear();
+	}
+
+	@Override
+	public void generated(Point t) {
+		// FIXME
+	}
+
 	public VRGwithTimeWindow() {
-		constructRoutes();// solve();// FIXME
+		VRGStaticData data = new VRGStaticData();
+		data.setListener(this);
+
+		printWithEnd();
+		generateAllStandart();
+		sortX();
+
+		pp(coordinates);
+
+		data.setMaxPoint(getMaxXPoint(), getMaxYPoint());
+		data.setMinPoint(getMinXPoint(), getMinYPoint());
+
+		generateLengthRoutesAndTable();
+
+		print();
+
+		optimalPoint = OptimalPoint.OptimalTime;
+		solve();// constructRoutes();//FIXME
+		out.flush();
+
+		showGraphIfNeed();
+
+		data.startTimer();// FIXME
 	}
 
 	public static boolean isValid() {
@@ -223,22 +296,7 @@ public class VRGwithTimeWindow {
 	}
 
 	public static void main(String[] args) {
-
-		printWithEnd();
-		generateAllStandart();
-		sortX();
-
-		pp(coordinates);
-
-		generateLengthRoutesAndTable();
-
-		print();
-
-		optimalPoint = OptimalPoint.OptimalTime;
-		solve();// constructRoutes();//FIXME
-		out.flush();
-
-		showGraphIfNeed();
+		new VRGwithTimeWindow();
 	}
 
 	public static void readFromFile(java.awt.Component parent) {
@@ -284,8 +342,16 @@ public class VRGwithTimeWindow {
 		}
 	}
 
+	private void updateGraph() {
+		if (frame != null && !newForEach) {
+			frame.updateRoutess(routess);
+		} else {
+			frame = new VRGgraphOld(routess);
+		}
+	}
+
 	public static void showGraph() {// FIXME
-		VRGgraphOld frame = new VRGgraphOld(routess);
+		frame = new VRGgraphOld(routess);
 		frame.withTimeWindow = true;
 		frame.addFocusListener(new FocusListener() {
 
@@ -364,7 +430,6 @@ public class VRGwithTimeWindow {
 
 	public static String randomSort() {
 		int k = random(0, 4);
-		rrr = 0;
 		Comparator<PointT> c = null;
 		switch (k) {
 		case 0:
@@ -401,7 +466,7 @@ public class VRGwithTimeWindow {
 		out.flush();
 	}
 
-	public static void pp(ArrayList<PointT> pp) {
+	public static void pp(List<PointT> pp) {
 		for (PointT p : pp) {
 			p(pp.indexOf(p) + " " + p.toS());
 		}
@@ -543,107 +608,6 @@ public class VRGwithTimeWindow {
 		allIndexes.clear();
 	}
 
-	private static void constructRoutes() {
-		clearRoutess();
-		int k = getCountCars();
-
-		ArrayList<Integer> oldPath = new ArrayList<Integer>();
-		passedPath = new ArrayList<PointT>();
-
-		cars = new ArrayList<Pair>();
-
-		setStartPlaceForCars();
-		closeUnnecessaryPlace();
-		routess.addDepo();
-		p(routess);
-
-		oldPath.add(0);
-		passedPath.add(coordinates.get(0));
-
-		for (int i = 0; i < k; i++) {
-			// double m = getMin(qq); // getMin(arr); // 0; // readInt();
-			PointT optimPlace = getOptimPlace(cars.get(i));
-			p(optimPlace.toStr());
-			// routess.addSectionForIndex(i, optimPlace.getPoint(),
-			// optimPlace.getEndPlace());
-			routess.addSectionForIndex(i, optimPlace);
-
-			// double end = Math.max(cars.get(i).delay, s) + m;
-			double endDD = cars.get(i).delay + getDistance(cars.get(i).getLastPlace(), optimPlace) + optimPlace.getDelay();
-			// FIXME optimPlace.getDelay to t.getDelay
-			p("конечное время " + endDD);// getDelay()
-
-			Pair p = new Pair(endDD, coordinates.indexOf(optimPlace), cars.get(i).num);
-			p.setLastPlace(optimPlace);
-			p.addDistance(getDistance(cars.get(i).getLastPlace(), optimPlace));
-			cars.get(i).setNewValue(p);
-
-			p(p.toStr());
-			p(cars.get(i).toStr());
-			oldPath.add(p.place);
-			passedPath.add(optimPlace.close());
-		}
-
-		p("passedPath");
-		pp(passedPath);
-		p("");
-		pp(coordinates);
-		p("");
-		pr(cars);
-
-		ArrayList<Integer> pathNew = getDifferenceBetweenSets(allIndexes, oldPath);
-
-		ArrayList<PointT> remnant = getRemnantPlace(pathNew);
-		p(remnant + " осталось");
-		p("");
-
-		for (int i = 0; i < remnant.size(); i++) {
-			PointT t = remnant.get(i);
-			p(coordinates.indexOf(t) + " " + t.toStr());
-
-			PointT optimPlace = getOptimPlace(cars, t);
-			if (optimPlace == null) {
-				err("optim place not found");
-				continue;
-			}
-			p("оптимально по " + optimalPoint.toString());
-			p(optimPlace.getEndPlace().toString() + " - " + optimPlace.toStr());
-
-			int carIndex = getNumOfCarsWithPlace(cars, optimPlace) - 1;// car.num
-			// routess.addSectionForIndex(carIndex, t.getPoint(),
-			// t.getEndPlace());
-			routess.addSectionForIndex(carIndex, t);
-
-			double endDD = cars.get(carIndex).delay + getDistance(cars.get(carIndex).getLastPlace(), t) + optimPlace.delay;
-			p("конечное время " + endDD);
-
-			Pair p = new Pair(endDD, coordinates.indexOf(t), cars.get(carIndex).num);
-			p.setLastPlace(t);
-			p.addDistance(getDistance(cars.get(carIndex).getLastPlace(), t));
-			cars.get(carIndex).setNewValue(p);
-
-			p(p.toStr());
-			p(cars.get(carIndex).toStr());
-			oldPath.add(p.place);
-			passedPath.add(t.close());
-		}
-
-		p("passedPath");
-		pp(passedPath);
-		p("");
-		pp(coordinates);
-		p("");
-		pr(cars);
-
-		for (Pair p : cars) {
-			routes.add(p.path);
-		}
-
-		p(routess);
-		passedPath.clear();
-		allIndexes.clear();
-	}
-
 	private static PointT getOptimPlace(ArrayList<Pair> cs, PointT t) {
 		switch (optimalPoint) {
 		case OptimalDistance:
@@ -719,8 +683,6 @@ public class VRGwithTimeWindow {
 		return result;
 	}
 
-	static int rrr = 0;
-
 	private static PointT getOptimPlace(Pair car) {
 		p("Ищем место для машины");
 		p(car.toStr());
@@ -737,23 +699,14 @@ public class VRGwithTimeWindow {
 				distance = getDistance(t, car.getLastPoint());
 
 				p("from " + car.place + " to " + i + ", start= " + start + ",\tend= " + end + ", distance= " + distance);
-				if (distance == 8.1) {
-					rrr++;
-				}
 				if (distance > end) {
 					p("Не успеем");// FIXME close place
 					t.close();
 				} else {
-					if (t.getPoint().equals(new Point(8, 1))) {
-						err("stop");
-					}
 					if (distance < start) {
 						p("успеем и ждём");
 					} else {
 						p("успеем");
-					}
-					if (t.getPoint().x == 8) {
-						err("stop");
 					}
 					recom.add(t);
 				}
@@ -786,9 +739,6 @@ public class VRGwithTimeWindow {
 			err("see getOptimPlace from depo");
 		} else {
 			p(optim);
-		}
-		if (optim.getPoint().x == 8) {
-			err("stop");
 		}
 
 		return optim;
@@ -881,6 +831,22 @@ public class VRGwithTimeWindow {
 		} while (result == oldValue);
 
 		return result;
+	}
+
+	private int getMinYPoint() {
+		return Collections.min(coordinates, new VRGwithTimeWindow.PointT.C.Cy()).y;
+	}
+
+	private int getMinXPoint() {
+		return Collections.min(coordinates, new VRGwithTimeWindow.PointT.C.Cx()).x;
+	}
+
+	private int getMaxYPoint() {
+		return Collections.max(coordinates, new VRGwithTimeWindow.PointT.C.Cy()).y;
+	}
+
+	private int getMaxXPoint() {
+		return Collections.max(coordinates, new VRGwithTimeWindow.PointT.C.Cx()).x;
 	}
 
 	public static class Pair {
@@ -1014,8 +980,13 @@ public class VRGwithTimeWindow {
 		}
 
 		public void setTimeWindow(int s, int e) {
-			start = s;
-			end = e;
+			if (e > s) {
+				start = s;
+				end = e;
+			} else {
+				start = e;
+				end = s;
+			}
 		}
 
 		public void setDelay(int d) {
@@ -1053,7 +1024,7 @@ public class VRGwithTimeWindow {
 		}
 
 		public String toSt() {
-			return flag + " " + x + ", " + y + "\t" + start + " - " + end + ", end " + endPlace.toString() + ", distance "
+			return flag + " (" + x + ", " + y + ") to " + endPlace.toString() + " " + start + " to " + end + ", distance "
 					+ df.format(dis);
 		}
 
