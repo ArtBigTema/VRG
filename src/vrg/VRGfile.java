@@ -27,7 +27,7 @@ public class VRGfile {
 	public static String coordsFileName = "";
 
 	public static JFileChooser getFileChooser(String ext) {
-		JFileChooser chooser = new JFileChooser();
+		JFileChooser chooser = new JFileChooser(new File("").getAbsolutePath());
 		FileFilter ff = new FileNameExtensionFilter(VRGUtils.TXT_FILES, ext, "adb");
 		chooser.setFileFilter(ff);
 		return chooser;
@@ -39,6 +39,10 @@ public class VRGfile {
 		int result = chooser.showOpenDialog(parent);
 		if (result == JFileChooser.APPROVE_OPTION) {
 			file = chooser.getSelectedFile();
+		}
+		if (file == null) {
+			VRGUtils.showErrorMess(parent, VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_FNF);
+			return null;
 		}
 		return file;
 	}
@@ -73,12 +77,15 @@ public class VRGfile {
 		File file = new File("resources/cars.json");
 
 		String json = "";
-		if (file.exists()) {
+		if (file != null && file.exists()) {
 			try {
 				json = FileUtils.readFileToString(file, "UTF-8");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			VRGUtils.showErrorMess(null, VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_FNF);
+			return null;
 		}
 
 		JSONParser parser = new JSONParser();
@@ -98,16 +105,19 @@ public class VRGfile {
 		return res;
 	}
 
-	public static ArrayList<PointT> readCoordFromFile() {
-		File file = new File("resources/coords.json");
+	public static ArrayList<PointT> readCoordFromFile(java.awt.Component parent) {
+		// File file = new File("resources/coords.json");
+		File file = openFile(parent, "json");
 
 		String json = "";
-		if (file.exists()) {
+		if (file != null && file.exists()) {
 			try {
 				json = FileUtils.readFileToString(file, "UTF-8");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			return null;
 		}
 
 		JSONParser parser = new JSONParser();
