@@ -606,15 +606,7 @@ public class VRGframe extends JFrame {
 
 				@Override
 				public void actionPerformed(ActionEvent evt) {
-					tabbedPane.setSelectedIndex(0);
-					buttonDeleteVertexActionPerformed(evt);
-					VRG.readTableFromFile(VRGframe.this);
-					if (isVal()) {
-						fillAllStandart();
-						VRG.generateGraphRoutes();
-					} else {
-						VRGUtils.showErrorMess(VRGframe.this, VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_FNF);
-					}
+					importData();
 				}
 			});
 
@@ -638,6 +630,25 @@ public class VRGframe extends JFrame {
 					closeProgram();
 				}
 			});
+		}
+	}
+
+	private void importData() {
+		tabbedPane.setSelectedIndex(0);
+		clearAll();
+		readDataFromFile();
+	}
+
+	private void readDataFromFile() {
+		if (isTW()) {
+			VRGwithTimeWindow.readFromFile(this);
+		} else {
+			VRG.readTableFromFile(this);
+		}
+		if (isVal()) {
+			// generateSolution();
+			generateRoutes();
+			fillAllStandart();
 		}
 	}
 
@@ -787,7 +798,7 @@ public class VRGframe extends JFrame {
 		setValueInFirstColumn(dtm);
 
 		for (int i = 1; i < dtm.getRowCount(); i++) {
-			dtm.setValueAt(getCoordinates(i).toString(), i, 1);
+			dtm.setValueAt(getStrCoordinates(i).toString(), i, 1);
 			dtm.setValueAt(getSecondCollumn(i), i, 2);
 			dtm.setValueAt(getLastCollumn(i), i, 3);
 		}
@@ -1104,12 +1115,12 @@ public class VRGframe extends JFrame {
 	private void fillColumnValueToResultTable() {
 		DefaultTableModel dtm = (DefaultTableModel) tableResult.getModel();
 
-		addRowCount(Math.max(VRG.countCars - dtm.getRowCount(), 0), dtm);
+		addRowCount(Math.max(getCountCars() - dtm.getRowCount(), 0), dtm);
 		int n = dtm.getRowCount();
 		if (dtm.getValueAt(n - 1, 0).equals(VRGUtils.TXT_IS_ALL)) {
 			n--;
 		}
-		for (int j = 0; j < n; j++) {
+		for (int j = 0; j < n - 1; j++) {
 			dtm.setValueAt(VRGUtils.SPACE + (j + 1) + VRGUtils.COMMA + VRGUtils.SPACE + VRGUtils.LABEL_WEIGHT + VRGUtils.SPACE
 					+ getCarsRows(j + 1), j, 0);
 		}
@@ -1250,15 +1261,17 @@ public class VRGframe extends JFrame {
 	java.awt.event.MouseAdapter coordsSelectionListener = new java.awt.event.MouseAdapter() {
 		@Override
 		public void mouseClicked(java.awt.event.MouseEvent evt) {
-			int row = tableCoordsDP.rowAtPoint(evt.getPoint());
-			int col = tableCoordsDP.columnAtPoint(evt.getPoint());
-			if (row >= 1 && col >= 1) {
-				generateCoordsValue(row, col);
-			}
-			if (row > 0 && col == 0) {
-				generateCoordsValue(row, 1);
-				generateCoordsValue(row, 2);
-				generateCoordsValue(row, 3);
+			if (!isTW()) {
+				int row = tableCoordsDP.rowAtPoint(evt.getPoint());
+				int col = tableCoordsDP.columnAtPoint(evt.getPoint());
+				if (row >= 1 && col >= 1) {
+					generateCoordsValue(row, col);
+				}
+				if (row > 0 && col == 0) {
+					generateCoordsValue(row, 1);
+					generateCoordsValue(row, 2);
+					generateCoordsValue(row, 3);
+				}
 			}
 		}
 	};
@@ -1271,10 +1284,12 @@ public class VRGframe extends JFrame {
 	java.awt.event.MouseAdapter carsSelectionListener = new java.awt.event.MouseAdapter() {
 		@Override
 		public void mouseClicked(java.awt.event.MouseEvent evt) {
-			int row = tableCars.rowAtPoint(evt.getPoint());
-			int col = tableCars.columnAtPoint(evt.getPoint());
-			if (row >= 0 && col >= 0 && tableCars.getValueAt(row, col) != null) {
-				generateCarsValue(row, col);
+			if (!isTW()) {
+				int row = tableCars.rowAtPoint(evt.getPoint());
+				int col = tableCars.columnAtPoint(evt.getPoint());
+				if (row >= 0 && col >= 0 && tableCars.getValueAt(row, col) != null) {
+					generateCarsValue(row, col);
+				}
 			}
 		}
 	};
@@ -1375,6 +1390,14 @@ public class VRGframe extends JFrame {
 			return VRGwithTimeWindow.getCountCars();
 		} else {
 			return VRG.getCountCars() - 1;
+		}
+	}
+
+	private String getStrCoordinates(int index) {
+		if (isTW()) {
+			return VRGwithTimeWindow.getCoords(index).toS();
+		} else {
+			return VRG.coordinates.get(index).toString();
 		}
 	}
 
