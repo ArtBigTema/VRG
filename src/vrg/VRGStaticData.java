@@ -16,6 +16,8 @@ public class VRGStaticData {
 	private Point max;
 	private Point min;
 	private long stop = 5;
+	private int maxTime = 10;
+	private int predMaxTime = 0;
 
 	int count = 0;
 
@@ -76,7 +78,17 @@ public class VRGStaticData {
 		PointT t = new PointT(random(min.x, max.x), random(min.y, max.y));
 		t.setDelay(0);
 		t.setEndPlace(random(min.x, max.x), random(min.y, max.y));
-		t.setTimeWindow(random(min.x, max.x), random(min.x, max.x));
+		t.setTimeWindow(random(predMaxTime, predMaxTime + predMaxTime / 3), random(maxTime, maxTime + maxTime / 3));
+
+		predMaxTime = (int) (maxTime + 2 * t.dis);
+		maxTime = (int) (maxTime + 5 * t.dis);// Math.max(maxTime, t.end);
+
+		int k = 1;
+		max.x = max.x + k;// Math.max(t.getEndPlace().x, t.getPoint().x);
+		max.y = max.y + k;// Math.max(t.getEndPlace().y, t.getPoint().y);
+		// min.x = min.x + k;
+		// min.y = min.y + k;
+		// max = new Point(min.x + 10, min.y + 10);
 		return t;
 	}
 
@@ -87,6 +99,14 @@ public class VRGStaticData {
 
 	public void setMaxPoint(int x, int y) {
 		max = new Point(x, y);
+	}
+
+	public void setMaxTime(int time) {
+		predMaxTime = time;
+		maxTime = time + 10;
+
+		min = new Point(time / 2, time / 2);
+		max = new Point(time, time);
 	}
 
 	public void setMinPoint(int x, int y) {

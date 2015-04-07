@@ -15,6 +15,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 	private static final boolean showGraph = true;
 	private static final boolean forTaxi = true;
 	private static boolean newForEach = false;
+	private static boolean addToTail = true;
 	private static VRGgraphOld frame;
 
 	public static final int MAX_TIME = 100;
@@ -42,13 +43,16 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 	public void generated(PointT t) {
 		newPointT.add(t);
 
-		if (newForEach) {
+		if (addToTail) {
+			if (addNewPoint(t)) {
+				updateGraph();
+			}
+		} else if (newForEach) {
 			coordinates.add(t);
 			openPlace();
 			sortX();
 			generateLengthRoutesAndTable();
 			solve();
-
 			updateGraph();
 		}
 	}
@@ -57,6 +61,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 	public void started() {
 		newForEach = !newForEach;// FIXME
 		optimalPoint = OptimalPoint.OptimalTime;
+
 	}
 
 	@Override
@@ -111,6 +116,12 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		out.flush();
 
 		showGraphIfNeed();
+
+		ArrayList<Double> delays = new ArrayList<Double>();
+		for (Pair p : cars) {
+			delays.add(p.delay);
+		}
+		data.setMaxTime(Collections.min(delays).intValue());
 
 		data.startTimer();// FIXME
 	}
@@ -608,6 +619,45 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		allIndexes.clear();
 	}
 
+	private static boolean addNewPoint(PointT t) {
+		PointT optimPlace = getOptimPlace(cars, t);
+		if (optimPlace == null) {
+			err("optim place not found");
+			return false;
+		} else {
+			coordinates.add(t);
+			p(coordinates.indexOf(t) + " " + t.toStr());
+		}
+		p("оптимально по " + optimalPoint.toString());
+		p(optimPlace.getEndPlace().toString() + " - " + optimPlace.toStr());
+
+		int carIndex = getNumOfCarsWithPlace(cars, optimPlace) - 1;// car.num
+		double waiting = t.start - cars.get(carIndex).delay - getDistance(cars.get(carIndex).getLastPoint(), t);
+		if (waiting < 0) {
+			waiting = 0.0;
+		}
+		if (t.end < cars.get(carIndex).delay + getDistance(cars.get(carIndex).getLastPoint(), t)) {
+			err("it's late");
+		}
+		p("ожидание пассажира " + df.format(waiting));
+		// routess.addSectionForIndex(carIndex, t.getPoint(),
+		// t.getEndPlace());
+		routess.addSectionForIndex(carIndex, t);
+
+		double endDD = cars.get(carIndex).delay + getDistance(cars.get(carIndex).getLastPoint(), t) + waiting + t.getDelay();
+		p("конечное время " + df.format(endDD));
+
+		Pair p = new Pair(endDD, coordinates.indexOf(t), cars.get(carIndex).num);
+		p.setLastPlace(t);
+		p.addDistance(getDistance(cars.get(carIndex).getLastPoint(), t) + t.getDistance());
+		cars.get(carIndex).setNewValue(p);
+
+		p(p.toStr());
+		p(cars.get(carIndex).toStr());
+		passedPath.add(t.close());
+		return true;
+	}
+
 	private static PointT getOptimPlace(ArrayList<Pair> cs, PointT t) {
 		switch (optimalPoint) {
 		case OptimalDistance:
@@ -625,7 +675,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		for (Pair car : cs) {
 			endTimes.add(car.delay + getDistance(car.getLastPoint(), t));
 		}
-		p(endTimes); // 8.5 10 8
+		p(endTimes);
 		double min = MAX_TIME;
 		int in = -1;
 		for (Double time : endTimes) {
