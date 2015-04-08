@@ -13,9 +13,9 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 	private static DecimalFormat df = new DecimalFormat("#.#");// FIXME
 	private static final PrintWriter out = new PrintWriter(System.out);
 	private static final boolean showGraph = true;
-	private static final boolean forTaxi = true;
-	private static boolean newForEach = false;
-	private static boolean addToTail = true;
+	private static final boolean forTaxi = false;// FIXME
+	private static boolean newForEach = true;
+	private static boolean addToTail = false;
 	private static VRGgraphOld frame;
 
 	public static final int MAX_TIME = 100;
@@ -24,8 +24,8 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 	public static final int[][] COORDS_END = { { 0, 0 }, { 1, 3 }, { 7, 4 }, { 7, 7 }, { 7, 1 }, { 2, 3 }, { 3, 2 }, { 5, 6 },
 			{ 4, 6 }, { 8, 4 } };
 	public static final int[] CARS_WEIGHT = { 3, 3, 5 };
-	public static final int[][] TIMES = { { 0, MAX_TIME }, { 1, 5 }, { 3, 7 }, { 5, 7 }, { 9, 20 }, { 15, 19 }, { 2, 3 },
-			{ 20, 30 }, { 1, 1 }, { 15, 18 } };
+	public static final int[][] TIMES = { { 0, MAX_TIME }, { 1, 5 }, { 3, 7 }, { 5, 7 }, { 9, 20 }, { 15, 19 }, { 6, 9 },
+			{ 20, 30 }, { 8, 9 }, { 15, 18 } };
 
 	public static ArrayList<Integer> carsWeight = new ArrayList<Integer>();
 	public static ArrayList<PointT> coordinates = new ArrayList<PointT>();
@@ -111,7 +111,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 
 		print();
 
-		optimalPoint = OptimalPoint.OptimalTime;
+		optimalPoint = OptimalPoint.OptimalDistance;
 		solve();// constructRoutes();//FIXME
 		out.flush();
 
@@ -320,6 +320,19 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		sort();
 	}
 
+	public static String getStringDifferenceBetweenSets() {
+		Set<Integer> arr = new HashSet<Integer>();
+		for (Point p : routess.getNoActivePoint()) {
+			for (PointT t : coordinates)
+				if (t.getPoint().equals(p))
+					arr.add(coordinates.indexOf(t));
+		}
+		if (arr.size() == 0) {
+			return "";
+		}
+		return VRGUtils.SPACE + VRGUtils.SLASH + VRGUtils.SPACE + arr.toString();
+	}
+
 	private static void printWithEnd() {
 		for (int i = 0; i < COORDS.length; i++) {
 			p(i + " " + COORDS[i][0] + " " + COORDS[i][1] + " - " + COORDS_END[i][0] + " " + COORDS_END[i][1] + ", "
@@ -479,7 +492,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 
 	public static void pp(List<PointT> pp) {
 		for (PointT p : pp) {
-			p(pp.indexOf(p) + " " + p.toS());
+			p(pp.indexOf(p) + " " + p.toStr());
 		}
 	}
 
@@ -537,6 +550,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 			// optimPlace.getEndPlace());
 			routess.addSectionForIndex(i, optimPlace);
 
+			optimPlace.setWaiting(optimPlace.start - cars.get(i).delay - getDistance(cars.get(i).getLastPoint(), optimPlace));
 			double endDD = cars.get(i).delay + getDistance(cars.get(i).getLastPoint(), optimPlace) + optimPlace.getDelay();
 
 			p("конечное время " + endDD);
@@ -570,6 +584,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 			PointT optimPlace = getOptimPlace(cars, t);
 			if (optimPlace == null) {
 				err("optim place not found");
+				routess.addNoActivePoint(t.getPoint());
 				continue;
 			}
 			p("оптимально по " + optimalPoint.toString());
@@ -580,8 +595,11 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 			if (waiting < 0) {
 				waiting = 0.0;
 			}
+			t.setWaiting(waiting);
 			if (t.end < cars.get(carIndex).delay + getDistance(cars.get(carIndex).getLastPoint(), t)) {
 				err("it's late");
+				routess.addNoActivePoint(t.getPoint());
+				continue;
 			}
 			p("ожидание пассажира " + df.format(waiting));
 			// routess.addSectionForIndex(carIndex, t.getPoint(),
@@ -610,11 +628,24 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		p("");
 		pr(cars);
 
-		for (Pair p : cars) {
-			routes.add(p.path);
+		for (Pair c : cars) {
+			routes.add(c.path);
+
+			double endDD = c.delay + getDistance(c.getLastPoint(), new Point(0, 0));
+			Pair p = new Pair(endDD, 0, c.num);
+			p.setLastPlace(new PointT(0, 0));
+			p.addDistance(getDistance(c.getLastPoint(), new Point(0, 0)));
+
+			PointT t = new PointT(c.getLastPoint());
+			t.setEndPlace(0, 0);
+
+			routess.addSectionForIndex(cars.indexOf(c), t);
+
+			c.setNewValue(p);
 		}
 
 		p(routess);
+		routess.checkNoActPoint(passedPath);
 		passedPath.clear();
 		allIndexes.clear();
 	}
@@ -623,6 +654,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		PointT optimPlace = getOptimPlace(cars, t);
 		if (optimPlace == null) {
 			err("optim place not found");
+			routess.addNoActivePoint(t.getPoint());// FIXME
 			return false;
 		} else {
 			coordinates.add(t);
@@ -638,6 +670,8 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		}
 		if (t.end < cars.get(carIndex).delay + getDistance(cars.get(carIndex).getLastPoint(), t)) {
 			err("it's late");
+			routess.addNoActivePoint(t);// FIXME
+			return false;
 		}
 		p("ожидание пассажира " + df.format(waiting));
 		// routess.addSectionForIndex(carIndex, t.getPoint(),
@@ -712,6 +746,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 
 		if (min == MAX_TIME) {
 			err("see getOptimPlaceForDistance not found optim ");
+			return null;
 		}
 
 		p(in + " =index, min= " + min);
@@ -752,6 +787,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 				if (distance > end) {
 					p("Не успеем");// FIXME close place
 					t.close();
+					// routess.addNoActivePoint(t);//FIXME
 				} else {
 					if (distance < start) {
 						p("успеем и ждём");
@@ -834,6 +870,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 			if (distance > end) {
 				p("Закрываем, всё равно не успеем");
 				t.close();
+				routess.addNoActivePoint(t.getPoint());// FIXME
 			}
 		}
 		p("");
@@ -918,11 +955,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 
 		public Pair(double d, int i, int n) {
 			path = new ArrayList<Integer>();
-			if (i != 0) {// FIXME
-				delay = d;
-			} else {
-				delay = 0;
-			}
+			delay = d;
 			num = n;
 			place = i;
 			path.add(i);
@@ -980,7 +1013,11 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 
 		@Override
 		public String toString() {
-			return "Num: " + num + ", delay: " + delay + ",  lastPlace: " + place;
+			// return "Num: " + num + ", delay: " + delay + ",  lastPlace: " +
+			// place;
+			return "Num: " + num + ", delay: " + df.format(delay) + ", " + path.toString() + ", dis: " + df.format(distance)
+					+ "\n";
+
 		}
 	}
 
@@ -995,6 +1032,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		public boolean flag;
 		public Point endPlace; // PointT
 		public double dis;
+		public double waiting;
 
 		public PointT(int xx, int yy) {
 			super(xx, yy);
@@ -1007,6 +1045,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 			delay = 1;
 			flag = false;
 			dis = 0;
+			waiting = 0;
 		}
 
 		public PointT(Point t) {
@@ -1073,6 +1112,10 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 			return endPlace;
 		}
 
+		public void setWaiting(double w) {
+			waiting = w;
+		}
+
 		public String toSt() {
 			return flag + " (" + x + ", " + y + ") to " + endPlace.toString() + " " + start + " to " + end + ", distance "
 					+ df.format(dis);
@@ -1080,7 +1123,8 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 
 		public String toS() {
 			if (endPlace == null) {
-				return flag + " " + x + ", " + y + "\t" + start + " - " + end + ", end ";
+				return " (" + x + ", " + y + "),  (" + df.format(r) + ", " + df.format(f) + VRGUtils.DEEGRES + ")";
+				// ", end ";
 			} else {
 				return "(" + x + "; " + y + ") " + VRGUtils.ARROW + " " + endPlace.toString();
 			}
@@ -1089,7 +1133,7 @@ public class VRGwithTimeWindow implements VRGgeneratorListener {
 		public String toStr() {
 			return "Активность " + flag + " Декартовы: (" + x + ", " + y + ")," + "\t" + "Полярные: (" + df.format(r) + ", "
 					+ df.format(f) + VRGUtils.DEEGRES + ")," + "\t" + "Окна: (" + start + ", " + end
-					+ "),\tЗадержка в городе: " + delay;
+					+ "),\tЗадержка в городе: " + delay + "\tОжидание клиента: " + waiting;
 		}
 
 		@Override
