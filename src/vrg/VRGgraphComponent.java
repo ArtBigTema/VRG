@@ -83,7 +83,7 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 		}
 		removeAllVertexes(graph);
 		vrgVertexes.clear();
-		setZoomIfNeed(withTimeWindow);// FIXME
+		setZoomIfNeed(withTimeWindow);
 
 		Vertex vertexA = new Vertex(translateX + coordinates.get(0).x * distance, translateY + coordinates.get(0).y * distance,
 				VRGUtils.LABEL_BASE);
@@ -247,11 +247,19 @@ public class VRGgraphComponent extends JGraphComponent implements VRGframe.onSpa
 
 	@Override
 	public void paint(Graphics g) {
+		if (g == null) {
+			return;
+		}
 		if (withBackground) {
 			g.drawImage(VRGUtils.getImageForGraph().getImage(), 0, 0, g.getClipBounds().width, g.getClipBounds().height, null);
 		}
+		try {
+			super.paint(g);
+		} catch (Exception exception) {
+			// exception.printStackTrace();
+			return;
+		}
 
-		super.paint(g);
 		VRGUtils.paintCarcass(g.create());
 		if (isCompleted) {
 			g.drawOval(translateX + coordinates.get(0).x * distance - VRGUtils.radius, translateY + coordinates.get(0).y
