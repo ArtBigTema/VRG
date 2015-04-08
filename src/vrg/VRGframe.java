@@ -1049,6 +1049,8 @@ public class VRGframe extends JFrame {
 	}
 
 	private void fillValueToResultTable(String s) {
+		fillCoordsTable((DefaultTableModel) tableCoordsDP.getModel());// FIXME
+		fillRoutesTable();// FIXME
 		DefaultTableModel dtm = (DefaultTableModel) tableResult.getModel();
 
 		int n = dtm.getRowCount();
@@ -1073,7 +1075,8 @@ public class VRGframe extends JFrame {
 
 		for (int j = 0; j < n; j++) {
 			// Fourth column is weight or delay of routes
-			dtm.setValueAt(getRoutesWeight(j), j, 3);// FIXME
+			// dtm.setValueAt(getRoutesWeight(j), j, 3);// FIXME
+			dtm.setValueAt(getRoutesStrWeight(j), j, 3);
 		}
 
 		for (int j = 0; j < n; j++) {
@@ -1081,9 +1084,7 @@ public class VRGframe extends JFrame {
 			dtm.setValueAt(VRGUtils.get(getBenefit(j)), j, 4);
 		}
 
-		if (!isTW()) {
-			setLastStroke(dtm);// FIXME
-		}
+		setLastStroke(dtm);
 	}
 
 	private void setLastStroke(DefaultTableModel dtm) {
@@ -1092,7 +1093,7 @@ public class VRGframe extends JFrame {
 			return;
 		}
 		Double result = 0D;
-		dtm.setValueAt(VRGUtils.TXT_GRAPH + VRG.getStringDifferenceBetweenSets(), dtm.getRowCount() - 1, 1);
+		dtm.setValueAt(VRGUtils.TXT_GRAPH + getDiff(), dtm.getRowCount() - 1, 1);
 
 		for (int j = 0; j < n; j++) {
 			result += VRGUtils.getDouble(dtm.getValueAt(j, 2));
@@ -1101,9 +1102,9 @@ public class VRGframe extends JFrame {
 
 		result = 0D;
 		for (int j = 0; j < n; j++) {
-			result += VRGUtils.getIntFromObject(dtm.getValueAt(j, 3));
+			result += VRGUtils.getDouble(dtm.getValueAt(j, 3));
 		}
-		dtm.setValueAt(result.intValue(), dtm.getRowCount() - 1, 3);
+		dtm.setValueAt(VRGUtils.get(result), dtm.getRowCount() - 1, 3);
 
 		result = 0D;
 		for (int j = 0; j < n; j++) {
@@ -1361,6 +1362,14 @@ public class VRGframe extends JFrame {
 		}
 	}
 
+	private String getRoutesStrWeight(int j) {
+		if (isTW()) {
+			return VRGUtils.df.format(VRGwithTimeWindow.getDelayOfRoutes(j));// FIXME
+		} else {
+			return String.valueOf(VRG.getRoutesWeight(j));
+		}
+	}
+
 	private Double getLengthOfRoutes(int j) {
 		if (isTW()) {
 			return VRGwithTimeWindow.getLengthOfRoutes(j);// FIXME
@@ -1398,6 +1407,14 @@ public class VRGframe extends JFrame {
 			return VRGwithTimeWindow.getCoords(index).toS();
 		} else {
 			return VRG.coordinates.get(index).toString();
+		}
+	}
+
+	private String getDiff() {
+		if (isTW()) {
+			return VRGwithTimeWindow.getStringDifferenceBetweenSets();
+		} else {
+			return VRG.getStringDifferenceBetweenSets();
 		}
 	}
 
