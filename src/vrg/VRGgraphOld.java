@@ -185,11 +185,12 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 					vertex.vertexCoords = new VRGvertexes.VertexCoords(s.getStart(), s.getEnd());
 
-					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { vertex.startObjectVertex });
-					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "red", new Object[] { vertex.endObjectVertex });
-					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "green",
+					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "gray", new Object[] { vertex.startObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "gray", new Object[] { vertex.endObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "gray",
 							new Object[] { vertex.startObjectVertex });
-					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "red", new Object[] { vertex.endObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "gray",
+							new Object[] { vertex.endObjectVertex });
 					graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2),
 							new Object[] { vertex.startObjectVertex });
 					graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2),
@@ -239,13 +240,26 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			Object v = graph.insertVertex(parent, null, getFirstRoute(i).toString(),
 					translateX + getFirstRoute(i).x * distance, translateY + getFirstRoute(i).y * distance, w, h);
 
-			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { v });
-			graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "green", new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "gray", new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "gray", new Object[] { v });
 			graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2), new Object[] { v });
 			graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "black", new Object[] { v });
 
 			graph.insertEdge(parent, null, VRGroutes.getStrDistance(new Point(0, 0), getFirstRoute(i)), ports.get(i), v,
 					VRGUtils.GRAPH_PARAM_3);
+		}
+		insertNoActivePoint(graph);
+	}
+
+	private void insertNoActivePoint(mxGraph graph) {
+		for (VRGUtils.Point p : routess.getNoActivePoint()) {
+			Object v = graph.insertVertex(graph.getDefaultParent(), null, p.toString(), translateX + p.x * distance, translateY
+					+ p.y * distance, w, h );
+
+			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "white", new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "white", new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef*2), new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "black", new Object[] { v });
 		}
 	}
 
