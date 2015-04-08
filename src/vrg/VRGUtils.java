@@ -405,5 +405,9 @@ public class VRGUtils {
 		public String toString() {
 			return "(" + x + "; " + y + ") ";
 		}
+
+		public boolean equals(Point t) {
+			return (x == t.x) && (y == t.y);
+		}
 	}
 }
