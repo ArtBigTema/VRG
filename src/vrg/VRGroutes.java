@@ -114,13 +114,16 @@ public class VRGroutes {
 
 	public ArrayList<Route> routes;
 	public Point depo;
+	public ArrayList<Point> noActivePoint;
 
 	public VRGroutes() {
 		routes = new ArrayList<Route>();
+		noActivePoint = new ArrayList<Point>();
 	}
 
 	public VRGroutes(VRGroutes r) {
 		routes = new ArrayList<Route>(r.getRoutes());
+		noActivePoint = new ArrayList<Point>(r.getNoActivePoint());
 		setDepo(r.getDepo());
 	}
 
@@ -174,7 +177,6 @@ public class VRGroutes {
 	public void addDepo() {
 		for (int i = 0; i < getCountRoutess(); i++) {
 			routes.get(i).addSection(new Point(0, 0), new Point(0, 0));
-			// routes.get(i).addSection(coordinates.get(0));
 			// routes.get(i).addSection(new Point(0, 0));
 		}
 		setDepo(new Point(0, 0));
@@ -212,6 +214,28 @@ public class VRGroutes {
 
 	public static String getStrDistance(Point p1, Point p2) {
 		return df.format(getDistance(p1, p2));
+	}
+
+	public void addNoActivePoint(Point p) {
+		noActivePoint.add(p);
+	}
+
+	public void checkNoActPoint(ArrayList<PointT> arr) {
+		for (PointT p : arr) {
+			for (Point t : noActivePoint) {
+				if (p.getPoint().equals(t)) {
+					noActivePoint.remove(p);
+				}
+			}
+		}
+	}
+
+	public void addNoActivePoint(ArrayList<Point> p) {
+		noActivePoint.addAll(p);
+	}
+
+	public ArrayList<Point> getNoActivePoint() {
+		return noActivePoint;
 	}
 
 	@Override
@@ -259,6 +283,5 @@ public class VRGroutes {
 				return "Отсортировано по Y";
 			}
 		}
-
 	}
 }
