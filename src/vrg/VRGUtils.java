@@ -83,6 +83,7 @@ public class VRGUtils {
 			+ "entryX=0;entryY=1;entryPerimeter=0;";
 	public static final String GRAPH_PARAM_3 = "strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;";
 	public static final String GRAPH_PARAM_4 = "strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;";
+    public static final String GRAPH_PARAM_5 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
 
 	public static final String MSG_INIT = "Здесь будет отображаться Ваш граф" + "\n"
 			+ "Чтобы сгенерировать другой маршрут нажмите пробел (spase)" + "\n"
@@ -337,7 +338,7 @@ public class VRGUtils {
 
 	public static ImageIcon getImageForGraph() {
 		File f;
-		if (Math.random() * 100 % 2 == 0) {
+		if (System.currentTimeMillis() % 2 == 0) {
 			f = new File("resources/backCountry.jpg");
 		} else {
 			f = new File("resources/backSamara.jpg");
