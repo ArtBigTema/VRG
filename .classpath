@@ -6,5 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="C:/Users/Артем/workspace/Avrg/libs/graph.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Артем/workspace/Avrg/libs/io.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Артем/workspace/Avrg/libs/json-simple.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Артем/workspace/Avrg/libs/org.json-20120521.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Артем/workspace/Avrg/libs/guava.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
