@@ -115,10 +115,12 @@ public class VRGroutes {
 	public ArrayList<Route> routes;
 	public Point depo;
 	public ArrayList<Point> noActivePoint;
+	public ArrayList<Integer> load;
 
 	public VRGroutes() {
 		routes = new ArrayList<Route>();
 		noActivePoint = new ArrayList<Point>();
+		load = new ArrayList<Integer>();
 	}
 
 	public VRGroutes(VRGroutes r) {
@@ -164,6 +166,7 @@ public class VRGroutes {
 
 	public void clear() {
 		this.routes.clear();
+		this.noActivePoint.clear();
 	}
 
 	public void addSectionForIndex(int i, Point s, Point e) {
@@ -222,11 +225,12 @@ public class VRGroutes {
 
 	public void checkNoActPoint(ArrayList<PointT> arr) {
 		for (PointT p : arr) {
-			for (Point t : noActivePoint) {
-				if (p.getPoint().equals(t)) {
-					noActivePoint.remove(p);
+			if (noActivePoint != null && noActivePoint.size() > 0)
+				for (Point t : noActivePoint) {
+					if (p.getPoint().equals(t)) {
+						// noActivePoint.remove(t);
+					}
 				}
-			}
 		}
 	}
 
@@ -236,6 +240,30 @@ public class VRGroutes {
 
 	public ArrayList<Point> getNoActivePoint() {
 		return noActivePoint;
+	}
+
+	public void setLoad(ArrayList<Integer> l) {
+		load.addAll(l);
+	}
+
+	public void setLoad(Integer l) {
+		load.add(l);
+	}
+
+	public void setLoad(int index, Integer l) {
+		load.set(index, l);
+	}
+
+	public int getLoad(Integer i) {
+		return load.get(i);
+	}
+
+	public boolean decLoad(Integer i) {
+		load.set(i, load.get(i) - 1);
+		if (load.get(i) <= 0) {
+			return true;
+		} else
+			return false;
 	}
 
 	@Override
