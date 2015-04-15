@@ -94,7 +94,7 @@ public class VRGgraphOld extends javax.swing.JFrame {
 		this.setSize(w, h);
 		this.setVisible(true);
 
-		// graphComponent.setBackgroundImage(VRGUtils.getImageForGraph());
+		 graphComponent.setBackgroundImage(VRGUtils.getImageForGraph());
 		repaint();
 		invalidate();
 
@@ -185,12 +185,14 @@ public class VRGgraphOld extends javax.swing.JFrame {
 
 					vertex.vertexCoords = new VRGvertexes.VertexCoords(s.getStart(), s.getEnd());
 
-					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "gray", new Object[] { vertex.startObjectVertex });
-					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "gray", new Object[] { vertex.endObjectVertex });
-					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "gray",
+					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { vertex.startObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "red", new Object[] { vertex.endObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "green",
 							new Object[] { vertex.startObjectVertex });
-					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "gray",
-							new Object[] { vertex.endObjectVertex });
+					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "green",
+							new Object[] { vertex.objectVertex });
+					graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "red", new Object[] { vertex.endObjectVertex });
+
 					graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2),
 							new Object[] { vertex.startObjectVertex });
 					graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2),
@@ -240,8 +242,8 @@ public class VRGgraphOld extends javax.swing.JFrame {
 			Object v = graph.insertVertex(parent, null, getFirstRoute(i).toString(),
 					translateX + getFirstRoute(i).x * distance, translateY + getFirstRoute(i).y * distance, w, h);
 
-			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "gray", new Object[] { v });
-			graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "gray", new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "green", new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "green", new Object[] { v });
 			graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2), new Object[] { v });
 			graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "black", new Object[] { v });
 
@@ -254,11 +256,11 @@ public class VRGgraphOld extends javax.swing.JFrame {
 	private void insertNoActivePoint(mxGraph graph) {
 		for (VRGUtils.Point p : routess.getNoActivePoint()) {
 			Object v = graph.insertVertex(graph.getDefaultParent(), null, p.toString(), translateX + p.x * distance, translateY
-					+ p.y * distance, w, h );
+					+ p.y * distance, w, h);
 
 			graph.setCellStyles(mxConstants.STYLE_FILLCOLOR, "white", new Object[] { v });
 			graph.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, "white", new Object[] { v });
-			graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef*2), new Object[] { v });
+			graph.setCellStyles(mxConstants.STYLE_FONTSIZE, String.valueOf(coef * 2), new Object[] { v });
 			graph.setCellStyles(mxConstants.STYLE_FONTCOLOR, "black", new Object[] { v });
 		}
 	}
@@ -306,12 +308,15 @@ public class VRGgraphOld extends javax.swing.JFrame {
 					index = in;// rollback
 					continue;
 				}
-				graph.insertEdge(
-						parent,
-						null,
-						VRGroutes.getStrDistance(vrgVertexes.get(index).getSection().getEnd(), vrgVertexes.get(in).getSection()
-								.getStart()), vrgVertexes.get(index).endObjectVertex, vrgVertexes.get(in).startObjectVertex,
-						VRGUtils.GRAPH_PARAM_4);
+				if (VRGroutes.getDistance(vrgVertexes.get(index).getSection().getEnd(), vrgVertexes.get(in).getSection()
+						.getStart()) != 0.0) {
+					graph.insertEdge(
+							parent,
+							null,
+							VRGroutes.getStrDistance(vrgVertexes.get(index).getSection().getEnd(), vrgVertexes.get(in)
+									.getSection().getStart()), vrgVertexes.get(index).endObjectVertex,
+							vrgVertexes.get(in).startObjectVertex, VRGUtils.GRAPH_PARAM_4);
+				}
 				index = in;
 			}
 		}

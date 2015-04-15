@@ -1049,9 +1049,9 @@ public class VRGframe extends JFrame {
 	}
 
 	private void fillValueToResultTable(String s) {
-		fillCoordsTable((DefaultTableModel) tableCoordsDP.getModel());// FIXME
-		fillRoutesTable();// FIXME
 		DefaultTableModel dtm = (DefaultTableModel) tableResult.getModel();
+		fillCoordsTable(dtm);// FIXME
+		fillRoutesTable();// FIXME
 
 		int n = dtm.getRowCount();
 		if (!s.equals("") || dtm.getValueAt(n - 1, 0).equals(VRGUtils.TXT_IS_ALL)) {
@@ -1351,14 +1351,6 @@ public class VRGframe extends JFrame {
 			return VRGwithTimeWindow.getLengthOfRoutes(j);// FIXME
 		} else {
 			return VRG.getBenefit(j);
-		}
-	}
-
-	private Integer getRoutesWeight(int j) {
-		if (isTW()) {
-			return VRGwithTimeWindow.getDelayOfRoutes(j).intValue();// FIXME
-		} else {
-			return VRG.getRoutesWeight(j);
 		}
 	}
 
