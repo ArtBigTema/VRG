@@ -83,7 +83,7 @@ public class VRGUtils {
 			+ "entryX=0;entryY=1;entryPerimeter=0;";
 	public static final String GRAPH_PARAM_3 = "strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;";
 	public static final String GRAPH_PARAM_4 = "strokeColor=green;edgeStyle=Loop;dashed=1;entryX=0;entryPerimeter=1;exitPerimeter=0;";
-    public static final String GRAPH_PARAM_5 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
+	public static final String GRAPH_PARAM_5 = "shape=and;fillColor=#ff0000;gradientColor=#ffffff;shadow=1";
 
 	public static final String MSG_INIT = "Здесь будет отображаться Ваш граф" + "\n"
 			+ "Чтобы сгенерировать другой маршрут нажмите пробел (spase)" + "\n"
@@ -205,6 +205,14 @@ public class VRGUtils {
 
 	public static void showErrorMess(java.awt.Component frame, String title, String body) {
 		showMessage(frame, title, body, JOptionPane.ERROR_MESSAGE);
+	}
+
+	public static void showErrorMess(java.awt.Component frame) {
+		showMessage(frame, VRGUtils.MSG_ERR_TITLE, VRGUtils.MSG_ERR_BODY_NULL, JOptionPane.ERROR_MESSAGE);
+	}
+
+	public static void showErrorMess(java.awt.Component frame, String body) {
+		showMessage(frame, VRGUtils.MSG_ERR_TITLE, body, JOptionPane.ERROR_MESSAGE);
 	}
 
 	public static void showQuestionMess(java.awt.Component frame, String title, String body) {
